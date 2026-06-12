@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Resume template thumbnail placeholder</title>
+  <desc id="desc">A neutral placeholder shown when a resume template thumbnail is unavailable.</desc>
+  <rect width="800" height="1000" fill="#f8fafc"/>
+  <rect x="118" y="96" width="564" height="808" rx="10" fill="#ffffff" stroke="#e5e7eb" stroke-width="4"/>
+  <rect x="168" y="154" width="246" height="28" rx="6" fill="#111827"/>
+  <rect x="168" y="202" width="164" height="16" rx="4" fill="#6366f1"/>
+  <rect x="168" y="266" width="464" height="12" rx="4" fill="#d1d5db"/>
+  <rect x="168" y="296" width="418" height="12" rx="4" fill="#e5e7eb"/>
+  <rect x="168" y="326" width="440" height="12" rx="4" fill="#e5e7eb"/>
+  <rect x="168" y="402" width="152" height="16" rx="4" fill="#111827"/>
+  <rect x="168" y="448" width="456" height="12" rx="4" fill="#d1d5db"/>
+  <rect x="168" y="478" width="380" height="12" rx="4" fill="#e5e7eb"/>
+  <rect x="168" y="508" width="430" height="12" rx="4" fill="#e5e7eb"/>
+  <rect x="168" y="584" width="118" height="16" rx="4" fill="#111827"/>
+  <rect x="168" y="630" width="134" height="34" rx="17" fill="#eef2ff"/>
+  <rect x="318" y="630" width="112" height="34" rx="17" fill="#eef2ff"/>
+  <rect x="446" y="630" width="152" height="34" rx="17" fill="#eef2ff"/>
+  <rect x="168" y="704" width="168" height="16" rx="4" fill="#111827"/>
+  <rect x="168" y="750" width="428" height="12" rx="4" fill="#d1d5db"/>
+  <rect x="168" y="780" width="384" height="12" rx="4" fill="#e5e7eb"/>
+</svg>
