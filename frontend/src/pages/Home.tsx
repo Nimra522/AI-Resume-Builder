@@ -37,10 +37,6 @@ export const Home: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Hero Text */}
           <div className="space-y-8 z-10">
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-100 text-primary text-sm font-medium">
-              <span className="flex h-2 w-2 rounded-full bg-primary mr-2"></span>
-              v1.0 Now Live 
-            </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-main leading-tight tracking-tight">
               Create Your Professional <br />
               <span className="text-primary">Resume in Minutes</span>

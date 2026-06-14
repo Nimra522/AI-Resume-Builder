@@ -86,6 +86,18 @@ export interface Certification {
   date: string;
 }
 
+export interface Language {
+  id: string;
+  name: string;
+  proficiency: string;
+}
+
+export interface AdditionalInfo {
+  id: string;
+  label: string;
+  value: string;
+}
+
 export interface ResumeData {
   personalInfo: {
     fullName: string;
@@ -102,6 +114,8 @@ export interface ResumeData {
   skills: string[];
   projects: Project[];
   certifications: Certification[];
+  languages: Language[];
+  additionalInfo: AdditionalInfo[];
 }
 
 export interface Template {

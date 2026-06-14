@@ -243,4 +243,6 @@ export const INITIAL_RESUME_DATA = {
   skills: [],
   projects: [],
   certifications: [],
+  languages: [],
+  additionalInfo: [],
 };

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ResumeData, Experience, Education, Project, Certification } from '../../types';
+import { ResumeData, Experience, Education, Project, Certification, Language, AdditionalInfo } from '../../types';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { FormSection } from '../ui/FormSection';
-import { Plus, User, Briefcase, GraduationCap, Code, FolderGit2, Award, ChevronUp, ChevronDown } from 'lucide-react';
+import { Plus, User, Briefcase, GraduationCap, Code, FolderGit2, Award, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Languages, Info, Eye } from 'lucide-react';
 import { LOCATION_OPTIONS, LocationOption } from '../../data/locations';
 import { FAQExamples } from '../faq/FAQExamples';
 
