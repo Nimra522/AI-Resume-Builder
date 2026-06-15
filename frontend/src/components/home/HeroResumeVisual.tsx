@@ -1,5 +1,5 @@
 import React from 'react';
-import { Briefcase, GraduationCap, Mail, MapPin, Phone } from 'lucide-react';
+import { ArrowRight, Briefcase, GraduationCap, Mail, MapPin, Phone, Sparkles } from 'lucide-react';
 
 const skills = ['Product Strategy', 'ATS Writing', 'Analytics', 'Leadership'];
 
@@ -18,25 +18,102 @@ const experience = [
   },
 ];
 
+const aiSuggestions = [
+  'Tailored your resume for higher ATS screening success.',
+  'Generated role-specific content to strengthen your application.',
+];
+
 export const HeroResumeVisual: React.FC = () => {
+  const floatingCards = [
+    {
+      label: 'ATS Score',
+      value: '92',
+      tone: 'bg-emerald-50 text-emerald-700 border-emerald-100 shadow-emerald-100/80',
+      position: 'top-right',
+    },
+    {
+      label: 'AI Suggestions',
+      value: '8',
+      tone: 'bg-sky-50 text-sky-700 border-sky-100 shadow-sky-100/80',
+      position: 'bottom-left',
+    },
+    {
+      label: 'Resume Analysis',
+      value: '96%',
+      tone: 'bg-indigo-50 text-indigo-700 border-indigo-100 shadow-indigo-100/80',
+      position: 'bottom-right',
+    },
+  ];
+
   return (
-    <div className="relative w-full max-w-[520px] mx-auto">
-      <div className="relative bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+    <div className="relative w-full max-w-[390px] lg:max-w-[410px] mx-auto overflow-visible">
+      <div className="group relative bg-white rounded-none shadow-2xl border border-gray-100 overflow-visible scale-[0.84] origin-top lg:scale-[0.86]">
+        {floatingCards.map((card) => {
+          const positionClass =
+            card.position === 'top-right'
+              ? 'absolute -right-1 top-3 z-10 lg:-right-3 lg:top-4'
+              : card.position === 'bottom-left'
+                ? 'absolute -left-5 top-[85%] z-10 lg:-left-7 lg:top-[93%]'
+                : 'absolute -right-1 bottom-5 z-10 lg:-right-2 lg:bottom-6';
+
+          if (card.label === 'AI Suggestions') {
+            return (
+              <div key={card.label} className={`${positionClass} transition duration-300 group-hover:-translate-y-1 group-hover:scale-[1.02]`}>
+                <div className="w-[212px] rounded-[18px] border border-sky-100 bg-gradient-to-br from-sky-50 to-white p-1.75 shadow-lg shadow-sky-100/70 backdrop-blur transition duration-300 group-hover:-translate-y-1 group-hover:shadow-xl sm:w-[228px]">
+                  <div className="mb-1.5 flex items-center gap-2">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-xl bg-white text-sky-700 shadow-sm">
+                      <Sparkles size={10} className="fill-current" />
+                    </span>
+                    <div>
+                      <p className="text-[9px] font-semibold text-sky-900">AI-powered ideas:</p>
+                      <p className="text-[8px] uppercase tracking-[0.18em] text-sky-700/80">AI Suggestions</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.25">
+                    {aiSuggestions.map((item) => (
+                      <div
+                        key={item}
+                        className="flex items-center gap-2.5 rounded-xl bg-white/90 p-1.75 transition duration-200 hover:bg-white hover:shadow-sm"
+                      >
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-sky-600 text-white shadow-sm">
+                          <ArrowRight size={10} />
+                        </span>
+                        <p className="text-[9px] font-medium leading-snug text-sky-900">{item}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div key={card.label} className={`${positionClass} transition duration-300 group-hover:-translate-y-1 group-hover:scale-[1.03]`}>
+              <div
+                className={`rounded-2xl border px-3 py-2 shadow-lg backdrop-blur transition duration-300 group-hover:-translate-y-0.5 group-hover:shadow-xl ${card.tone}`}
+              >
+                <p className="text-[9px] uppercase tracking-[0.18em] opacity-80">{card.label}</p>
+                <p className="text-sm font-bold">{card.value}</p>
+              </div>
+            </div>
+          );
+        })}
         <div className="h-3 bg-gradient-to-r from-primary via-indigo-400 to-cyan-400" />
 
-        <div className="p-6 sm:p-8">
-          <div className="flex items-start gap-4 pb-6 border-b border-gray-100">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-100 to-cyan-100 border border-indigo-100 flex items-center justify-center shadow-inner">
-              <div className="w-11 h-11 rounded-full bg-primary text-white flex items-center justify-center text-lg font-bold">
+        <div className="p-3 sm:p-3.5 lg:p-4.5">
+          <div className="flex items-start gap-3 pb-3.5 border-b border-gray-100">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-cyan-100 border border-indigo-100 flex items-center justify-center shadow-inner">
+              <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
                 AR
               </div>
             </div>
 
             <div className="min-w-0 flex-1">
-              <p className="text-2xl font-bold text-text-main leading-tight">Ariana Reed</p>
-              <p className="text-sm font-semibold text-primary mt-1">Senior Product Manager</p>
+              <p className="text-lg font-bold text-text-main leading-tight">Ariana Reed</p>
+              <p className="text-xs font-semibold text-primary mt-1">Senior Product Manager</p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4 text-[11px] text-text-muted">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 mt-1.5 text-[8px] text-text-muted">
                 <span className="flex items-center gap-1.5">
                   <Mail size={12} className="text-primary" />
                   ariana.reed@email.com
@@ -53,8 +130,8 @@ export const HeroResumeVisual: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-[1fr_0.78fr] gap-6 pt-6">
-            <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-[1fr_0.78fr] gap-3.5 pt-3.5">
+            <div className="space-y-2">
               <section>
                 <div className="flex items-center gap-2 mb-3">
                   <div className="h-2 w-2 rounded-full bg-primary" />
@@ -62,7 +139,7 @@ export const HeroResumeVisual: React.FC = () => {
                     Summary
                   </h3>
                 </div>
-                <p className="text-xs leading-relaxed text-text-muted">
+                <p className="text-[9px] leading-relaxed text-text-muted">
                   Strategic product leader with 7+ years building user-centered workflows,
                   improving resume review journeys, and translating customer insights into
                   measurable growth.
@@ -70,27 +147,27 @@ export const HeroResumeVisual: React.FC = () => {
               </section>
 
               <section>
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-3">
                   <Briefcase size={14} className="text-primary" />
                   <h3 className="text-xs font-black uppercase tracking-[0.18em] text-text-main">
                     Experience
                   </h3>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {experience.map((item) => (
                     <div key={`${item.role}-${item.company}`} className="relative pl-5">
                       <div className="absolute left-0 top-1.5 h-2.5 w-2.5 rounded-full bg-white border-2 border-primary" />
                       <div className="absolute left-[4px] top-5 bottom-[-16px] w-px bg-indigo-100 last:hidden" />
                       <div className="flex flex-col gap-1">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                          <p className="text-sm font-bold text-text-main">{item.role}</p>
+                          <p className="text-xs font-bold text-text-main">{item.role}</p>
                           <p className="text-[10px] font-semibold text-primary bg-indigo-50 rounded-full px-2 py-0.5 w-fit">
                             {item.period}
                           </p>
                         </div>
-                        <p className="text-xs font-semibold text-text-muted">{item.company}</p>
-                        <p className="text-[11px] leading-relaxed text-gray-500">{item.detail}</p>
+                        <p className="text-[10px] font-semibold text-text-muted">{item.company}</p>
+                        <p className="text-[9px] leading-relaxed text-gray-500">{item.detail}</p>
                       </div>
                     </div>
                   ))}
@@ -98,19 +175,19 @@ export const HeroResumeVisual: React.FC = () => {
               </section>
             </div>
 
-            <div className="space-y-6">
-              <section className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                <h3 className="text-xs font-black uppercase tracking-[0.18em] text-text-main mb-4">
+            <div className="space-y-3">
+              <section className="bg-gray-50 rounded-none p-2 border border-gray-100">
+                <h3 className="text-[9px] font-black uppercase tracking-[0.18em] text-text-main mb-1.5">
                   Skills
                 </h3>
                 <div className="space-y-3">
                   {skills.map((skill, index) => (
                     <div key={skill}>
-                      <div className="flex justify-between gap-3 text-[11px] font-semibold text-text-main mb-1.5">
+                      <div className="flex justify-between gap-3 text-[9px] font-semibold text-text-main mb-1">
                         <span>{skill}</span>
                         <span className="text-primary">{92 - index * 6}%</span>
                       </div>
-                      <div className="h-1.5 rounded-full bg-white overflow-hidden">
+                      <div className="h-1 rounded-full bg-white overflow-hidden">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-primary to-cyan-400"
                           style={{ width: `${92 - index * 6}%` }}
@@ -121,25 +198,25 @@ export const HeroResumeVisual: React.FC = () => {
                 </div>
               </section>
 
-              <section className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+              <section className="bg-white rounded-none p-1.5 border border-gray-100 shadow-sm">
                 <div className="flex items-center gap-2 mb-3">
                   <GraduationCap size={14} className="text-primary" />
                   <h3 className="text-xs font-black uppercase tracking-[0.18em] text-text-main">
                     Education
                   </h3>
                 </div>
-                <p className="text-sm font-bold text-text-main">MBA, Product Leadership</p>
-                <p className="text-xs text-text-muted mt-1">Stanford Graduate School</p>
-                <p className="text-[11px] text-primary font-semibold mt-2">2017 - 2019</p>
+                <p className="text-[10px] font-bold text-text-main">MBA, Product Leadership</p>
+                <p className="text-[9px] text-text-muted mt-0.5">Stanford Graduate School</p>
+                <p className="text-[9px] text-primary font-semibold mt-1">2017 - 2019</p>
               </section>
 
-              <section className="rounded-2xl p-4 bg-primary text-white shadow-lg">
-                <p className="text-[11px] font-semibold text-indigo-100 uppercase tracking-[0.16em]">
+              <section className="rounded-none p-1.5 bg-primary text-white shadow-lg">
+                <p className="text-[10px] font-semibold text-indigo-100 uppercase tracking-[0.16em]">
                   Resume Health
                 </p>
-                <div className="flex items-end justify-between mt-3">
-                  <p className="text-3xl font-bold">96</p>
-                  <p className="text-xs font-semibold text-indigo-100">ATS ready</p>
+                <div className="flex items-end justify-between mt-2">
+                  <p className="text-xl font-bold">96</p>
+                  <p className="text-[9px] font-semibold text-indigo-100">ATS ready</p>
                 </div>
               </section>
             </div>
