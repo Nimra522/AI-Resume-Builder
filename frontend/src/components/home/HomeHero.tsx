@@ -48,7 +48,7 @@ export const HomeHero: React.FC = () => {
             <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-gray-100 bg-white/90 px-4 py-2 shadow-sm backdrop-blur">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
               <p className="text-sm text-text-muted">Trusted by 10,000+ job seekers nationwide</p>
-              <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-primary">4.9/5 recruiter-ready</span>
+              <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold text-primary">4.5/5 recruiter-ready</span>
             </div>
           </div>
         </div>
