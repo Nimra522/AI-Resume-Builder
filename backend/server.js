@@ -12,6 +12,7 @@ const userRoutes = require('./routes/users');
 const webhookRoutes = require('./routes/webhookRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const templatesRoutes = require('./routes/templatesRoutes');
+const resumeRoutes = require('./routes/resume');
 
 const app = express();
 
@@ -82,6 +83,7 @@ app.use('/webhook', webhookRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/templates', templatesRoutes);
+app.use('/api/resume', resumeRoutes);
 
 
 /* =======================
