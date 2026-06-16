@@ -13,6 +13,7 @@ const webhookRoutes = require('./routes/webhookRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const templatesRoutes = require('./routes/templatesRoutes');
 const resumeRoutes = require('./routes/resume');
+const aiRoutes = require('./routes/ai');
 
 const app = express();
 
@@ -84,6 +85,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/templates', templatesRoutes);
 app.use('/api/resume', resumeRoutes);
+app.use('/api/ai', aiRoutes);
 
 
 /* =======================
