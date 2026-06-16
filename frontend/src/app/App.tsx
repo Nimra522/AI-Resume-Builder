@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Layout } from '../components/layout/Layout';
+import { Layout, FullWidthLayout } from '../components/layout/Layout';
 import { Home } from '../pages/Home';
 import { Login } from '../pages/Login';
 import { Signup } from '../pages/Signup';
@@ -42,13 +42,22 @@ const PlaceholderDashboard: React.FC<{ title: string }> = ({ title }) => (
 const AppRoutes: React.FC = () => {
   const { pathname } = useLocation();
 
-  if (pathname === '/') return <Layout><Home /></Layout>;
+  if (pathname === '/') return <FullWidthLayout><Home /></FullWidthLayout>;
 
   const mainLayoutRoutes = [
-    '/login', '/signup', '/about', '/contact', 
+    '/about', '/contact', 
     '/privacy', '/terms', '/cookies', '/forgot-password', 
     '/templates', '/examples', '/pricing'
   ];
+
+  if (pathname === '/login' || pathname === '/signup') {
+    return (
+      <FullWidthLayout>
+        {pathname === '/login' && <Login />}
+        {pathname === '/signup' && <Signup />}
+      </FullWidthLayout>
+    );
+  }
 
   if (pathname === '/blog' || pathname.startsWith('/blog/')) {
     return (
@@ -66,8 +75,6 @@ const AppRoutes: React.FC = () => {
   if (mainLayoutRoutes.includes(pathname)) {
     return (
       <Layout>
-        {pathname === '/login' && <Login />}
-        {pathname === '/signup' && <Signup />}
         {pathname === '/about' && <About />}
         {pathname === '/contact' && <Contact />}
         {pathname === '/privacy' && <PrivacyPolicy />}
@@ -104,7 +111,7 @@ const AppRoutes: React.FC = () => {
   if (pathname === '/payment-success') return <PaymentSuccess />;
   if (pathname === '/payment-cancel') return <PaymentCancel />;
 
-  return <Layout><Home /></Layout>;
+  return <FullWidthLayout><Home /></FullWidthLayout>;
 };
 
 const App: React.FC = () => {

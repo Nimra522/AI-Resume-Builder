@@ -38,7 +38,7 @@ export const useAuth = () => {
 };
 
 const SESSION_KEY = 'resume_ai_token';
-const API_URL = process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:8080/api';
+const API_URL = '/api';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
