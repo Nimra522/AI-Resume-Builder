@@ -2,6 +2,8 @@ import React from 'react';
 import { Template } from '../../types';
 import { Button } from '../../components/ui/Button';
 import { Check, Sparkles, Lock } from 'lucide-react';
+import { LivePreview } from '../resume/LivePreview';
+import { EXAMPLES } from '../../data/examples';
 
 interface TemplateCardProps {
   template: Template;
@@ -48,17 +50,11 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
         className="relative w-full bg-gray-100 overflow-hidden cursor-pointer rounded-t-2xl"
         onClick={handleSelect}
       >
-        <div className="aspect-[4/5]">
-          <img
-            src={template.thumbnailUrl}
-            alt={template.name}
-            className="w-full h-full object-contain transition-opacity duration-300 rounded-t-2xl shadow-sm bg-white p-2"
-            loading="lazy"
-            onError={(event) => {
-              if (event.currentTarget.src.endsWith('/thumbnails/placeholder.svg')) return;
-              event.currentTarget.src = '/thumbnails/placeholder.svg';
-            }}
-          />
+        <div className="aspect-[4/5] bg-white rounded-t-2xl overflow-hidden p-1 shadow-sm">
+          {/* Live Preview Scaled Down */}
+          <div style={{ transform: 'scale(0.25)', transformOrigin: 'top left', width: '400%', height: '400%' }}>
+            <LivePreview data={EXAMPLES[0].data} templateId={template.id} />
+          </div>
         </div>
 
         {/* TAG */}

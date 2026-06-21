@@ -23,6 +23,21 @@ const WarmProfessionalTemplate = lazy(() => import('../templates/WarmProfessiona
 const RetroContourTemplate = lazy(() => import('../templates/RetroContourTemplate'));
 const ExecutiveBlueTemplate = lazy(() => import('../templates/ExecutiveBlueTemplate'));
 const MonochromeFrameTemplate = lazy(() => import('../templates/MonochromeFrameTemplate'));
+const VibrantVioletTemplate = lazy(() => import('../templates/VibrantVioletTemplate'));
+const EmeraldExecutiveTemplate = lazy(() => import('../templates/EmeraldExecutiveTemplate'));
+const CoralCreativeGridTemplate = lazy(() => import('../templates/CoralCreativeGridTemplate'));
+const IndigoTimelineProTemplate = lazy(() => import('../templates/IndigoTimelineProTemplate'));
+const SunsetSidebarTemplate = lazy(() => import('../templates/SunsetSidebarTemplate'));
+const NavyGoldTemplate = lazy(() => import('../templates/NavyGoldTemplate'));
+const RoseBlushTemplate = lazy(() => import('../templates/RoseBlushTemplate'));
+const SlateAmberTemplate = lazy(() => import('../templates/SlateAmberTemplate'));
+const ForestLimeTemplate = lazy(() => import('../templates/ForestLimeTemplate'));
+const TealCyanTemplate = lazy(() => import('../templates/TealCyanTemplate'));
+const NavyGoldExecutiveTemplate = lazy(() => import('../templates/NavyGoldExecutiveTemplate'));
+const DeepTealEmeraldTemplate = lazy(() => import('../templates/DeepTealEmeraldTemplate'));
+const BurgundyBlushEleganceTemplate = lazy(() => import('../templates/BurgundyBlushEleganceTemplate'));
+const SlateBlueSilverTemplate = lazy(() => import('../templates/SlateBlueSilverTemplate'));
+const CharcoalAmberProTemplate = lazy(() => import('../templates/CharcoalAmberProTemplate'));
 
 const TEMPLATE_MAP: Record<string, React.LazyExoticComponent<React.ComponentType<{ data: ResumeData }>>> = {
   modern: ModernTemplate,
@@ -41,6 +56,21 @@ const TEMPLATE_MAP: Record<string, React.LazyExoticComponent<React.ComponentType
   'retro-contour': RetroContourTemplate,
   'executive-blue': ExecutiveBlueTemplate,
   'monochrome-frame': MonochromeFrameTemplate,
+  'vibrant-violet': VibrantVioletTemplate,
+  'emerald-executive': EmeraldExecutiveTemplate,
+  'coral-creative-grid': CoralCreativeGridTemplate,
+  'indigo-timeline-pro': IndigoTimelineProTemplate,
+  'sunset-sidebar': SunsetSidebarTemplate,
+  'navy-gold': NavyGoldTemplate,
+  'rose-blush': RoseBlushTemplate,
+  'slate-amber': SlateAmberTemplate,
+  'forest-lime': ForestLimeTemplate,
+  'teal-cyan': TealCyanTemplate,
+  'navy-gold-executive': NavyGoldExecutiveTemplate,
+  'deep-teal-emerald': DeepTealEmeraldTemplate,
+  'burgundy-blush-elegance': BurgundyBlushEleganceTemplate,
+  'slate-blue-silver': SlateBlueSilverTemplate,
+  'charcoal-amber-pro': CharcoalAmberProTemplate,
 };
 
 const LoadingFallback: React.FC = () => (
