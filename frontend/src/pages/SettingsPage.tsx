@@ -7,7 +7,7 @@ import { Button } from '../components/ui/Button';
 import { ToggleSwitch } from '../components/ui/ToggleSwitch';
 import { Toast, ToastType } from '../components/ui/Toast';
 import { DeleteAccountModal } from '../components/profile/DeleteAccountModal';
-import { Camera, User, Lock, Palette, ShieldAlert, ShieldCheck, Save, X, Loader2 } from 'lucide-react';
+import { Camera, User, Lock, Palette, ShieldAlert, ShieldCheck, Save, X, Loader2, UserCircle, Phone, Mail, Bell, Monitor, CreditCard, HelpCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from '../components/layout/Navbar';
 import { useNotifications } from '../context/NotificationContext';
@@ -127,7 +127,6 @@ export const SettingsPage: React.FC = () => {
         twoFactor: user.twoFactorEnabled || false
       });
       
-
     }
   }, [user]);
 
@@ -137,10 +136,6 @@ export const SettingsPage: React.FC = () => {
     new: '',
     confirm: ''
   });
-
-
-
-
 
   // --- Loading States ---
   const [isSavingProfile, setIsSavingProfile] = useState(false);
@@ -177,8 +172,8 @@ export const SettingsPage: React.FC = () => {
         return;
     }
     if (!password.current) {
-        showToast('Current password is required', 'error');
-        return;
+      showToast('Current password is required', 'error');
+      return;
     }
 
     setIsChangingPassword(true);
@@ -313,32 +308,28 @@ export const SettingsPage: React.FC = () => {
         
         {/* Page Header */}
         <div className="mb-8">
-           <h1 className="text-2xl font-bold text-text-main">Settings</h1>
-           <p className="text-text-muted mt-1">Manage your account settings and preferences.</p>
+           <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
+           <p className="text-gray-500 text-sm">Manage your account settings, preferences, and security.</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* --- LEFT COLUMN --- */}
-          <div className="space-y-6">
+          {/* --- LEFT COLUMN (Profile & Account) --- */}
+          <div className="lg:col-span-2 space-y-6">
             
             {/* 1. Profile Information */}
-            <Card 
-              variant="settings"
-              title="Profile Information" 
-              subtitle="Update your photo and personal details."
-              footer={
-                <Button onClick={handleProfileSave} isLoading={isSavingProfile} icon={<Save size={16}/>}>
-                   Save Profile
-                </Button>
-              }
-            >
-               <div className="flex items-center gap-6 mb-6">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-shadow">
+               <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                  <UserCircle size={24} className="text-indigo-600" />
+                  <h2 className="text-xl font-bold text-gray-900">Profile Information</h2>
+               </div>
+
+               <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-8">
                   <div className="relative group">
-                     <div className="w-20 h-20 rounded-full bg-indigo-50 border-2 border-indigo-100 overflow-hidden">
+                     <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-100 overflow-hidden">
                         {isUploading ? (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                            <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
                           </div>
                         ) : (
                           <img 
@@ -351,22 +342,22 @@ export const SettingsPage: React.FC = () => {
                      <button 
                        onClick={() => fileInputRef.current?.click()}
                        disabled={isUploading || isRemoving}
-                       className="absolute bottom-1 right-1 p-2 bg-white rounded-full shadow-md text-text-muted hover:text-primary transition-colors border border-gray-100 disabled:opacity-50"
+                       className="absolute bottom-2 right-2 p-2 bg-white rounded-full shadow-md text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all border border-gray-100 disabled:opacity-50"
                        title="Change Profile Picture"
                      >
                        <Camera size={16} />
                      </button>
                   </div>
-                  <div>
-                     <h4 className="font-bold text-text-main">Profile Photo</h4>
-                     <p className="text-xs text-text-muted mb-2">
-                       {user?.profileImage ? 'Click to change your profile photo' : 'Click to upload a profile photo'}
+                  <div className="flex-1">
+                     <h4 className="font-semibold text-gray-900 mb-1">Profile Photo</h4>
+                     <p className="text-xs text-gray-500 mb-2">
+                       {user?.profileImage ? 'Click to change your profile photo' : 'Add a photo to personalize your account'}
                      </p>
                      <div className="flex gap-2">
                         <button 
                           onClick={() => fileInputRef.current?.click()} 
                           disabled={isUploading || isRemoving}
-                          className="text-xs font-semibold text-primary hover:underline disabled:opacity-50"
+                          className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors disabled:opacity-50"
                         >
                           Change
                         </button>
@@ -376,7 +367,7 @@ export const SettingsPage: React.FC = () => {
                             <button 
                               onClick={handleRemoveProfileImage} 
                               disabled={isUploading || isRemoving}
-                              className="text-xs font-semibold text-red-500 hover:underline disabled:opacity-50 flex items-center gap-1"
+                              className="text-xs font-semibold text-red-500 hover:text-red-700 transition-colors disabled:opacity-50 flex items-center gap-1"
                             >
                               {isRemoving ? <Loader2 size={12} className="animate-spin" /> : <X size={12} />}
                               Remove
@@ -395,76 +386,90 @@ export const SettingsPage: React.FC = () => {
                   />
                </div>
                
-               <div className="space-y-4">
-                  <Input 
-                    label="Full Name" 
-                    value={profile.fullName} 
-                    onChange={e => setProfile({...profile, fullName: e.target.value})} 
-                    icon={User}
-                  />
-                  <Input 
-                    label="Username" 
-                    value={profile.username} 
-                    onChange={e => setProfile({...profile, username: e.target.value})} 
-                    placeholder="@username"
-                  />
-                  <div>
-                    <label className="block text-sm font-medium text-text-main mb-1.5">Email Address</label>
-                    <div className="flex items-center px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-text-muted text-sm cursor-not-allowed">
-                       {profile.email}
-                       <span className="ml-auto text-xs bg-gray-200 px-2 py-0.5 rounded">Verified</span>
+               <div className="space-y-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-800">Full Name</label>
+                      <Input 
+                        value={profile.fullName} 
+                        onChange={e => setProfile({...profile, fullName: e.target.value})} 
+                      />
                     </div>
-                    <p className="text-xs text-text-muted mt-1">To change your email, please contact support.</p>
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-800">Username</label>
+                      <Input 
+                        value={profile.username} 
+                        onChange={e => setProfile({...profile, username: e.target.value})} 
+                        placeholder="@username"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-800">Email Address</label>
+                    <div className="flex items-center px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 text-sm">
+                       {profile.email}
+                       <span className="ml-auto text-xs bg-gray-200 px-2 py-0.5 rounded-full text-gray-700 font-semibold">Verified</span>
+                    </div>
+                    <p className="text-xs text-gray-400">To change your email, please contact support.</p>
                   </div>
                </div>
-            </Card>
+
+               <div className="mt-8 pt-5 border-t border-gray-100 flex justify-end">
+                 <Button onClick={handleProfileSave} isLoading={isSavingProfile} icon={<Save size={16}/>} className="shadow-sm">
+                    Save Changes
+                 </Button>
+               </div>
+            </div>
 
             {/* 2. Account Settings */}
-            <Card variant="settings" title="Account Settings">
-               <div className="space-y-4">
-                  <Input 
-                    label="Phone Number" 
-                    value={account.phone} 
-                    onChange={e => setAccount({...account, phone: e.target.value})} 
-                    placeholder="+1 (555) 000-0000"
-                  />
-                  <div className="border-t border-gray-100 pt-4">
-                     <div className={isUpdating2FA ? 'opacity-50 pointer-events-none' : ''}>
-                       <ToggleSwitch 
-                         label="Two-Factor Authentication" 
-                         description="Add an extra layer of security to your account."
-                         checked={account.twoFactor} 
-                         onChange={handle2FAUpdate}
-                       />
-                     </div>
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-shadow">
+               <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                  <Phone size={24} className="text-indigo-600" />
+                  <h2 className="text-xl font-bold text-gray-900">Account Settings</h2>
+               </div>
+
+               <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-800">Phone Number</label>
+                    <Input 
+                      value={account.phone} 
+                      onChange={e => setAccount({...account, phone: e.target.value})} 
+                      placeholder="+1 (555) 000-0000"
+                    />
+                  </div>
+                  
+                  <div className="border-t border-gray-100 pt-6">
+                     <ToggleSwitch 
+                       label="Two-Factor Authentication" 
+                       description="Add an extra layer of security to your account."
+                       checked={account.twoFactor} 
+                       onChange={handle2FAUpdate}
+                       disabled={isUpdating2FA}
+                     />
                   </div>
                </div>
-            </Card>
-
-
+            </div>
 
           </div>
 
-          {/* --- RIGHT COLUMN --- */}
+          {/* --- RIGHT COLUMN (Password, Notifications, Danger) --- */}
           <div className="space-y-6">
              
-             {/* 2. Change Password */}
-             <Card 
-               variant="settings"
-               title="Change Password"
-               footer={
-                 <Button onClick={handlePasswordUpdate} isLoading={isChangingPassword} variant="secondary">Update Password</Button>
-               }
-             >
-                <form onSubmit={handlePasswordUpdate} className="space-y-4">
+             {/* Change Password */}
+             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                  <Lock size={24} className="text-indigo-600" />
+                  <h2 className="text-xl font-bold text-gray-900">Change Password</h2>
+                </div>
+
+                <form onSubmit={handlePasswordUpdate} className="space-y-5">
                    <Input 
                      label="Current Password" 
                      type="password"
                      value={password.current}
                      onChange={e => setPassword({...password, current: e.target.value})}
-                     icon={Lock}
                    />
-                   <div className="grid grid-cols-2 gap-4">
+                   <div className="grid grid-cols-1 gap-5">
                       <Input 
                         label="New Password" 
                         type="password"
@@ -472,17 +477,17 @@ export const SettingsPage: React.FC = () => {
                         onChange={e => setPassword({...password, new: e.target.value})}
                       />
                       <Input 
-                        label="Confirm Password" 
+                        label="Confirm New Password" 
                         type="password"
                         value={password.confirm}
                         onChange={e => setPassword({...password, confirm: e.target.value})}
                         error={password.confirm && password.new !== password.confirm ? "Passwords do not match" : undefined}
                       />
                    </div>
-                   {/* Password Strength Mock */}
+                   {/* Password Strength */}
                    {password.new && (
-                     <div className="space-y-2 pt-2">
-                        <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                     <div className="space-y-2 pt-1">
+                        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
                            <div 
                              className={`h-full transition-all duration-300 ${
                                password.new.length < 6 ? 'w-1/3 bg-red-500' : 
@@ -490,29 +495,60 @@ export const SettingsPage: React.FC = () => {
                              }`} 
                            />
                         </div>
-                        <p className="text-xs text-text-muted text-right">
+                        <p className="text-xs text-gray-500 text-right font-medium">
                           {password.new.length < 6 ? 'Weak' : password.new.length < 10 ? 'Medium' : 'Strong'}
                         </p>
                      </div>
                    )}
-                </form>
-             </Card>
 
-             {/* 3. Danger Zone */}
-             <Card variant="settings" title="Danger Zone" danger>
-                <p className="text-sm text-text-muted mb-4">
+                   <div className="pt-4">
+                     <Button type="submit" isLoading={isChangingPassword} variant="outline" className="w-full shadow-sm">Update Password</Button>
+                   </div>
+                </form>
+             </div>
+
+             {/* Notifications */}
+             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                  <Bell size={24} className="text-indigo-600" />
+                  <h2 className="text-xl font-bold text-gray-900">Notifications</h2>
+                </div>
+
+                <div className="space-y-5">
+                   <ToggleSwitch 
+                     label="Email Notifications" 
+                     description="Receive updates via email about your account and activity."
+                     checked={true} 
+                     onChange={() => {}}
+                   />
+                   <ToggleSwitch 
+                     label="Marketing Emails" 
+                     description="Get the latest tips, tutorials, and offers."
+                     checked={false} 
+                     onChange={() => {}}
+                   />
+                </div>
+             </div>
+
+             {/* Danger Zone */}
+             <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl border border-red-100 shadow-sm p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-3 mb-4">
+                  <ShieldAlert size={24} className="text-red-500" />
+                  <h2 className="text-xl font-bold text-gray-900">Danger Zone</h2>
+                </div>
+                <p className="text-sm text-gray-600 mb-6 leading-relaxed">
                   Permanently delete your account and all of your content. This action is not reversible, so please continue with caution.
                 </p>
-                <div className="flex justify-end">
+                <div className="flex justify-start">
                   <Button 
                     variant="outline" 
-                    className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 focus:ring-red-200"
+                    className="border-red-200 text-red-600 hover:bg-red-100 hover:border-red-300 shadow-sm"
                     onClick={() => setShowDeleteModal(true)}
                   >
                     Delete Account
                   </Button>
                 </div>
-             </Card>
+             </div>
 
           </div>
         </div>
@@ -535,22 +571,22 @@ export const SettingsPage: React.FC = () => {
 
         {/* 2FA Setup Modal */}
         {twoFASetupData.show && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
-              <div className="text-center mb-6">
-                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <ShieldCheck className="w-8 h-8 text-primary" />
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-fade-in">
+              <div className="text-center mb-8">
+                <div className="mx-auto w-20 h-20 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-full flex items-center justify-center mb-6 border border-indigo-100">
+                  <ShieldCheck className="w-10 h-10 text-indigo-600" />
                 </div>
-                <h3 className="text-xl font-bold text-text-main">Setup Two-Factor Authentication</h3>
-                <p className="text-sm text-text-muted mt-2">Enter the 6-digit code sent to your phone</p>
+                <h3 className="text-2xl font-bold text-gray-900">Setup Two-Factor Authentication</h3>
+                <p className="text-gray-500 mt-3">Enter the 6-digit code sent to your phone</p>
               </div>
               
-              <div className="mb-4 p-3 bg-gray-50 rounded-lg text-center">
-                <p className="text-sm text-text-muted">OTP sent to:</p>
-                <p className="font-semibold text-text-main">***-***-{twoFASetupData.phone?.slice(-4)}</p>
+              <div className="mb-8 p-5 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl text-center border border-indigo-100">
+                <p className="text-sm text-gray-600 mb-2">OTP sent to:</p>
+                <p className="font-bold text-gray-900 text-lg">***-***-{twoFASetupData.phone?.slice(-4)}</p>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <Input
                   label="Verification Code"
                   placeholder="Enter 6-digit OTP"
@@ -559,7 +595,7 @@ export const SettingsPage: React.FC = () => {
                   maxLength={6}
                 />
                 
-                <div className="flex gap-3">
+                <div className="flex gap-4 pt-2">
                   <Button 
                     variant="outline" 
                     className="flex-1"
@@ -573,7 +609,7 @@ export const SettingsPage: React.FC = () => {
                   </Button>
                   <Button 
                     variant="primary" 
-                    className="flex-1"
+                    className="flex-1 shadow-sm"
                     onClick={handle2FAVerify}
                     isLoading={isVerifying2FA}
                   >
@@ -587,17 +623,17 @@ export const SettingsPage: React.FC = () => {
 
         {/* 2FA Disable Modal */}
         {twoFADisableData.show && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
-              <div className="text-center mb-6">
-                <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                  <ShieldAlert className="w-8 h-8 text-red-600" />
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-fade-in">
+              <div className="text-center mb-8">
+                <div className="mx-auto w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-6 border border-red-100">
+                  <ShieldAlert className="w-10 h-10 text-red-600" />
                 </div>
-                <h3 className="text-xl font-bold text-text-main">Disable Two-Factor Authentication</h3>
-                <p className="text-sm text-text-muted mt-2">Enter your current 2FA code to disable</p>
+                <h3 className="text-2xl font-bold text-gray-900">Disable Two-Factor Authentication</h3>
+                <p className="text-gray-500 mt-3">Enter your current 2FA code to disable</p>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <Input
                   label="Current 2FA Code"
                   placeholder="Enter 6-digit code from your app"
@@ -606,7 +642,7 @@ export const SettingsPage: React.FC = () => {
                   maxLength={6}
                 />
                 
-                <div className="flex gap-3">
+                <div className="flex gap-4 pt-2">
                   <Button 
                     variant="outline" 
                     className="flex-1"
@@ -618,8 +654,8 @@ export const SettingsPage: React.FC = () => {
                     Cancel
                   </Button>
                   <Button 
-                    variant="primary" 
-                    className="flex-1"
+                    variant="outline" 
+                    className="flex-1 border-red-200 text-red-600 hover:bg-red-50 shadow-sm"
                     onClick={handle2FADisable}
                     isLoading={isDisabling2FA}
                   >

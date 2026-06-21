@@ -7,6 +7,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
   fullWidth?: boolean;
   icon?: React.ReactNode;
+  iconPosition?: 'left' | 'right';
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -16,6 +17,7 @@ export const Button: React.FC<ButtonProps> = ({
   isLoading = false,
   fullWidth = false,
   icon,
+  iconPosition = 'left',
   className = '',
   disabled,
   ...props
@@ -36,6 +38,9 @@ export const Button: React.FC<ButtonProps> = ({
     google: "bg-white border border-gray-300 text-text-main hover:bg-gray-50 hover:shadow-md focus:ring-gray-400"
   };
 
+  // Destructure iconPosition from props so it doesn't get passed to DOM element
+  const { iconPosition: _iconPosition, ...restProps } = props;
+
   return (
     <button
       className={`
@@ -46,14 +51,17 @@ export const Button: React.FC<ButtonProps> = ({
         ${className}
       `}
       disabled={isLoading || disabled}
-      {...props}
+      {...restProps}
     >
       {isLoading ? (
         <Loader2 className="animate-spin mr-2" size={size === 'sm' ? 14 : 18} />
-      ) : icon ? (
+      ) : icon && iconPosition === 'left' ? (
         <span className="mr-2">{icon}</span>
       ) : null}
       {children}
+      {icon && iconPosition === 'right' ? (
+        <span className="ml-2">{icon}</span>
+      ) : null}
     </button>
   );
 };

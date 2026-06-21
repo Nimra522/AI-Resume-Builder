@@ -19,38 +19,40 @@ export const ExamplesPage: React.FC = () => {
     navigate(`/examples/${id}`);
   };
 
-
-
   return (
-    <div className="pb-12 animate-fade-in">
-      {/* 1. Hero Section */}
-      <section className="relative py-16 bg-gradient-to-br from-indigo-50 to-white p-8 rounded-2xl border border-indigo-100 shadow-sm mb-12">
-        <div className="relative max-w-4xl mx-auto px-4 text-center z-10">
-          <div className="inline-flex items-center justify-center p-3 bg-white rounded-xl text-primary mb-6 shadow-sm border border-gray-100">
-            <FileText size={32} />
+    <div className="space-y-12 pb-16 bg-gray-50">
+      {/* Hero Section */}
+      <section className="pt-24 pb-16 bg-gradient-to-r from-gray-900 to-indigo-900 border-b border-indigo-950 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-400 opacity-20 rounded-full blur-3xl transform -translate-x-1/3 translate-y-1/3"></div>
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-slate-700 mb-6">
+            <FileText size={14} className="text-indigo-400" />
+            <span className="text-xs font-semibold text-indigo-300 tracking-widest uppercase">Resume Examples</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-text-main mb-4 tracking-tight">
-            Resume Examples
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+            Professional Resume Examples
           </h1>
-          <p className="text-xl text-text-muted mb-8 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-400 max-w-2xl mx-auto text-xl leading-relaxed mb-8">
             Explore 8 professionally written resume examples for every career stage. Click "View" to preview each example.
           </p>
 
           <div className="relative max-w-md mx-auto">
-             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
                <Search size={20} />
              </div>
              <input 
                type="text" 
                placeholder="Search by role or industry..." 
-               className="block w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none shadow-sm"
+               className="block w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-700 bg-slate-800/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none shadow-sm"
              />
           </div>
         </div>
       </section>
 
-      {/* 2. Examples Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+      {/* Examples Grid */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
            {EXAMPLES.map((example) => (
              <ExampleCard 
@@ -62,9 +64,9 @@ export const ExamplesPage: React.FC = () => {
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-4 text-center">
-        <p className="text-text-muted text-sm">
-          <a href="#/templates" className="text-primary font-bold hover:underline">Choose Your Template</a>.
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <p className="text-slate-600 text-sm">
+          <a href="#/templates" className="text-indigo-600 font-bold hover:text-indigo-800 underline">Choose Your Template</a>.
         </p>
       </section>
     </div>

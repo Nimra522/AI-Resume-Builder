@@ -9,6 +9,7 @@ import { Download, Eye, Palette, Save, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useNotifications } from '../context/NotificationContext';
 import { useAuth } from '../context/AuthContext';
+import { useLocation } from '../components/layout/Navbar';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -19,51 +20,65 @@ export const ResumeBuilder: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [resumeTitle, setResumeTitle] = useState('');
-  const [pendingTemplateId, setPendingTemplateId] = useState<string | null>(null);
   
+  const { search } = useLocation();
   const { addNotification } = useNotifications();
   const { user, isAuthenticated, openLoginModal, updateResumeCount, verifyTemplateAccess } = useAuth();
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Load from local storage if available on mount
+  // Load from local storage if available, and check template param
   useEffect(() => {
-    console.log('ResumeBuilder mounting, loading saved data...');
+    console.log('ResumeBuilder mounting/updating, loading saved data...');
     const savedData = localStorage.getItem('resume_builder_data');
     const savedTitle = localStorage.getItem('resume_builder_title');
     const savedTemplate = localStorage.getItem('resume_builder_template_id');
     
     console.log('Found saved data:', { savedData: !!savedData, savedTitle: !!savedTitle, savedTemplate: !!savedTemplate });
     
-    // Check for template parameter in URL for new template selection
-    const urlParams = new URLSearchParams(window.location.hash.split('?')[1] || '');
+    // Check for template parameter in URL
+    const urlParams = new URLSearchParams(search);
     const templateParam = urlParams.get('template');
+    const editParam = urlParams.get('edit');
     
+    // Handle template param first
     if (templateParam) {
       console.log('Template parameter found in URL:', templateParam);
-      setPendingTemplateId(templateParam);
-      const newHash = window.location.hash.split('?')[0];
-      window.location.hash = newHash;
-    }
-    
-    // Check if the saved data contains old sample values (like the original Alex Jordan data)
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        console.log('Parsed data:', parsedData.personalInfo);
-        
-        // Check if this is old sample data by looking for specific old values
-        if (parsedData.personalInfo.fullName === 'Alex Jordan' || 
-            parsedData.personalInfo.email === 'alex.jordan@example.com' ||
-            parsedData.personalInfo.summary?.includes('Creative and detail-oriented Product Designer')) {
-          // This is old sample data, clear it and use initial empty data
-          console.log('Clearing old sample data');
-          localStorage.removeItem('resume_builder_data');
-          localStorage.removeItem('resume_builder_title');
-          localStorage.removeItem('resume_builder_template_id');
-        } else {
-          // This is actual user data, load it
-          console.log('Loading actual user data');
-          // Ensure backward compatibility by adding missing countryCode field
+      const template = TEMPLATES.find(t => t.id === templateParam);
+      const needsAuth = template ? template.requiresAuth !== false : true;
+
+      if (!isAuthenticated && needsAuth) {
+        openLoginModal(`/dashboard?template=${templateParam}`);
+        return;
+      }
+
+      if (needsAuth) {
+        verifyTemplateAccess(templateParam, 'editor').then(result => {
+          if (result.success) {
+            setSelectedTemplateId(templateParam);
+            // Clear localStorage for new template to start fresh
+            localStorage.removeItem('resume_builder_data');
+            localStorage.removeItem('resume_builder_title');
+            setResumeData(INITIAL_RESUME_DATA);
+            setResumeTitle('');
+          } else if (result.status === 403) {
+            addNotification('Upgrade your plan to use this template.', 'warning');
+          }
+        });
+      } else {
+        setSelectedTemplateId(templateParam);
+        // Clear localStorage for new template to start fresh
+        localStorage.removeItem('resume_builder_data');
+        localStorage.removeItem('resume_builder_title');
+        setResumeData(INITIAL_RESUME_DATA);
+        setResumeTitle('');
+      }
+    } else if (editParam) {
+      console.log('Edit parameter found in URL:', editParam);
+      // Load from localStorage, since DashboardOverview sets localStorage before navigate
+      if (savedData) {
+        try {
+          const parsedData = JSON.parse(savedData);
+          console.log('Parsed data:', parsedData.personalInfo);
           const normalizedData = {
             ...parsedData,
             personalInfo: {
@@ -73,49 +88,52 @@ export const ResumeBuilder: React.FC = () => {
           };
           setResumeData(normalizedData);
           if (savedTitle) setResumeTitle(savedTitle);
-          // Only set template from localStorage if no template parameter was provided
-          if (savedTemplate && !templateParam) setSelectedTemplateId(savedTemplate);
+          if (savedTemplate) setSelectedTemplateId(savedTemplate);
+        } catch (e) {
+          console.error('Failed to load resume data', e);
         }
-      } catch (e) {
-        console.error("Failed to load resume data", e);
       }
-    } else if (!templateParam) {
-      // If no saved data and no template parameter, use default template
-      setSelectedTemplateId('modern');
-    }
-    
-    // Cleanup function
-    return () => {
-      console.log('ResumeBuilder unmounting');
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!pendingTemplateId) return;
-
-    const template = TEMPLATES.find(t => t.id === pendingTemplateId);
-    const needsAuth = template ? template.requiresAuth !== false : true;
-
-    if (!isAuthenticated && needsAuth) {
-      openLoginModal(`/dashboard?template=${pendingTemplateId}`);
-      return;
-    }
-
-    if (needsAuth) {
-      verifyTemplateAccess(pendingTemplateId, 'editor').then(result => {
-        if (result.success) {
-          setSelectedTemplateId(pendingTemplateId);
-        } else if (result.status === 403) {
-          addNotification('Upgrade your plan to use this template.', 'warning');
-        }
-      }).finally(() => {
-        setPendingTemplateId(null);
-      });
     } else {
-      setSelectedTemplateId(pendingTemplateId);
-      setPendingTemplateId(null);
+      // If no params, use saved data (if valid) or defaults
+      if (savedData) {
+        try {
+          const parsedData = JSON.parse(savedData);
+          console.log('Parsed data:', parsedData.personalInfo);
+          
+          // Check if this is old sample data by looking for specific old values
+          if (parsedData.personalInfo.fullName === 'Alex Jordan' || 
+              parsedData.personalInfo.email === 'alex.jordan@example.com' ||
+              parsedData.personalInfo.summary?.includes('Creative and detail-oriented Product Designer')) {
+            // This is old sample data, clear it and use initial empty data
+            console.log('Clearing old sample data');
+            localStorage.removeItem('resume_builder_data');
+            localStorage.removeItem('resume_builder_title');
+            localStorage.removeItem('resume_builder_template_id');
+          } else {
+            // This is actual user data, load it
+            console.log('Loading actual user data');
+            // Ensure backward compatibility by adding missing countryCode field
+            const normalizedData = {
+              ...parsedData,
+              personalInfo: {
+                ...parsedData.personalInfo,
+                countryCode: parsedData.personalInfo.countryCode || '+1'
+              }
+            };
+            setResumeData(normalizedData);
+            if (savedTitle) setResumeTitle(savedTitle);
+            if (savedTemplate) setSelectedTemplateId(savedTemplate);
+          }
+        } catch (e) {
+          console.error('Failed to load resume data', e);
+        }
+      } else {
+        // If no saved data, use defaults
+        if (savedTemplate) setSelectedTemplateId(savedTemplate);
+        else setSelectedTemplateId('modern');
+      }
     }
-  }, [pendingTemplateId, isAuthenticated, openLoginModal, verifyTemplateAccess, addNotification]);
+  }, [search, isAuthenticated, openLoginModal, verifyTemplateAccess, addNotification]);
 
   // Auto-save draft to local storage (for the current session)
   useEffect(() => {
@@ -342,25 +360,28 @@ export const ResumeBuilder: React.FC = () => {
   return (
     <DashboardLayout>
        {/* Builder Toolbar */}
-       <div className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4 shadow-sm">
-         <div className="flex items-center gap-3">
+       <div className="sticky top-0 z-30 bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4 shadow-md">
+         <div className="flex items-center gap-4">
            <div className="relative group">
               <input 
                 type="text" 
                 value={resumeTitle}
                 onChange={(e) => setResumeTitle(e.target.value)}
-                className="text-xl font-bold text-text-main bg-transparent border-b border-dashed border-transparent hover:border-gray-300 focus:border-primary focus:outline-none px-1 transition-all"
+                className="text-2xl font-bold text-gray-900 bg-white border border-transparent hover:border-gray-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 rounded-lg px-4 py-2 outline-none transition-all shadow-sm"
                 placeholder="My Resume Title"
               />
            </div>
-           <span className="text-[10px] text-text-muted px-2 py-0.5 bg-gray-100 rounded-full font-bold uppercase tracking-widest">Draft</span>
+           <span className="inline-flex items-center gap-1 text-[11px] text-indigo-700 px-3 py-1 bg-indigo-50 rounded-full font-bold uppercase tracking-wider border border-indigo-100">
+             <Sparkles size={12} />
+             Draft
+           </span>
          </div>
          
-         <div className="flex items-center gap-2 ml-auto">
-            <div className="hidden md:flex items-center gap-2 mr-4 border-r border-gray-200 pr-4">
-              <Palette size={18} className="text-text-muted" />
+         <div className="flex items-center gap-3 ml-auto">
+            <div className="hidden md:flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
+              <Palette size={18} className="text-indigo-600" />
               <select 
-                className="text-sm border-none bg-transparent focus:ring-0 cursor-pointer text-text-main font-semibold hover:text-primary transition-colors"
+                className="text-sm border-none bg-transparent focus:ring-0 cursor-pointer text-gray-800 font-semibold outline-none"
                 value={selectedTemplateId}
                 onChange={async (e) => {
                   const nextTemplateId = e.target.value;
@@ -392,7 +413,7 @@ export const ResumeBuilder: React.FC = () => {
             <Button 
               variant="secondary" 
               size="sm" 
-              className="md:hidden"
+              className="md:hidden shadow-sm"
               onClick={() => setShowMobilePreview(!showMobilePreview)}
               icon={<Eye size={16}/>}
             >
@@ -405,6 +426,7 @@ export const ResumeBuilder: React.FC = () => {
               icon={isSaving ? <Loader2 className="animate-spin" size={16}/> : <Save size={16}/>}
               onClick={handleSave}
               disabled={isSaving}
+              className="shadow-sm"
             >
               {isSaving ? 'Saving...' : 'Save Resume'}
             </Button>
@@ -414,6 +436,7 @@ export const ResumeBuilder: React.FC = () => {
               icon={isDownloading ? <Loader2 className="animate-spin" size={16}/> : <Download size={16}/>}
               onClick={handleDownloadPDF}
               disabled={isDownloading}
+              className="shadow-lg hover:shadow-xl transition-shadow"
             >
               {isDownloading ? 'Exporting...' : 'Download PDF'}
             </Button>
@@ -421,25 +444,25 @@ export const ResumeBuilder: React.FC = () => {
        </div>
 
        {/* Main Workspace */}
-       <div className="flex h-[calc(100vh-128px)] overflow-hidden">
+       <div className="flex h-[calc(100vh-130px)] overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100">
          {/* Left: Editor */}
          <div className={`
            w-full md:w-1/2 lg:w-5/12 xl:w-1/3 bg-white border-r border-gray-200 overflow-y-auto custom-scrollbar
            ${showMobilePreview ? 'hidden md:block' : 'block'}
          `}>
-           <div className="p-4 sm:p-6 max-w-2xl mx-auto">
+           <div className="p-5 sm:p-8 max-w-2xl mx-auto">
              <ResumeForm data={resumeData} onChange={setResumeData} />
            </div>
          </div>
 
          {/* Right: Preview */}
          <div className={`
-            flex-1 bg-gray-200 overflow-y-auto custom-scrollbar p-4 sm:p-8 flex justify-center items-start
-            ${showMobilePreview ? 'block fixed inset-0 z-40 bg-gray-200 mt-[115px] pb-32' : 'hidden md:flex'}
+            flex-1 bg-gradient-to-br from-gray-100 to-gray-200 overflow-y-auto custom-scrollbar p-5 sm:p-10 flex justify-center items-start
+            ${showMobilePreview ? 'block fixed inset-0 z-40 bg-gradient-to-br from-gray-100 to-gray-200 mt-[118px] pb-32' : 'hidden md:flex'}
          `}>
             <div 
               ref={previewRef}
-              className="bg-white shadow-2xl w-full max-w-[800px] min-h-[1100px] origin-top transition-transform duration-200 scale-100 xl:scale-100 lg:scale-[0.85] md:scale-[0.65]"
+              className="bg-white shadow-2xl rounded-sm w-full max-w-[800px] min-h-[1100px] origin-top transition-all duration-300 scale-100 xl:scale-100 lg:scale-[0.85] md:scale-[0.65] hover:shadow-3xl"
             >
                <LivePreview data={resumeData} templateId={selectedTemplateId} />
             </div>

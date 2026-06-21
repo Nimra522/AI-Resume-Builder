@@ -21,6 +21,7 @@ import { MyResumesPage } from '../pages/MyResumesPage';
 import { SettingsPage } from '../pages/SettingsPage';
 import { PricingPage } from '../pages/PricingPage';
 import { UserProfilePage } from '../pages/UserProfilePage';
+import { DashboardOverview } from '../pages/DashboardOverview';
 import { HelpSupportPage } from '../pages/HelpSupportPage';
 import { PaymentSuccess } from '../pages/PaymentSuccess';
 import { PaymentCancel } from '../pages/PaymentCancel';
@@ -40,7 +41,7 @@ const PlaceholderDashboard: React.FC<{ title: string }> = ({ title }) => (
 );
 
 const AppRoutes: React.FC = () => {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
 
   if (pathname === '/') return <FullWidthLayout><Home /></FullWidthLayout>;
 
@@ -89,7 +90,10 @@ const AppRoutes: React.FC = () => {
   }
 
   if (pathname === '/dashboard') {
-    return <ResumeBuilder />;
+    if (search.includes('?edit=') || search.includes('?template=')) {
+      return <ResumeBuilder />;
+    }
+    return <DashboardOverview />;
   }
 
   if (pathname.startsWith('/dashboard') || pathname === '/settings' || pathname === '/profile') {

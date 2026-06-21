@@ -62,15 +62,15 @@ export const Footer: React.FC = () => {
             © {new Date().getFullYear()} ResumeCraft. All rights reserved.
           </p>
           <div className="flex space-x-4">
-            <a href="#" className="text-slate-400 hover:text-white transition-colors">
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white transition-colors">
               <span className="sr-only">GitHub</span>
               <Github size={18} />
             </a>
-            <a href="#" className="text-slate-400 hover:text-white transition-colors">
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white transition-colors">
               <span className="sr-only">Twitter</span>
               <Twitter size={18} />
             </a>
-            <a href="#" className="text-slate-400 hover:text-white transition-colors">
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white transition-colors">
               <span className="sr-only">LinkedIn</span>
               <Linkedin size={18} />
             </a>

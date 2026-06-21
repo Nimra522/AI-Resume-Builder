@@ -327,29 +327,33 @@ export const MyResumesPage: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto min-h-[calc(100vh-64px)]">
+      <div className="p-6 sm:p-8 lg:p-10 max-w-7xl mx-auto min-h-[calc(100vh-80px)]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-text-main">My Resumes</h1>
-            <p className="text-text-muted mt-1">Manage and edit your saved documents.</p>
+            <h1 className="text-3xl font-black text-slate-900">My Resumes</h1>
+            <p className="text-slate-500 mt-1">Manage and edit your saved documents.</p>
           </div>
           
           <div className="flex items-center gap-3 w-full md:w-auto">
-            <div className="relative flex-grow md:flex-grow-0 md:w-64">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                <Search size={18} />
+            <div className="relative flex-grow md:flex-grow-0 md:w-80">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                <Search size={20} />
               </div>
               <input
                 type="text"
                 placeholder="Search resumes..."
-                className="block w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
+                className="block w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <Button onClick={() => navigate('/templates')} icon={<Plus size={18} />}>
+            <button 
+              onClick={() => navigate('/templates')}
+              className="flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+            >
+              <Plus size={20} />
               Create New
-            </Button>
+            </button>
           </div>
         </div>
 

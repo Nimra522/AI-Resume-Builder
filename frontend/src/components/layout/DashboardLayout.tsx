@@ -5,6 +5,7 @@ import { Link, useLocation } from './Navbar';
 import { 
   LayoutDashboard, 
   FileText, 
+  LayoutTemplate, 
   Settings, 
   HelpCircle, 
   LogOut, 
@@ -12,11 +13,13 @@ import {
   X,
   Bell
 } from 'lucide-react';
+import LogoImage from '../../assets/Logo.png';
 import { NavItem } from '../../types';
 import { useNotifications } from '../../context/NotificationContext';
 import { useAuth } from '../../context/AuthContext';
 import { NotificationDropdown } from './NotificationDropdown';
 import { UserMenu } from './UserMenu';
+import FloatingChatButton from '../ui/FloatingChatButton';
 
 const DASHBOARD_NAV: NavItem[] = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -41,12 +44,12 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex font-sans">
+    <div className="min-h-screen bg-slate-50 flex font-sans">
       
       {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-md"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
@@ -54,54 +57,58 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
       {/* Sidebar */}
       <aside 
         className={`
-          fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transform transition-all duration-300 ease-in-out
-          ${isSidebarCollapsed ? 'w-20' : 'w-64'}
+          fixed inset-y-0 left-0 z-50 bg-gradient-to-b from-slate-900 to-slate-800 border-r border-slate-700/50 transform transition-all duration-300 ease-in-out
+          ${isSidebarCollapsed ? 'w-20' : 'w-60'}
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-          md:relative md:translate-x-0 flex flex-col
+          md:sticky md:top-0 md:translate-x-0 md:h-screen flex flex-col shadow-2xl
         `}
       >
-        <div className="h-16 flex items-center px-4 border-b border-gray-100">
-          <Link to="/" className="flex items-center gap-2 flex-1">
-            <div className="bg-primary text-white p-1.5 rounded-lg flex-shrink-0">
-              <FileText size={20} />
-            </div>
+        <div className="h-16 flex items-center px-4 border-b border-slate-700/30">
+          <Link to="/" className="flex items-center gap-3 flex-1">
+            <img
+              src={LogoImage}
+              alt="ResumeCraft logo"
+              className="h-8 w-auto object-contain flex-shrink-0"
+            />
             {!isSidebarCollapsed && (
-              <span className="font-bold text-lg text-text-main tracking-tight whitespace-nowrap">ResumeCraft</span>
+              <span className="text-xl font-bold tracking-tight text-white whitespace-nowrap">
+                Resume<span className="text-indigo-400">Craft</span>
+              </span>
             )}
           </Link>
           <button 
-            className="ml-2 md:hidden text-gray-500"
+            className="ml-2 md:hidden text-slate-400 hover:text-white transition-colors"
             onClick={() => setIsSidebarOpen(false)}
           >
             <X size={24} />
           </button>
           <button 
-            className="ml-2 hidden md:block text-gray-500 hover:text-primary transition-colors"
+            className="ml-2 hidden md:block text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg p-1.5 transition-all"
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           >
             {isSidebarCollapsed ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="9 18 15 12 9 6" />
               </svg>
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             )}
           </button>
         </div>
 
-        <nav className="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 py-8 px-3 space-y-2 overflow-y-auto">
           {DASHBOARD_NAV.map((item) => {
             const isActive = pathname === item.path || (item.path === '/dashboard' && pathname === '/dashboard');
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${
                   isActive 
-                    ? 'bg-indigo-50 text-primary' 
-                    : 'text-text-muted hover:bg-gray-50 hover:text-text-main'
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30' 
+                    : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'
                 } ${isSidebarCollapsed ? 'justify-center' : ''}`}
                 onClick={() => setIsSidebarOpen(false)}
               >
@@ -112,10 +119,10 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
           })}
         </nav>
 
-        <div className="p-4 border-t border-gray-100">
+        <div className="p-5 border-t border-slate-700/30">
            <button 
              onClick={handleLogout}
-             className={`flex items-center gap-3 w-full px-3 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 ${isSidebarCollapsed ? 'justify-center' : ''}`}
+             className={`flex items-center gap-3 w-full px-4 py-3.5 text-sm font-semibold text-slate-400 hover:bg-red-500/10 hover:text-red-400 rounded-xl transition-all duration-300 ${isSidebarCollapsed ? 'justify-center' : ''}`}
            >
              <LogOut size={20} className="flex-shrink-0" />
              {!isSidebarCollapsed && <span className="whitespace-nowrap">Log Out</span>}
@@ -123,26 +130,24 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
         </div>
       </aside>
 
-
-
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+        <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-6 sm:px-8 lg:px-10 sticky top-0 z-30">
           <button 
-            className="md:hidden text-gray-500 p-2 -ml-2 hover:bg-gray-100 rounded-md"
+            className="md:hidden text-slate-600 p-2 -ml-2 hover:bg-slate-100 rounded-xl transition-colors"
             onClick={() => setIsSidebarOpen(true)}
           >
             <Menu size={24} />
           </button>
 
-          <div className="flex items-center ml-auto gap-2 sm:gap-4">
+          <div className="flex items-center ml-auto gap-3 sm:gap-5">
             <div className="relative" ref={notificationRef}>
               <button 
                 onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                className={`p-2 rounded-full transition-all relative ${isNotificationsOpen ? 'bg-indigo-50 text-primary' : 'text-text-muted hover:text-primary hover:bg-gray-100'}`}
+                className={`p-3 rounded-xl transition-all relative ${isNotificationsOpen ? 'bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600 shadow-md' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-100'}`}
               >
-                <Bell size={20} />
+                <Bell size={22} />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-500 text-[10px] font-bold text-white flex items-center justify-center rounded-full border-2 border-white">
+                  <span className="absolute top-2 right-2 w-5 h-5 bg-gradient-to-r from-red-500 to-rose-500 text-[10px] font-bold text-white flex items-center justify-center rounded-full border-2 border-white shadow-md">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
@@ -150,16 +155,17 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
               {isNotificationsOpen && <NotificationDropdown onClose={() => setIsNotificationsOpen(false)} />}
             </div>
             
-            <div className="h-8 w-px bg-gray-200 mx-1"></div>
+            <div className="h-10 w-px bg-slate-200 mx-1"></div>
             
             <UserMenu variant="dashboard" />
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto bg-gray-100 relative custom-scrollbar">
+        <main className="flex-1 bg-slate-50 relative">
           {children}
         </main>
       </div>
+      <FloatingChatButton />
     </div>
   );
 };

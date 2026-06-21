@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Mail, Lock, User, ArrowRight, AlertCircle, FileText, Sparkles } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, AlertCircle, Sparkles } from 'lucide-react';
 import LogoImage from '../assets/Logo.png';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
@@ -120,10 +120,14 @@ export const Signup: React.FC = () => {
         <div className="w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 sm:p-10 relative z-10 animate-fade-in text-center">
           <div className="flex flex-col items-center">
             <Link to="/" className="inline-flex items-center gap-2.5 mb-6 group">
-              <div className="bg-primary text-white p-2.5 rounded-xl shadow-lg transform group-hover:scale-105 transition-all duration-300">
-                <FileText size={22} />
-              </div>
-              <span className="font-bold text-xl text-text-main tracking-tight">ResumeCraft</span>
+              <img
+                src={LogoImage}
+                alt="ResumeCraft logo"
+                className="h-10 w-auto object-contain transform group-hover:scale-105 transition-all duration-300"
+              />
+              <span className="text-xl font-bold tracking-tight text-gray-900">
+                Resume<span className="text-primary">Craft</span>
+              </span>
             </Link>
             
             <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">Welcome!</h2>
@@ -212,8 +216,8 @@ export const Signup: React.FC = () => {
               {/* Logo visible only on mobile */}
               <div className="md:hidden flex items-center gap-2 mb-6">
                 <Link to="/" className="inline-flex items-center gap-2">
-                  <img src={LogoImage} alt="ResumeCraft logo" className="h-10 w-auto object-contain" />
-                  <span className="font-bold text-lg text-text-main tracking-tight">
+                  <img src={LogoImage} alt="ResumeCraft logo" className="h-8 w-auto object-contain" />
+                  <span className="text-lg font-bold tracking-tight text-gray-900">
                     Resume<span className="text-primary">Craft</span>
                   </span>
                 </Link>
