@@ -72,21 +72,6 @@ export const TEMPLATES: Template[] = [
   },
 
   {
-    id: 'tech',
-    name: 'Tech Stack',
-    tag: 'Developer',
-    description: 'Monospace fonts and skill-focused sidebar for developers.',
-    thumbnailUrl: '/thumbnails/tech.png',
-    thumbnailClass: 'bg-gray-100 border-l-4 border-green-500',
-
-    access: 'free',
-    requiresAuth: false,
-    price: 12.99,
-    watermark: true,
-    atsOptimized: true,
-  },
-
-  {
     id: 'academic',
     name: 'Academic',
     tag: 'Scholar',
@@ -114,19 +99,7 @@ export const TEMPLATES: Template[] = [
     atsOptimized: true,
   },
 
-  {
-    id: 'elegant',
-    name: 'Elegant',
-    tag: 'Sophisticated',
-    description: 'Refined typography and balanced layout for premium professional presentation.',
-    thumbnailUrl: '/thumbnails/elegant.png',
-    thumbnailClass: 'bg-white border-t-4 border-rose-300',
 
-    access: 'free',
-    requiresAuth: false,
-    watermark: true,
-    atsOptimized: false,
-  },
   
   {
     id: 'startup',
@@ -674,6 +647,111 @@ export const TEMPLATES: Template[] = [
     description: 'Fresh, vibrant design with coral and rose accents, modern and inviting.',
     thumbnailUrl: '',
     thumbnailClass: 'bg-gradient-to-r from-coral-500 via-rose-400 to-pink-500',
+
+    access: 'free',
+    requiresAuth: false,
+    watermark: true,
+    atsOptimized: true,
+  },
+  {
+    id: 'slate-executive-pro',
+    name: 'Slate Executive Pro',
+    tag: 'Professional',
+    description: 'Traditional slate-themed executive resume, perfect for corporate roles.',
+    thumbnailUrl: '',
+    thumbnailClass: 'bg-slate-800',
+
+    access: 'free',
+    requiresAuth: false,
+    watermark: true,
+    atsOptimized: true,
+  },
+
+  {
+    id: 'geometric-creative-edge',
+    name: 'Geometric Creative Edge',
+    tag: 'Creative',
+    description: 'Modern geometric accents and playful colors for designers.',
+    thumbnailUrl: '',
+    thumbnailClass: 'bg-gradient-to-br from-cyan-500 to-purple-500',
+
+    access: 'free',
+    requiresAuth: false,
+    watermark: true,
+    atsOptimized: false,
+  },
+  {
+    id: 'clean-mono-minimal',
+    name: 'Clean Mono Minimal',
+    tag: 'Minimal',
+    description: 'Ultra-minimalist monochrome design, focused solely on content.',
+    thumbnailUrl: '',
+    thumbnailClass: 'bg-white border-b border-slate-200',
+
+    access: 'free',
+    requiresAuth: false,
+    watermark: true,
+    atsOptimized: true,
+  },
+  {
+    id: 'soft-cyan-minimal',
+    name: 'Soft Cyan Minimal',
+    tag: 'Minimal',
+    description: 'Soft cyan and white minimalist design for a clean look.',
+    thumbnailUrl: '',
+    thumbnailClass: 'bg-cyan-50',
+
+    access: 'free',
+    requiresAuth: false,
+    watermark: true,
+    atsOptimized: true,
+  },
+  {
+    id: 'tech-startup-modern',
+    name: 'Tech Startup Modern',
+    tag: 'Modern',
+    description: 'Clean tech-themed resume, great for startups and tech roles.',
+    thumbnailUrl: '',
+    thumbnailClass: 'bg-gradient-to-r from-blue-500 to-cyan-500',
+
+    access: 'free',
+    requiresAuth: false,
+    watermark: true,
+    atsOptimized: true,
+  },
+  {
+    id: 'modern-green-tech',
+    name: 'Modern Green Tech',
+    tag: 'Modern',
+    description: 'Elegant green-themed resume, perfect for sustainability-focused roles.',
+    thumbnailUrl: '',
+    thumbnailClass: 'bg-gradient-to-r from-emerald-500 to-green-500',
+
+    access: 'free',
+    requiresAuth: false,
+    watermark: true,
+    atsOptimized: true,
+  },
+  {
+    id: 'elegant-coral',
+    name: 'Elegant Coral',
+    tag: 'Modern',
+    description: 'Elegant coral and pink resume with a warm, inviting feel.',
+    thumbnailUrl: '',
+    thumbnailClass: 'bg-gradient-to-r from-coral-500 to-pink-500',
+
+    access: 'free',
+    requiresAuth: false,
+    watermark: true,
+    atsOptimized: true,
+  },
+  {
+    id: 'warm-peach-elegant',
+    name: 'Warm Peach Elegant',
+    tag: 'Modern',
+    description: 'Warm peach and amber-themed elegant resume.',
+    thumbnailUrl: '',
+    thumbnailClass: 'bg-gradient-to-r from-amber-500 to-orange-500',
 
     access: 'free',
     requiresAuth: false,

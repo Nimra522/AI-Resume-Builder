@@ -13,10 +13,8 @@ const MinimalistTemplate = lazy(() => import('../templates/MinimalistTemplate'))
 const ExecutiveTemplate = lazy(() => import('../templates/ExecutiveTemplate'));
 const CreativeTemplate = lazy(() => import('../templates/CreativeTemplate'));
 const CompactTemplate = lazy(() => import('../templates/CompactTemplate'));
-const TechTemplate = lazy(() => import('../templates/TechTemplate'));
 const StartupTemplate = lazy(() => import('../templates/StartupTemplate'));
 const AcademicTemplate = lazy(() => import('../templates/AcademicTemplate'));
-const ElegantTemplate = lazy(() => import('../templates/ElegantTemplate'));
 const FreshGraduateModernTemplate = lazy(() => import('../templates/FreshGraduateModernTemplate'));
 const ModernTimelineTemplate = lazy(() => import('../templates/ModernTimelineTemplate'));
 const WarmProfessionalTemplate = lazy(() => import('../templates/WarmProfessionalTemplate'));
@@ -58,6 +56,14 @@ const TechModernTemplate = lazy(() => import('../templates/TechModernTemplate'))
 const GlassEffectTemplate = lazy(() => import('../templates/GlassEffectTemplate'));
 const SunsetRetroTemplate = lazy(() => import('../templates/SunsetRetroTemplate'));
 const CoralFreshTemplate = lazy(() => import('../templates/CoralFreshTemplate'));
+const SlateExecutiveProTemplate = lazy(() => import('../templates/SlateExecutiveProTemplate'));
+const GeometricCreativeEdgeTemplate = lazy(() => import('../templates/GeometricCreativeEdgeTemplate'));
+const CleanMonoMinimalTemplate = lazy(() => import('../templates/CleanMonoMinimalTemplate'));
+const SoftCyanMinimalTemplate = lazy(() => import('../templates/SoftCyanMinimalTemplate'));
+const TechStartupModernTemplate = lazy(() => import('../templates/TechStartupModernTemplate'));
+const ModernGreenTechTemplate = lazy(() => import('../templates/ModernGreenTechTemplate'));
+const ElegantCoralTemplate = lazy(() => import('../templates/ElegantCoralTemplate'));
+const WarmPeachElegantTemplate = lazy(() => import('../templates/WarmPeachElegantTemplate'));
 
 const TEMPLATE_MAP: Record<string, React.LazyExoticComponent<React.ComponentType<{ data: ResumeData }>>> = {
   modern: ModernTemplate,
@@ -66,10 +72,8 @@ const TEMPLATE_MAP: Record<string, React.LazyExoticComponent<React.ComponentType
   executive: ExecutiveTemplate,
   creative: CreativeTemplate,
   compact: CompactTemplate,
-  tech: TechTemplate,
   startup: StartupTemplate,
   academic: AcademicTemplate,
-  elegant: ElegantTemplate,
   'fresh-graduate-modern': FreshGraduateModernTemplate,
   'modern-timeline': ModernTimelineTemplate,
   'warm-professional': WarmProfessionalTemplate,
@@ -111,6 +115,14 @@ const TEMPLATE_MAP: Record<string, React.LazyExoticComponent<React.ComponentType
   'glass-effect': GlassEffectTemplate,
   'sunset-retro': SunsetRetroTemplate,
   'coral-fresh': CoralFreshTemplate,
+  'slate-executive-pro': SlateExecutiveProTemplate,
+  'geometric-creative-edge': GeometricCreativeEdgeTemplate,
+  'clean-mono-minimal': CleanMonoMinimalTemplate,
+  'soft-cyan-minimal': SoftCyanMinimalTemplate,
+  'tech-startup-modern': TechStartupModernTemplate,
+  'modern-green-tech': ModernGreenTechTemplate,
+  'elegant-coral': ElegantCoralTemplate,
+  'warm-peach-elegant': WarmPeachElegantTemplate,
 };
 
 const LoadingFallback: React.FC = () => (
@@ -120,7 +132,7 @@ const LoadingFallback: React.FC = () => (
 );
 
 export const LivePreview: React.FC<LivePreviewProps> = ({ data, templateId }) => {
-  const TemplateComponent = TEMPLATE_MAP[templateId] || ElegantTemplate;
+  const TemplateComponent = TEMPLATE_MAP[templateId] || ModernTemplate;
 
   return (
     <Suspense fallback={<LoadingFallback />}>
