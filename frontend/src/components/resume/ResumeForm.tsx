@@ -5,7 +5,7 @@ import { Button } from '../ui/Button';
 import { FormSection } from '../ui/FormSection';
 import { Plus, User, Briefcase, GraduationCap, Code, FolderGit2, Award, ChevronLeft, ChevronRight, CheckCircle2, Sparkles, RefreshCw, Loader2, X } from 'lucide-react';
 import { LOCATION_OPTIONS, LocationOption } from '../../data/locations';
-import { FAQExamples } from '../faq/FAQExamples';
+
 import { useAuth } from '../../context/AuthContext';
 
 interface ResumeFormProps {
@@ -462,11 +462,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                       Improve with AI
                     </Button>
                   </div>
-                  <FAQExamples 
-                    field="summary" 
-                    currentValue={data.personalInfo.summary} 
-                    onValueChange={(value) => updatePersonalInfo('summary', value)} 
-                  />
+
                 </div>
             </div>
           </div>
@@ -557,11 +553,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                             Improve with AI
                           </Button>
                         </div>
-                        <FAQExamples 
-                          field="description" 
-                          currentValue={exp.description} 
-                          onValueChange={(value) => updateItem<Experience>('experience', exp.id, 'description', value)} 
-                        />
+
                       </div>
                     </div>
                   </FormSection>
@@ -632,11 +624,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                             Improve with AI
                           </Button>
                         </div>
-                        <FAQExamples 
-                          field="description" 
-                          currentValue={edu.description} 
-                          onValueChange={(value) => updateItem<Education>('education', edu.id, 'description', value)} 
-                        />
+
                       </div>
                     </div>
                   </FormSection>
@@ -686,14 +674,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                   ))}
                 </div>
               )}
-              <FAQExamples 
-                field="skills" 
-                currentValue={data.skills.join(', ')} 
-                onValueChange={(value) => {
-                  const skillsArray = value.split(',').map(s => s.trim());
-                  onChange({ ...data, skills: skillsArray });
-                }} 
-              />
+
             </div>
           </div>
         )}
@@ -756,11 +737,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
                             Improve with AI
                           </Button>
                         </div>
-                        <FAQExamples 
-                          field="description" 
-                          currentValue={proj.description} 
-                          onValueChange={(value) => updateItem<Project>('projects', proj.id, 'description', value)} 
-                        />
+
                       </div>
                     </div>
                   </FormSection>

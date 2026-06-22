@@ -16,7 +16,9 @@ const BASE_DATA: ResumeData = {
   education: [],
   skills: [],
   projects: [],
-  certifications: []
+  certifications: [],
+  languages: [],
+  additionalInfo: []
 };
 
 // Fix: Use any for overrides to allow partial nested objects while maintaining a simple data creation helper
@@ -32,7 +34,7 @@ export const EXAMPLES: Example[] = [
     title: 'Senior Software Engineer',
     role: 'Tech & Engineering',
     description: 'A performance-focused resume highlighting cloud architecture and full-stack expertise.',
-    layoutType: 'tech',
+    layoutType: 'modern',
     thumbnailUrl: '/dist/assets/templates/Teck stack.jpg',
     colorAccent: 'bg-green-500',
     data: createData({

@@ -19,6 +19,7 @@ export type UserMenuVariant = 'navbar' | 'dashboard';
 
 interface UserMenuProps {
   variant?: UserMenuVariant;
+  isEditorPage?: boolean;
 }
 
 const MenuLink: React.FC<{
@@ -65,7 +66,7 @@ const planBadgeClass = (plan: string) =>
  * - Navbar: <UserMenu variant="navbar" />
  * - Dashboard: <UserMenu variant="dashboard" />
  */
-export const UserMenu: React.FC<UserMenuProps> = ({ variant = 'navbar' }) => {
+export const UserMenu: React.FC<UserMenuProps> = ({ variant = 'navbar', isEditorPage = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
@@ -128,7 +129,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ variant = 'navbar' }) => {
       {/* Dropdown Panel */}
       {isOpen && (
         <div
-          className={`absolute right-0 ${isNavbar ? 'mt-2 w-64' : 'mt-3 w-72'} bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[100] animate-fade-in origin-top-right`}
+          className={`absolute right-0 ${isEditorPage ? (isNavbar ? 'mt-2 w-64 origin-top-right' : 'mt-3 w-72 origin-top-right') : (isNavbar ? 'bottom-full mb-2 w-64 origin-bottom-right' : 'bottom-full mb-3 w-72 origin-bottom-right')} bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[999] animate-fade-in`}
         >
           {isNavbar ? (
             <>

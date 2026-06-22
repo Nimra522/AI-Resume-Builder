@@ -359,25 +359,26 @@ export const ResumeBuilder: React.FC = () => {
 
   return (
     <DashboardLayout>
-       {/* Builder Toolbar */}
-       <div className="sticky top-0 z-30 bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4 shadow-md">
-         <div className="flex items-center gap-4">
-           <div className="relative group">
+      <div className="flex flex-col h-full overflow-hidden">
+        {/* Builder Toolbar */}
+        <div className="z-20 bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-3 shadow-md flex-shrink-0">
+          <div className="flex items-center gap-4">
+            <div className="relative group">
               <input 
                 type="text" 
                 value={resumeTitle}
                 onChange={(e) => setResumeTitle(e.target.value)}
-                className="text-2xl font-bold text-gray-900 bg-white border border-transparent hover:border-gray-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 rounded-lg px-4 py-2 outline-none transition-all shadow-sm"
+                className="text-xl font-bold text-gray-900 bg-white border border-transparent hover:border-gray-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 rounded-lg px-3 py-1.5 outline-none transition-all shadow-sm"
                 placeholder="My Resume Title"
               />
-           </div>
-           <span className="inline-flex items-center gap-1 text-[11px] text-indigo-700 px-3 py-1 bg-indigo-50 rounded-full font-bold uppercase tracking-wider border border-indigo-100">
-             <Sparkles size={12} />
-             Draft
-           </span>
-         </div>
-         
-         <div className="flex items-center gap-3 ml-auto">
+            </div>
+            <span className="inline-flex items-center gap-1 text-[11px] text-indigo-700 px-3 py-1 bg-indigo-50 rounded-full font-bold uppercase tracking-wider border border-indigo-100">
+              <Sparkles size={12} />
+              Draft
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-3 ml-auto">
             <div className="hidden md:flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
               <Palette size={18} className="text-indigo-600" />
               <select 
@@ -440,11 +441,11 @@ export const ResumeBuilder: React.FC = () => {
             >
               {isDownloading ? 'Exporting...' : 'Download PDF'}
             </Button>
-         </div>
-       </div>
+          </div>
+        </div>
 
-       {/* Main Workspace */}
-       <div className="flex h-[calc(100vh-130px)] overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100">
+        {/* Main Workspace */}
+        <div className="flex flex-1 overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100">
          {/* Left: Editor */}
          <div className={`
            w-full md:w-1/2 lg:w-5/12 xl:w-1/3 bg-white border-r border-gray-200 overflow-y-auto custom-scrollbar
@@ -458,7 +459,7 @@ export const ResumeBuilder: React.FC = () => {
          {/* Right: Preview */}
          <div className={`
             flex-1 bg-gradient-to-br from-gray-100 to-gray-200 overflow-y-auto custom-scrollbar p-5 sm:p-10 flex justify-center items-start
-            ${showMobilePreview ? 'block fixed inset-0 z-40 bg-gradient-to-br from-gray-100 to-gray-200 mt-[118px] pb-32' : 'hidden md:flex'}
+            ${showMobilePreview ? 'block fixed inset-0 z-40 bg-gradient-to-br from-gray-100 to-gray-200 top-[calc(5rem+var(--toolbar-height,3.5rem))]' : 'hidden md:flex'}
          `}>
             <div 
               ref={previewRef}
@@ -467,7 +468,8 @@ export const ResumeBuilder: React.FC = () => {
                <LivePreview data={resumeData} templateId={selectedTemplateId} />
             </div>
          </div>
-       </div>
+        </div>
+      </div>
     </DashboardLayout>
   );
 };
