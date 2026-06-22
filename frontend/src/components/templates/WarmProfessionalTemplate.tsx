@@ -61,7 +61,11 @@ const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
               borderRadius: '0 20px 0 0',
             }}
           >
-            <User size={36} className="text-gray-400" />
+            {personalInfo.photoUrl ? (
+              <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <img src="/profile-placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
+            )}
           </div>
           <div className="flex-1 min-w-0 pt-1">
             <h1 className="text-2xl font-bold text-[#2C2C2C] uppercase tracking-[0.12em] leading-tight">

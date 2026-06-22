@@ -108,6 +108,7 @@ export interface ResumeData {
     linkedin: string;
     jobTitle: string;
     summary: string;
+    photoUrl?: string;
   };
   experience: Experience[];
   education: Education[];

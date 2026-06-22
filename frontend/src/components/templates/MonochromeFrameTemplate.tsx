@@ -106,7 +106,11 @@ const MonochromeFrameComponent: React.FC<MonochromeFrameProps> = ({ data }) => {
           {/* Profile Photo - top right, extends above frame */}
           <div className="self-end relative z-10" style={{ width: photoSize, height: photoSize }}>
             <div className="w-full h-full bg-gray-200 overflow-hidden flex items-center justify-center">
-              <User size={36} className="text-gray-400" />
+              {personalInfo.photoUrl ? (
+                <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <img src="/profile-placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
+              )}
             </div>
           </div>
 

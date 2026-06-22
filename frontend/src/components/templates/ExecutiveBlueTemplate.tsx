@@ -29,7 +29,11 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
         <div className="flex items-center gap-5">
           {/* Square Profile Photo - overlaps header and sidebar */}
           <div className="w-[88px] h-[88px] bg-gray-300 overflow-hidden border-2 border-white shadow-md flex-shrink-0 flex items-center justify-center relative z-10 -mb-[-32px]">
-            <User size={36} className="text-gray-500" />
+            {personalInfo.photoUrl ? (
+              <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <img src="/profile-placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
+            )}
           </div>
           <div className="flex-1 min-w-0 pt-2">
             <h1 className="font-serif font-bold text-2xl text-white leading-tight">

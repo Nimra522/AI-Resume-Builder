@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, User } from 'lucide-react';
+import { Phone, Mail, MapPin } from 'lucide-react';
 
 interface RetroContourProps {
   data: ResumeData;
@@ -49,7 +49,11 @@ const RetroContourComponent: React.FC<RetroContourProps> = ({ data }) => {
             </div>
             {/* Circular Profile Photo */}
             <div className="w-[78px] h-[78px] rounded-full bg-gray-200 overflow-hidden border-2 border-[#3D2B1F] flex items-center justify-center relative z-10">
-              <User size={30} className="text-gray-400" />
+              {personalInfo.photoUrl ? (
+                <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <img src="/profile-placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
+              )}
             </div>
           </div>
 

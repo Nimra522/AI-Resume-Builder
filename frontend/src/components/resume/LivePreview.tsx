@@ -38,6 +38,16 @@ const DeepTealEmeraldTemplate = lazy(() => import('../templates/DeepTealEmeraldT
 const BurgundyBlushEleganceTemplate = lazy(() => import('../templates/BurgundyBlushEleganceTemplate'));
 const SlateBlueSilverTemplate = lazy(() => import('../templates/SlateBlueSilverTemplate'));
 const CharcoalAmberProTemplate = lazy(() => import('../templates/CharcoalAmberProTemplate'));
+const AuroraGlowTemplate = lazy(() => import('../templates/AuroraGlowTemplate'));
+const SapphireEleganceTemplate = lazy(() => import('../templates/SapphireEleganceTemplate'));
+const ForestCanopyTemplate = lazy(() => import('../templates/ForestCanopyTemplate'));
+const CrimsonSummitTemplate = lazy(() => import('../templates/CrimsonSummitTemplate'));
+const OceanicCalmTemplate = lazy(() => import('../templates/OceanicCalmTemplate'));
+const RoyalIndigoEleganceTemplate = lazy(() => import('../templates/RoyalIndigoEleganceTemplate'));
+const VerdantSageTemplate = lazy(() => import('../templates/VerdantSageTemplate'));
+const CrimsonRoseVelvetTemplate = lazy(() => import('../templates/CrimsonRoseVelvetTemplate'));
+const SlateSilverPrecisionTemplate = lazy(() => import('../templates/SlateSilverPrecisionTemplate'));
+const CharcoalAmberNoirTemplate = lazy(() => import('../templates/CharcoalAmberNoirTemplate'));
 
 const TEMPLATE_MAP: Record<string, React.LazyExoticComponent<React.ComponentType<{ data: ResumeData }>>> = {
   modern: ModernTemplate,
@@ -71,6 +81,16 @@ const TEMPLATE_MAP: Record<string, React.LazyExoticComponent<React.ComponentType
   'burgundy-blush-elegance': BurgundyBlushEleganceTemplate,
   'slate-blue-silver': SlateBlueSilverTemplate,
   'charcoal-amber-pro': CharcoalAmberProTemplate,
+  'aurora-glow': AuroraGlowTemplate,
+  'sapphire-elegance': SapphireEleganceTemplate,
+  'forest-canopy': ForestCanopyTemplate,
+  'crimson-summit': CrimsonSummitTemplate,
+  'oceanic-calm': OceanicCalmTemplate,
+  'royal-indigo-elegance': RoyalIndigoEleganceTemplate,
+  'verdant-sage': VerdantSageTemplate,
+  'crimson-rose-velvet': CrimsonRoseVelvetTemplate,
+  'slate-silver-precision': SlateSilverPrecisionTemplate,
+  'charcoal-amber-noir': CharcoalAmberNoirTemplate,
 };
 
 const LoadingFallback: React.FC = () => (

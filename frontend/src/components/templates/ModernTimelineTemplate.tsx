@@ -40,7 +40,11 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
       <div className="w-[34%] bg-gray-50 p-6 flex flex-col items-center space-y-5">
         {/* Profile Photo */}
         <div className="w-28 h-28 rounded-sm bg-gray-200 overflow-hidden flex items-center justify-center border border-gray-300">
-          <User size={48} className="text-gray-400" />
+          {personalInfo.photoUrl ? (
+            <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+          ) : (
+            <img src="/profile-placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
+          )}
         </div>
 
         {/* Name */}

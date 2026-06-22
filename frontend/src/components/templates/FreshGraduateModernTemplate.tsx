@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, User } from 'lucide-react';
+import { Phone, Mail, MapPin } from 'lucide-react';
 
 interface FreshGraduateModernProps {
   data: ResumeData;
@@ -50,7 +50,11 @@ const FreshGraduateModernComponent: React.FC<FreshGraduateModernProps> = ({ data
       {/* Header */}
       <div className="flex items-start gap-6 px-8 pt-8 pb-6 border-b border-gray-200 relative z-10">
         <div className="w-24 h-24 rounded-lg bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-200 flex items-center justify-center">
-          <User size={36} className="text-gray-300" />
+          {personalInfo.photoUrl ? (
+            <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+          ) : (
+            <img src="/profile-placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <h1 className="text-3xl font-bold uppercase tracking-[0.15em] text-gray-900 leading-tight">
