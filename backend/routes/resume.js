@@ -52,7 +52,7 @@ router.get('/all', authenticateToken, async (req, res) => {
   try {
     const resumes = await Resume.find(
       { user: req.user.id },
-      'title atsScore lastEdited'
+      'title atsScore lastEdited data templateId'
     ).sort({ lastEdited: -1 });
 
     res.json(resumes);

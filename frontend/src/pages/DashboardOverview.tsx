@@ -35,16 +35,62 @@ export const DashboardOverview: React.FC = () => {
 
   // Load user resumes
   useEffect(() => {
-    const storeKey = `saved_resumes_${user?.id || 'guest'}`;
-    const stored = localStorage.getItem(storeKey);
-    if (stored) {
-      try {
-        setResumes(JSON.parse(stored));
-      } catch (e) {
-        console.error('Failed to parse resumes on dashboard overview:', e);
+    const loadResumes = async () => {
+      if (isAuthenticated) {
+        try {
+          const response = await fetch('/api/resume/all', {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('resume_ai_token')}`
+            }
+          });
+          
+          if (response.ok) {
+            const apiResumes = await response.json();
+            
+            // Convert to SavedResume format
+            const formattedResumes: SavedResume[] = apiResumes.map((res: any) => ({
+              id: res._id,
+              title: res.title,
+              templateId: res.templateId,
+              lastEdited: new Date(res.lastEdited).toISOString(),
+              data: res.data
+            }));
+            
+            // Update state and also update localStorage
+            setResumes(formattedResumes);
+            
+            const storeKey = `saved_resumes_${user?.id || 'guest'}`;
+            localStorage.setItem(storeKey, JSON.stringify(formattedResumes));
+          }
+        } catch (err) {
+          console.error('Failed to load resumes from API, falling back to localStorage', err);
+          // Fallback to localStorage
+          const storeKey = `saved_resumes_${user?.id || 'guest'}`;
+          const stored = localStorage.getItem(storeKey);
+          if (stored) {
+            try {
+              setResumes(JSON.parse(stored));
+            } catch (e) {
+              console.error('Failed to parse resumes on dashboard overview:', e);
+            }
+          }
+        }
+      } else {
+        // Not authenticated, use localStorage
+        const storeKey = `saved_resumes_${user?.id || 'guest'}`;
+        const stored = localStorage.getItem(storeKey);
+        if (stored) {
+          try {
+            setResumes(JSON.parse(stored));
+          } catch (e) {
+            console.error('Failed to parse resumes on dashboard overview:', e);
+          }
+        }
       }
-    }
-  }, [user]);
+    };
+    
+    loadResumes();
+  }, [user, isAuthenticated]);
 
   const handleEdit = (resume: SavedResume) => {
     localStorage.setItem('resume_builder_data', JSON.stringify(resume.data));
@@ -63,7 +109,20 @@ export const DashboardOverview: React.FC = () => {
     setIsDeleting(true);
     
     try {
-      // Local delete logic
+      // Call delete API first if authenticated
+      if (isAuthenticated) {
+        const response = await fetch(`/api/resume/${deleteId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('resume_ai_token')}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) throw new Error('Failed to delete resume from server');
+      }
+      
+      // Update local state and localStorage regardless
       const updated = resumes.filter(r => r.id !== deleteId);
       setResumes(updated);
       const storeKey = `saved_resumes_${user?.id || 'guest'}`;
@@ -71,19 +130,6 @@ export const DashboardOverview: React.FC = () => {
       
       // Update count in Auth Context
       updateResumeCount();
-      
-      // Attempt API delete in background
-      try {
-        await fetch(`/api/resumes/${deleteId}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-            'Content-Type': 'application/json'
-          }
-        });
-      } catch (apiErr) {
-        console.warn('API delete background failed, synced locally');
-      }
 
       addNotification("Resume deleted successfully", "success");
     } catch (err) {

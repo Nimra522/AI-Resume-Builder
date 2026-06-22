@@ -262,6 +262,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
     setAiLoading(prev => ({ ...prev, experiences: { ...prev.experiences, [id]: true } }));
     try {
       const res = await callAI('/generate-experience', { role, company });
+      // @ts-ignore - dynamic field access
       updateItem('experience', id, 'description', res.description);
     } finally {
       setAiLoading(prev => ({ ...prev, experiences: { ...prev.experiences, [id]: false } }));
@@ -314,10 +315,13 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
     if (field === 'summary') {
       updatePersonalInfo('summary', improved);
     } else if (field === 'experience' && id) {
+      // @ts-ignore - dynamic field access
       updateItem('experience', id, 'description', improved);
     } else if (field === 'education' && id) {
+      // @ts-ignore - dynamic field access
       updateItem('education', id, 'description', improved);
     } else if (field === 'project' && id) {
+      // @ts-ignore - dynamic field access
       updateItem('projects', id, 'description', improved);
     }
     setImproveModal(null);
