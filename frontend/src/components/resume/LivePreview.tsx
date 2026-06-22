@@ -48,6 +48,16 @@ const VerdantSageTemplate = lazy(() => import('../templates/VerdantSageTemplate'
 const CrimsonRoseVelvetTemplate = lazy(() => import('../templates/CrimsonRoseVelvetTemplate'));
 const SlateSilverPrecisionTemplate = lazy(() => import('../templates/SlateSilverPrecisionTemplate'));
 const CharcoalAmberNoirTemplate = lazy(() => import('../templates/CharcoalAmberNoirTemplate'));
+const ClassicNavyExecutiveTemplate = lazy(() => import('../templates/ClassicNavyExecutiveTemplate'));
+const CharcoalCorporateTemplate = lazy(() => import('../templates/CharcoalCorporateTemplate'));
+const NeonCreativeTemplate = lazy(() => import('../templates/NeonCreativeTemplate'));
+const ArtDecoEleganceTemplate = lazy(() => import('../templates/ArtDecoEleganceTemplate'));
+const MonoCleanTemplate = lazy(() => import('../templates/MonoCleanTemplate'));
+const AiryLightTemplate = lazy(() => import('../templates/AiryLightTemplate'));
+const TechModernTemplate = lazy(() => import('../templates/TechModernTemplate'));
+const GlassEffectTemplate = lazy(() => import('../templates/GlassEffectTemplate'));
+const SunsetRetroTemplate = lazy(() => import('../templates/SunsetRetroTemplate'));
+const CoralFreshTemplate = lazy(() => import('../templates/CoralFreshTemplate'));
 
 const TEMPLATE_MAP: Record<string, React.LazyExoticComponent<React.ComponentType<{ data: ResumeData }>>> = {
   modern: ModernTemplate,
@@ -91,6 +101,16 @@ const TEMPLATE_MAP: Record<string, React.LazyExoticComponent<React.ComponentType
   'crimson-rose-velvet': CrimsonRoseVelvetTemplate,
   'slate-silver-precision': SlateSilverPrecisionTemplate,
   'charcoal-amber-noir': CharcoalAmberNoirTemplate,
+  'classic-navy-executive': ClassicNavyExecutiveTemplate,
+  'charcoal-corporate': CharcoalCorporateTemplate,
+  'neon-creative': NeonCreativeTemplate,
+  'art-deco-elegance': ArtDecoEleganceTemplate,
+  'mono-clean': MonoCleanTemplate,
+  'airy-light': AiryLightTemplate,
+  'tech-modern': TechModernTemplate,
+  'glass-effect': GlassEffectTemplate,
+  'sunset-retro': SunsetRetroTemplate,
+  'coral-fresh': CoralFreshTemplate,
 };
 
 const LoadingFallback: React.FC = () => (
