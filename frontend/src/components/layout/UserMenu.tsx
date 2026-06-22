@@ -107,21 +107,23 @@ export const UserMenu: React.FC<UserMenuProps> = ({ variant = 'navbar', isEditor
         </button>
       ) : (
         <div
-          className="flex items-center gap-3 pl-1 cursor-pointer hover:bg-gray-50 p-1.5 rounded-lg transition-colors"
+          className={`flex items-center gap-2 pl-1 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors ${isEditorPage ? 'p-1' : 'p-1.5'}`}
           onClick={() => setIsOpen(!isOpen)}
         >
-          <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-primary font-bold overflow-hidden border-2 border-white shadow-sm">
+          <div className={`rounded-full bg-indigo-100 flex items-center justify-center text-primary font-bold overflow-hidden border-2 border-white shadow-sm ${isEditorPage ? 'w-8 h-8' : 'w-9 h-9'}`}>
             <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
           </div>
-          <div className="hidden sm:block text-left">
-            <p className="text-sm font-bold text-text-main leading-none">{user.name}</p>
-            <p className="text-[10px] text-text-muted mt-1 uppercase font-black tracking-widest flex items-center gap-1">
-              <ShieldCheck size={10} className="text-primary" /> {displayPlan} Member
-            </p>
-          </div>
+          {!isEditorPage && (
+            <div className="hidden sm:block text-left">
+              <p className="text-sm font-bold text-text-main leading-none">{user.name}</p>
+              <p className="text-[10px] text-text-muted mt-1 uppercase font-black tracking-widest flex items-center gap-1">
+                <ShieldCheck size={10} className="text-primary" /> {displayPlan} Member
+              </p>
+            </div>
+          )}
           <ChevronDown
-            size={14}
-            className={`text-text-muted hidden sm:block transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+            size={isEditorPage ? 12 : 14}
+            className={`text-text-muted transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} ${isEditorPage ? '' : 'hidden sm:block'}`}
           />
         </div>
       )}
@@ -129,7 +131,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ variant = 'navbar', isEditor
       {/* Dropdown Panel */}
       {isOpen && (
         <div
-          className={`absolute right-0 ${isEditorPage ? (isNavbar ? 'mt-2 w-64 origin-top-right' : 'mt-3 w-72 origin-top-right') : (isNavbar ? 'bottom-full mb-2 w-64 origin-bottom-right' : 'bottom-full mb-3 w-72 origin-bottom-right')} bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[999] animate-fade-in`}
+          className={`absolute right-0 max-w-[90vw] ${isEditorPage ? (isNavbar ? 'mt-2 w-64 origin-top-right' : 'mt-3 w-72 origin-top-right') : (isNavbar ? 'bottom-full mb-2 w-64 origin-bottom-right' : 'bottom-full mb-3 w-72 origin-bottom-right')} bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[9999] animate-fade-in`}
         >
           {isNavbar ? (
             <>

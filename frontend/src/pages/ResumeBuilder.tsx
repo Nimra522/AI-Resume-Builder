@@ -361,28 +361,28 @@ export const ResumeBuilder: React.FC = () => {
     <DashboardLayout>
       <div className="flex flex-col h-full overflow-hidden">
         {/* Builder Toolbar */}
-        <div className="z-20 bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-3 shadow-md flex-shrink-0">
-          <div className="flex items-center gap-4">
+        <div className="z-20 bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 px-4 sm:px-6 py-1.5 flex flex-wrap items-center justify-between gap-2 shadow-md flex-shrink-0">
+          <div className="flex items-center gap-3">
             <div className="relative group">
               <input 
                 type="text" 
                 value={resumeTitle}
                 onChange={(e) => setResumeTitle(e.target.value)}
-                className="text-xl font-bold text-gray-900 bg-white border border-transparent hover:border-gray-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 rounded-lg px-3 py-1.5 outline-none transition-all shadow-sm"
+                className="text-base font-bold text-gray-900 bg-white border border-transparent hover:border-gray-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 rounded-lg px-2.5 py-1 outline-none transition-all shadow-sm"
                 placeholder="My Resume Title"
               />
             </div>
-            <span className="inline-flex items-center gap-1 text-[11px] text-indigo-700 px-3 py-1 bg-indigo-50 rounded-full font-bold uppercase tracking-wider border border-indigo-100">
-              <Sparkles size={12} />
+            <span className="inline-flex items-center gap-1 text-[10px] text-indigo-700 px-2.5 py-0.5 bg-indigo-50 rounded-full font-bold uppercase tracking-wider border border-indigo-100">
+              <Sparkles size={10} />
               Draft
             </span>
           </div>
           
-          <div className="flex items-center gap-3 ml-auto">
-            <div className="hidden md:flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
-              <Palette size={18} className="text-indigo-600" />
+          <div className="flex items-center gap-2 ml-auto">
+            <div className="hidden md:flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm">
+              <Palette size={16} className="text-indigo-600" />
               <select 
-                className="text-sm border-none bg-transparent focus:ring-0 cursor-pointer text-gray-800 font-semibold outline-none"
+                className="text-xs border-none bg-transparent focus:ring-0 cursor-pointer text-gray-800 font-semibold outline-none"
                 value={selectedTemplateId}
                 onChange={async (e) => {
                   const nextTemplateId = e.target.value;
@@ -414,9 +414,9 @@ export const ResumeBuilder: React.FC = () => {
             <Button 
               variant="secondary" 
               size="sm" 
-              className="md:hidden shadow-sm"
+              className="md:hidden shadow-sm text-xs h-8"
               onClick={() => setShowMobilePreview(!showMobilePreview)}
-              icon={<Eye size={16}/>}
+              icon={<Eye size={14}/>}
             >
               {showMobilePreview ? 'Edit' : 'Preview'}
             </Button>
@@ -424,20 +424,20 @@ export const ResumeBuilder: React.FC = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              icon={isSaving ? <Loader2 className="animate-spin" size={16}/> : <Save size={16}/>}
+              icon={isSaving ? <Loader2 className="animate-spin" size={14}/> : <Save size={14}/>}
               onClick={handleSave}
               disabled={isSaving}
-              className="shadow-sm"
+              className="shadow-sm text-xs h-8"
             >
               {isSaving ? 'Saving...' : 'Save Resume'}
             </Button>
             
             <Button 
               size="sm" 
-              icon={isDownloading ? <Loader2 className="animate-spin" size={16}/> : <Download size={16}/>}
+              icon={isDownloading ? <Loader2 className="animate-spin" size={14}/> : <Download size={14}/>}
               onClick={handleDownloadPDF}
               disabled={isDownloading}
-              className="shadow-lg hover:shadow-xl transition-shadow"
+              className="shadow-lg hover:shadow-xl transition-shadow text-xs h-8"
             >
               {isDownloading ? 'Exporting...' : 'Download PDF'}
             </Button>

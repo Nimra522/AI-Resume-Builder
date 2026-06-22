@@ -137,15 +137,15 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
       )}
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className={`h-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-6 sm:px-8 lg:px-10 flex-shrink-0 z-30 ${isEditorPage ? 'px-4 sm:px-6' : ''}`}>
+        <header className={`${isEditorPage ? 'h-14' : 'h-20'} bg-white/80 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-6 sm:px-8 lg:px-10 flex-shrink-0 z-30 ${isEditorPage ? 'px-4 sm:px-6' : ''}`}>
           {isEditorPage ? (
-            <Link to="/" className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2">
               <img
                 src={LogoImage}
                 alt="ResumeCraft logo"
-                className="h-8 w-auto object-contain flex-shrink-0"
+                className="h-6 w-auto object-contain flex-shrink-0"
               />
-              <span className="text-xl font-bold tracking-tight text-slate-900 whitespace-nowrap">
+              <span className="text-lg font-bold tracking-tight text-slate-900 whitespace-nowrap">
                 Resume<span className="text-indigo-600">Craft</span>
               </span>
             </Link>
@@ -158,15 +158,15 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
             </button>
           )}
 
-          <div className="flex items-center ml-auto gap-3 sm:gap-5">
+          <div className="flex items-center ml-auto gap-2 sm:gap-3">
             <div className="relative" ref={notificationRef}>
               <button 
                 onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                className={`p-3 rounded-xl transition-all relative ${isNotificationsOpen ? 'bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600 shadow-md' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-100'}`}
+                className={`p-2 rounded-lg transition-all relative ${isNotificationsOpen ? 'bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600 shadow-md' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-100'}`}
               >
-                <Bell size={22} />
+                <Bell size={18} />
                 {unreadCount > 0 && (
-                  <span className="absolute top-2 right-2 w-5 h-5 bg-gradient-to-r from-red-500 to-rose-500 text-[10px] font-bold text-white flex items-center justify-center rounded-full border-2 border-white shadow-md">
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-gradient-to-r from-red-500 to-rose-500 text-[8px] font-bold text-white flex items-center justify-center rounded-full border border-white shadow-md">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
@@ -174,13 +174,13 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
               {isNotificationsOpen && <NotificationDropdown onClose={() => setIsNotificationsOpen(false)} isEditorPage={isEditorPage} />}
             </div>
             
-            <div className="h-10 w-px bg-slate-200 mx-1"></div>
+            <div className="h-8 w-px bg-slate-200 mx-1"></div>
             
             <UserMenu variant="dashboard" isEditorPage={isEditorPage} />
           </div>
         </header>
 
-        <main className={`flex-1 bg-slate-50 relative overflow-hidden ${isEditorPage ? 'px-0' : ''}`}>
+        <main className={`flex-1 bg-slate-50 relative overflow-y-auto ${isEditorPage ? 'px-0 overflow-hidden' : ''}`}>
           {children}
         </main>
       </div>
