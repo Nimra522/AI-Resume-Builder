@@ -131,7 +131,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ variant = 'navbar', isEditor
       {/* Dropdown Panel */}
       {isOpen && (
         <div
-          className={`absolute right-0 max-w-[90vw] ${isEditorPage ? (isNavbar ? 'mt-2 w-64 origin-top-right' : 'mt-3 w-72 origin-top-right') : (isNavbar ? 'bottom-full mb-2 w-64 origin-bottom-right' : 'bottom-full mb-3 w-72 origin-bottom-right')} bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[9999] animate-fade-in`}
+          className={`absolute right-0 max-w-[90vw] ${isEditorPage ? (isNavbar ? 'mt-2 w-64 origin-top-right' : 'mt-3 w-72 origin-top-right') : (isNavbar ? 'mt-2 w-64 origin-top-right' : 'mt-3 w-72 origin-top-right')} bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[9999] animate-fade-in`}
         >
           {isNavbar ? (
             <>

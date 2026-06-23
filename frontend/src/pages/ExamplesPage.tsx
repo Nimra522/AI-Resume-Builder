@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { FileText, Search } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { EXAMPLES } from '../data/examples';
 import { ExampleCard } from '../components/examples/ExampleCard';
 import { useLocation } from '../components/layout/Navbar';
@@ -38,16 +38,6 @@ export const ExamplesPage: React.FC = () => {
             Explore 8 professionally written resume examples for every career stage. Click "View" to preview each example.
           </p>
 
-          <div className="relative max-w-md mx-auto">
-             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-               <Search size={20} />
-             </div>
-             <input 
-               type="text" 
-               placeholder="Search by role or industry..." 
-               className="block w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-700 bg-slate-800/50 text-white placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none shadow-sm"
-             />
-          </div>
         </div>
       </section>
 
