@@ -20,14 +20,21 @@ export const ResumeBuilder: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [resumeTitle, setResumeTitle] = useState('');
+  const hasLoadedResume = useRef(false); // Add ref to track if resume is already loaded
   
-  const { search } = useLocation();
+  const { search, navigate } = useLocation();
   const { addNotification } = useNotifications();
   const { user, isAuthenticated, openLoginModal, updateResumeCount, verifyTemplateAccess } = useAuth();
   const previewRef = useRef<HTMLDivElement>(null);
 
   // Load from local storage if available, and check template param
   useEffect(() => {
+    // If we've already loaded the resume, don't run this effect again!
+    if (hasLoadedResume.current) {
+      console.log('Resume already loaded, skipping initial load');
+      return;
+    }
+    
     console.log('ResumeBuilder mounting/updating, loading saved data...');
     const savedData = localStorage.getItem('resume_builder_data');
     const savedTitle = localStorage.getItem('resume_builder_title');
@@ -54,6 +61,7 @@ export const ResumeBuilder: React.FC = () => {
       if (needsAuth) {
         verifyTemplateAccess(templateParam, 'editor').then(result => {
           if (result.success) {
+            hasLoadedResume.current = true;
             setSelectedTemplateId(templateParam);
             // Clear localStorage for new template to start fresh
             localStorage.removeItem('resume_builder_data');
@@ -65,6 +73,7 @@ export const ResumeBuilder: React.FC = () => {
           }
         });
       } else {
+        hasLoadedResume.current = true;
         setSelectedTemplateId(templateParam);
         // Clear localStorage for new template to start fresh
         localStorage.removeItem('resume_builder_data');
@@ -74,25 +83,56 @@ export const ResumeBuilder: React.FC = () => {
       }
     } else if (editParam) {
       console.log('Edit parameter found in URL:', editParam);
-      // Load from localStorage, since DashboardOverview sets localStorage before navigate
-      if (savedData) {
-        try {
-          const parsedData = JSON.parse(savedData);
-          console.log('Parsed data:', parsedData.personalInfo);
-          const normalizedData = {
-            ...parsedData,
-            personalInfo: {
-              ...parsedData.personalInfo,
-              countryCode: parsedData.personalInfo.countryCode || '+1'
+      // Try to load from API first if authenticated
+      const loadResume = async () => {
+        if (isAuthenticated) {
+          try {
+            const response = await fetch(`/api/resume/${editParam}`, {
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('resume_ai_token')}`
+              }
+            });
+            if (response.ok) {
+              const resume = await response.json();
+              hasLoadedResume.current = true; // Mark resume as loaded
+              setResumeData(resume.data);
+              setResumeTitle(resume.title);
+              setSelectedTemplateId(resume.templateId);
+              
+              // Also update localStorage as fallback
+              localStorage.setItem('resume_builder_data', JSON.stringify(resume.data));
+              localStorage.setItem('resume_builder_title', resume.title);
+              localStorage.setItem('resume_builder_template_id', resume.templateId);
+              return;
             }
-          };
-          setResumeData(normalizedData);
-          if (savedTitle) setResumeTitle(savedTitle);
-          if (savedTemplate) setSelectedTemplateId(savedTemplate);
-        } catch (e) {
-          console.error('Failed to load resume data', e);
+          } catch (err) {
+            console.error('Failed to load resume from API, falling back to localStorage', err);
+          }
         }
-      }
+        
+        // Fallback to localStorage if API fails or not authenticated
+        if (savedData) {
+          try {
+            const parsedData = JSON.parse(savedData);
+            console.log('Parsed data:', parsedData.personalInfo);
+            const normalizedData = {
+              ...parsedData,
+              personalInfo: {
+                ...parsedData.personalInfo,
+                countryCode: parsedData.personalInfo.countryCode || '+1'
+              }
+            };
+            hasLoadedResume.current = true;
+            setResumeData(normalizedData);
+            if (savedTitle) setResumeTitle(savedTitle);
+            if (savedTemplate) setSelectedTemplateId(savedTemplate);
+          } catch (e) {
+            console.error('Failed to load resume data', e);
+          }
+        }
+      };
+      
+      loadResume();
     } else {
       // If no params, use saved data (if valid) or defaults
       if (savedData) {
@@ -109,6 +149,7 @@ export const ResumeBuilder: React.FC = () => {
             localStorage.removeItem('resume_builder_data');
             localStorage.removeItem('resume_builder_title');
             localStorage.removeItem('resume_builder_template_id');
+            hasLoadedResume.current = true;
           } else {
             // This is actual user data, load it
             console.log('Loading actual user data');
@@ -120,6 +161,7 @@ export const ResumeBuilder: React.FC = () => {
                 countryCode: parsedData.personalInfo.countryCode || '+1'
               }
             };
+            hasLoadedResume.current = true;
             setResumeData(normalizedData);
             if (savedTitle) setResumeTitle(savedTitle);
             if (savedTemplate) setSelectedTemplateId(savedTemplate);
@@ -129,6 +171,7 @@ export const ResumeBuilder: React.FC = () => {
         }
       } else {
         // If no saved data, use defaults
+        hasLoadedResume.current = true;
         if (savedTemplate) setSelectedTemplateId(savedTemplate);
         else setSelectedTemplateId('modern');
       }
@@ -203,70 +246,69 @@ export const ResumeBuilder: React.FC = () => {
     
     setIsSaving(true);
     
-    // Simulate API Latency
-    setTimeout(() => {
-      try {
-        const storeKey = `saved_resumes_${user?.id || 'guest'}`;
-        const savedResumes: SavedResume[] = JSON.parse(localStorage.getItem(storeKey) || '[]');
-        
-        console.log('Current saved resumes before save:', savedResumes);
-        console.log('Saving resume with title:', resumeTitle);
-        
-        // Check if we're editing an existing resume (look for matching ID in URL or state)
-        const urlParams = new URLSearchParams(window.location.hash.split('?')[1] || '');
-        const editingId = urlParams.get('edit');
-        
-        // If editing an existing resume, find it by ID
-        let existingIdx = -1;
-        if (editingId) {
-          existingIdx = savedResumes.findIndex(r => r.id === editingId);
-        }
-        
-        // Create timestamp for when this resume is saved
-        const currentTime = new Date();
-        
-        const newResume: SavedResume = {
-          id: existingIdx >= 0 ? savedResumes[existingIdx].id : `res_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          title: resumeTitle,
-          templateId: selectedTemplateId,
-          lastEdited: currentTime.toISOString(), // Store actual timestamp
-          data: resumeData
-        };
-
-        if (existingIdx >= 0) {
-          console.log('Updating existing resume at index:', existingIdx);
-          savedResumes[existingIdx] = newResume;
-        } else {
-          console.log('Adding new resume to list (always append)');
-          // ALWAYS append new resumes - never replace based on title
-          savedResumes.unshift(newResume);
-        }
-
-        console.log('Final resumes array after save:', savedResumes);
-        localStorage.setItem(storeKey, JSON.stringify(savedResumes));
-        
-        // Dispatch storage event to notify other components
-        window.dispatchEvent(new StorageEvent('storage', {
-          key: storeKey,
-          newValue: JSON.stringify(savedResumes)
-        }));
-        
-        // Also dispatch a custom event for better reliability
-        window.dispatchEvent(new CustomEvent('customStorageUpdate', {
-          detail: { key: storeKey, value: JSON.stringify(savedResumes) }
-        }));
-        
-        // Update resume count in auth context
-        updateResumeCount();
-        
-        addNotification(`"${resumeTitle}" saved successfully.`, 'success');
-      } catch (err) {
-        console.error(err);
-        addNotification("Failed to save resume. Please try again.", "error");
-      } finally {
-        setIsSaving(false);
+    try {
+      // Check if we're editing an existing resume
+      const urlParams = new URLSearchParams(search);
+      const editingId = urlParams.get('edit');
+      
+      const requestData = {
+        title: resumeTitle,
+        data: resumeData,
+        templateId: selectedTemplateId,
+        resumeId: editingId // send only if editing
+      };
+      
+      // Call backend API
+      const response = await fetch('/api/resume/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('resume_ai_token')}`
+        },
+        body: JSON.stringify(requestData)
+      });
+      
+      if (!response.ok) throw new Error('Failed to save resume');
+      
+      const savedResume = await response.json();
+      
+      // Update localStorage as a fallback and for quick UX
+      const storeKey = `saved_resumes_${user?.id || 'guest'}`;
+      let savedResumes: SavedResume[] = JSON.parse(localStorage.getItem(storeKey) || '[]');
+      
+      const existingIdx = savedResumes.findIndex(r => r.id === editingId || r.id === savedResume._id);
+      
+      const newResume: SavedResume = {
+        id: savedResume._id,
+        title: savedResume.title,
+        templateId: savedResume.templateId,
+        lastEdited: new Date(savedResume.lastEdited).toISOString(),
+        data: savedResume.data
+      };
+      
+      if (existingIdx >= 0) {
+        savedResumes[existingIdx] = newResume;
+      } else {
+        savedResumes.unshift(newResume);
       }
-    }, 800);
+      
+      localStorage.setItem(storeKey, JSON.stringify(savedResumes));
+      
+      // Update URL with actual saved resume ID if not already there
+      if (!editingId) {
+        navigate(`/dashboard?edit=${savedResume._id}`, { replace: true });
+      }
+      
+      // Update resume count
+      updateResumeCount();
+      
+      addNotification(`"${resumeTitle}" saved successfully.`, 'success');
+    } catch (err) {
+      console.error(err);
+      addNotification("Failed to save resume. Please try again.", "error");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDownloadPDF = async () => {

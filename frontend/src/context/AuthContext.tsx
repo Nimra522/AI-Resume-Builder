@@ -6,6 +6,7 @@ import { useNotifications } from './NotificationContext';
 interface AuthContextType {
   isAuthenticated: boolean;
   user: UserProfile | null;
+  token: string | null;
   login: (email: string, password: string) => Promise<{ success: boolean; message: string; twoFactorRequired?: boolean }>;
   loginWithToken: (token: string) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<{ success: boolean; message: string }>;
@@ -43,15 +44,17 @@ const API_URL = '/api';
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginRedirectPath, setLoginRedirectPath] = useState('/dashboard');
   
   const { addNotification, clearNotifications } = useNotifications();
 
   useEffect(() => {
-    const token = localStorage.getItem(SESSION_KEY);
-    if (token) {
-      validateToken(token);
+    const savedToken = localStorage.getItem(SESSION_KEY);
+    if (savedToken) {
+      setToken(savedToken);
+      validateToken(savedToken);
     }
   }, []);
 
@@ -103,6 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           plan: normalizedPlan
         });
         setIsAuthenticated(true);
+        setToken(token);
       } else {
         // Handle unauthorized/expired token
         const errorData = await res.json().catch(() => ({}));
@@ -117,7 +121,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const refreshUserData = async () => {
-    const token = localStorage.getItem(SESSION_KEY);
     if (token) await validateToken(token);
   };
 
@@ -137,9 +140,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const loginWithToken = async (token: string) => {
-    localStorage.setItem(SESSION_KEY, token);
-    await validateToken(token);
+  const loginWithToken = async (newToken: string) => {
+    localStorage.setItem(SESSION_KEY, newToken);
+    setToken(newToken);
+    await validateToken(newToken);
     addNotification("Signed in successfully with Google", "success");
   };
 
@@ -162,6 +166,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       localStorage.setItem(SESSION_KEY, data.token);
+      setToken(data.token);
       await validateToken(data.token);
       addNotification(`Welcome to ResumeCraft, ${data.user.fullName.split(' ')[0]}!`, "success");
       return { success: true, message: 'Success' };
@@ -196,6 +201,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       localStorage.setItem(SESSION_KEY, data.token);
+      setToken(data.token);
       await validateToken(data.token);
       addNotification(`Welcome back, ${data.user.fullName.split(' ')[0]}!`, "success");
       return { success: true, message: 'Success' };
@@ -390,6 +396,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem(SESSION_KEY);
     setIsAuthenticated(false);
     setUser(null);
+    setToken(null);
     addNotification("Logged out safely", "info");
   };
 
@@ -588,6 +595,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider value={{
       isAuthenticated,
       user,
+      token,
       login,
       loginWithToken,
       signup,
