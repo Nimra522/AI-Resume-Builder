@@ -145,4 +145,40 @@ router.post('/interview', authenticateToken, async (req, res) => {
   }
 });
 
+// New: AI Chatbot for Resume Help
+router.post('/chat', authenticateToken, async (req, res) => {
+  try {
+    const { message, history = [] } = req.body;
+
+    // Build conversation history prompt
+    let conversationContext = history.map(msg => 
+      `${msg.sender === 'user' ? 'User' : 'Assistant'}: ${msg.text}`
+    ).join('\n');
+
+    const systemPrompt = `You are an AI Resume Assistant. Your purpose is to help users with:
+    - Resume writing and improvement
+    - ATS optimization
+    - Professional summaries
+    - Skills development
+    - Experience and education sections
+    - Projects
+    - Cover letters
+    - Career advice
+    - Interview preparation
+    
+    Answer naturally, professionally, and helpfully. Keep responses concise but thorough.`;
+
+    const finalPrompt = `${systemPrompt}\n\nConversation History:\n${conversationContext}\n\nUser: ${message}\n\nAssistant:`;
+
+    const result = await model.generateContent(finalPrompt);
+    const response = await result.response;
+    const aiResponse = response.text();
+
+    res.json({ response: aiResponse.trim() });
+  } catch (error) {
+    console.error('Error with chatbot:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
