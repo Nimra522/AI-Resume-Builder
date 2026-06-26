@@ -456,37 +456,37 @@ export const SettingsPage: React.FC = () => {
           <div className="space-y-6">
              
              {/* Change Password */}
-             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-                  <Lock size={24} className="text-indigo-600" />
-                  <h2 className="text-xl font-bold text-gray-900">Change Password</h2>
+             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-2 mb-5 pb-3 border-b border-gray-100">
+                  <Lock size={20} className="text-indigo-600" />
+                  <h2 className="text-lg font-bold text-gray-900">Change Password</h2>
                 </div>
 
-                <form onSubmit={handlePasswordUpdate} className="space-y-5">
-                   <Input 
-                     label="Current Password" 
-                     type="password"
-                     value={password.current}
-                     onChange={e => setPassword({...password, current: e.target.value})}
-                   />
-                   <div className="grid grid-cols-1 gap-5">
-                      <Input 
-                        label="New Password" 
-                        type="password"
-                        value={password.new}
-                        onChange={e => setPassword({...password, new: e.target.value})}
-                      />
-                      <Input 
-                        label="Confirm New Password" 
-                        type="password"
-                        value={password.confirm}
-                        onChange={e => setPassword({...password, confirm: e.target.value})}
-                        error={password.confirm && password.new !== password.confirm ? "Passwords do not match" : undefined}
-                      />
+                <form onSubmit={handlePasswordUpdate} className="space-y-4">
+                   <div className="grid gap-4">
+                     <Input 
+                       label="Current Password" 
+                       type="password"
+                       value={password.current}
+                       onChange={e => setPassword({...password, current: e.target.value})}
+                     />
+                     <Input 
+                       label="New Password" 
+                       type="password"
+                       value={password.new}
+                       onChange={e => setPassword({...password, new: e.target.value})}
+                     />
+                     <Input 
+                       label="Confirm New Password" 
+                       type="password"
+                       value={password.confirm}
+                       onChange={e => setPassword({...password, confirm: e.target.value})}
+                       error={password.confirm && password.new !== password.confirm ? "Passwords do not match" : undefined}
+                     />
                    </div>
                    {/* Password Strength */}
                    {password.new && (
-                     <div className="space-y-2 pt-1">
+                     <div className="space-y-1 pt-1">
                         <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
                            <div 
                              className={`h-full transition-all duration-300 ${
@@ -501,7 +501,7 @@ export const SettingsPage: React.FC = () => {
                      </div>
                    )}
 
-                   <div className="pt-4">
+                   <div className="pt-3">
                      <Button type="submit" isLoading={isChangingPassword} variant="outline" className="w-full shadow-sm">Update Password</Button>
                    </div>
                 </form>

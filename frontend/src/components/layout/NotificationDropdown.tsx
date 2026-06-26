@@ -14,7 +14,7 @@ export const NotificationDropdown: React.FC<{ onClose: () => void; isEditorPage?
   };
 
   return (
-    <div className={`absolute right-0 max-w-[90vw] w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[9999] animate-fade-in ${isEditorPage ? 'mt-2 origin-top-right' : 'bottom-full mb-2 origin-bottom-right'}`}>
+    <div className={`absolute right-0 max-w-[90vw] w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[9999] animate-fade-in mt-2 origin-top-right`}>
       <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
         <h3 className="font-bold text-text-main">Notifications</h3>
         {unreadCount > 0 && (

@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Send, MessageSquare, X, Loader2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { useAuth } from '../../context/AuthContext';
-import { useClickOutside } from '../../hooks/useClickOutside';
 
 export const FloatingChatButton: React.FC = () => {
+  const { token } = useAuth();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Array<{ sender: 'user' | 'ai'; text: string }>>([
@@ -12,24 +13,16 @@ export const FloatingChatButton: React.FC = () => {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const portalNodeRef = useRef<HTMLDivElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const { token } = useAuth();
 
   useEffect(() => {
     if (scrollRef.current) {
-      try {
-        scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
-      } catch (e) {
-        // fallback for older browsers
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      }
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, open]);
 
   useEffect(() => {
-    // create a portal container attached to document.body so the fixed positioning
-    // is always relative to the viewport and not affected by ancestor transforms
     const node = document.createElement('div');
     node.setAttribute('id', 'floating-chat-portal');
     portalNodeRef.current = node;
@@ -42,34 +35,58 @@ export const FloatingChatButton: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (
+        chatContainerRef.current && 
+        !chatContainerRef.current.contains(event.target as Node) &&
+        !(event.target as Element).closest('[data-chat-toggle]')
+      ) {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [open]);
+
   const sendMessage = async (text: string) => {
     if (!text.trim()) return;
-    const userMessage = { sender: 'user' as const, text };
-    setMessages(prev => [...prev, userMessage]);
+    setMessages(prev => [...prev, { sender: 'user', text }]);
     setInput('');
     setIsTyping(true);
 
     try {
-      // Send request to backend
-      const response = await fetch('/api/ai/chat', {
+      const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token || localStorage.getItem('resume_ai_token')}`
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          message: text,
-          history: messages // send previous messages for context
-        })
+        body: JSON.stringify({ message: text })
       });
 
-      if (!response.ok) throw new Error('Failed to get AI response');
-
-      const data = await response.json();
-      setMessages(prev => [...prev, { sender: 'ai', text: data.response }]);
-    } catch (err) {
-      console.error('Chatbot error:', err);
-      setMessages(prev => [...prev, { sender: 'ai', text: "Sorry, I'm having trouble right now. Please try again later!" }]);
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(prev => [...prev, { sender: 'ai', text: data.reply }]);
+      } else {
+        const data = await res.json();
+        setMessages(prev => [...prev, { 
+          sender: 'ai', 
+          text: data.message || "Sorry, I'm having trouble responding right now. Please try again." 
+        }]);
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+      setMessages(prev => [...prev, { 
+        sender: 'ai', 
+        text: "Sorry, I'm having trouble responding right now. Please try again." 
+      }]);
     } finally {
       setIsTyping(false);
     }
@@ -81,18 +98,14 @@ export const FloatingChatButton: React.FC = () => {
     sendMessage(input);
   };
 
-  useClickOutside(containerRef, () => {
-    if (open) setOpen(false);
-  });
-
   const portalContent = (
-    <div ref={containerRef}>
-      {/* Chat Panel (dark themed) */}
+    <>
       <div
+        ref={chatContainerRef}
         className={`fixed z-50 right-6 bottom-20 transform transition-all duration-300 ${open ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0 pointer-events-none'}`}
         style={{ right: 'calc(env(safe-area-inset-right, 0px) + 1.5rem)' }}
       >
-        <div className="w-80 max-w-xs bg-slate-900 text-slate-100 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden flex flex-col" style={{ height: 480 }}>
+        <div className="w-80 max-w-xs bg-slate-900 text-slate-100 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden flex flex-col max-h-[80vh]">
           <div className="p-3 bg-gradient-to-r from-indigo-600 to-violet-600 flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-2">
               <MessageSquare size={18} className="text-white" />
@@ -103,11 +116,35 @@ export const FloatingChatButton: React.FC = () => {
             </button>
           </div>
 
-          <div ref={scrollRef} className="p-3 flex-1 overflow-y-auto space-y-3 bg-slate-900">
+          <div 
+            ref={scrollRef} 
+            className="p-3 overflow-y-auto flex-1 space-y-3 bg-slate-900"
+            style={{ maxHeight: '50vh' }}
+          >
             {messages.map((m, i) => (
               <div key={i} className={`max-w-full ${m.sender === 'user' ? 'flex justify-end' : 'flex justify-start'}`}>
                 <div className={`${m.sender === 'user' ? 'bg-indigo-600 text-white rounded-2xl rounded-tr-none px-3 py-2' : 'bg-slate-800 border border-slate-700 rounded-2xl rounded-tl-none px-3 py-2 text-slate-200'}`}>
-                  <div className="whitespace-pre-line text-sm">{m.text}</div>
+                  {m.sender === 'ai' ? (
+                    <ReactMarkdown
+                      components={{
+                        p: ({ ...props }) => <p className="text-sm text-slate-200 mb-2 last:mb-0" {...props} />,
+                        ul: ({ ...props }) => <ul className="text-sm text-slate-200 list-disc pl-4 mb-2 last:mb-0" {...props} />,
+                        ol: ({ ...props }) => <ol className="text-sm text-slate-200 list-decimal pl-4 mb-2 last:mb-0" {...props} />,
+                        li: ({ ...props }) => <li className="text-sm text-slate-200 mb-1 last:mb-0" {...props} />,
+                        strong: ({ ...props }) => <strong className="font-bold text-white" {...props} />,
+                        em: ({ ...props }) => <em className="italic" {...props} />,
+                        code: ({ ...props }) => <code className="bg-slate-700 px-1 py-0.5 rounded text-xs" {...props} />,
+                        h1: ({ ...props }) => <h1 className="text-lg font-bold text-white mb-2" {...props} />,
+                        h2: ({ ...props }) => <h2 className="text-base font-bold text-white mb-2" {...props} />,
+                        h3: ({ ...props }) => <h3 className="text-sm font-bold text-white mb-2" {...props} />,
+                        a: ({ ...props }) => <a className="text-indigo-400 underline hover:text-indigo-300" target="_blank" rel="noopener noreferrer" {...props} />
+                      }}
+                    >
+                      {m.text}
+                    </ReactMarkdown>
+                  ) : (
+                    <div className="whitespace-pre-line text-sm">{m.text}</div>
+                  )}
                 </div>
               </div>
             ))}
@@ -132,9 +169,9 @@ export const FloatingChatButton: React.FC = () => {
         </div>
       </div>
 
-      {/* Floating Button (fixed bottom-right, respects safe-area) */}
       <div className="fixed z-50" style={{ right: 'calc(env(safe-area-inset-right, 0px) + 1.25rem)', bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}>
         <button
+          data-chat-toggle
           onClick={() => setOpen(prev => !prev)}
           title={open ? 'Close chat' : 'Open chat'}
           className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-2xl flex items-center justify-center hover:scale-105 transition-transform"
@@ -142,7 +179,7 @@ export const FloatingChatButton: React.FC = () => {
           <MessageSquare size={22} />
         </button>
       </div>
-    </div>
+    </>
   );
 
   if (!portalNodeRef.current) return null;

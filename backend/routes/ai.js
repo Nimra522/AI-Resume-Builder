@@ -261,4 +261,42 @@ router.post('/chat', authenticateToken, async (req, res) => {
   }
 });
 
+// Chat endpoint for the floating chat widget
+router.post('/chat', authenticateToken, async (req, res) => {
+  try {
+    const { message } = req.body;
+    console.log('Incoming chat message:', message);
+
+    const systemPrompt = `You are an AI Resume Assistant for ResumeCraft, a professional resume builder platform.
+
+Your job is to help users:
+- Write and improve resume summaries, skills, experience bullet points
+- Suggest better phrasing for their job descriptions
+- Fix formatting and grammar in resume content
+- Recommend relevant skills for specific job roles
+- Guide them on how to use ResumeCraft features (create resume, pick templates, edit sections)
+
+How to use ResumeCraft:
+1. Click "Create Your First Resume" on the Dashboard
+2. Choose a template from Recommended Templates
+3. Fill in your personal info, work experience, education, and skills
+4. Download or share your finished resume
+
+Always give specific, helpful answers. Never say "can you share more details?" unless you truly need more info. If the user asks a general question, answer it directly and helpfully.`;
+
+    const fullPrompt = `${systemPrompt}\n\nUSER MESSAGE: ${message}\n\nYOUR RESPONSE:`;
+    const result = await model.generateContent(fullPrompt);
+    const response = await result.response;
+    const text = response.text();
+    console.log('Gemini response:', text);
+    
+    res.json({ reply: text.trim() });
+  } catch (error) {
+    console.error('Error in chat:', error);
+    res.status(500).json({ 
+      message: 'Sorry, I\'m having trouble responding right now. Please try again.' 
+    });
+  }
+});
+
 module.exports = router;

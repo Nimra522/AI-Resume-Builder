@@ -5,6 +5,7 @@ import { useNotifications } from '../context/NotificationContext';
 import { Link, useLocation } from '../components/layout/Navbar';
 import { SavedResume } from '../types';
 import { TEMPLATES } from '../data/templates';
+import { TemplateCard } from '../components/templates/TemplateCard';
 import { 
   FileText, 
   Plus, 
@@ -25,7 +26,7 @@ import {
 import { DeleteConfirmModal } from '../components/ui/DeleteConfirmModal';
 
 export const DashboardOverview: React.FC = () => {
-  const { user, isAuthenticated, updateResumeCount } = useAuth();
+  const { user, isAuthenticated, updateResumeCount, openLoginModal, verifyTemplateAccess } = useAuth();
   const { addNotification } = useNotifications();
   const { navigate } = useLocation();
   
@@ -91,6 +92,31 @@ export const DashboardOverview: React.FC = () => {
     
     loadResumes();
   }, [user, isAuthenticated]);
+
+  const handleUseTemplate = async (id: string) => {
+    const template = TEMPLATES.find(t => t.id === id);
+    if (!template) return;
+
+    const needsAuth = template.requiresAuth !== false;
+
+    if (!isAuthenticated && needsAuth) {
+      localStorage.setItem('post_login_redirect_template', id);
+      openLoginModal(`/templates?id=${id}`);
+      return;
+    }
+
+    if (needsAuth) {
+      const accessResult = await verifyTemplateAccess(id, 'editor');
+      if (!accessResult.success) {
+        if (accessResult.status === 403) {
+          navigate('/pricing');
+        }
+        return;
+      }
+    }
+
+    navigate(`/dashboard?template=${id}`);
+  };
 
   const handleEdit = (resume: SavedResume) => {
     localStorage.setItem('resume_builder_data', JSON.stringify(resume.data));
@@ -270,49 +296,49 @@ export const DashboardOverview: React.FC = () => {
 
           {/* Quick Actions */}
           <div className="space-y-4">
-            <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
+            <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm min-h-[300px]">
               <h3 className="font-bold text-slate-900 text-base mb-3">Quick Actions</h3>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <button
                   onClick={() => navigate('/templates')}
-                  className="w-full flex items-center gap-2.5 p-3 bg-slate-50 hover:bg-indigo-50 border border-slate-100 hover:border-indigo-100 rounded-xl text-left transition-all duration-300 group"
+                  className="w-full flex items-center gap-3 p-3.5 bg-slate-50 hover:bg-indigo-50 border border-slate-100 hover:border-indigo-100 rounded-2xl text-left transition-all duration-300 group"
                 >
-                  <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-lg group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex h-10 w-10 items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl group-hover:scale-110 transition-transform duration-300">
                     <Plus size={16} />
                   </div>
                   <div className="flex-1">
                     <div className="font-semibold text-slate-900 text-sm">New Resume</div>
-                    <div className="text-xs text-slate-500">Pick a template</div>
+                    <div className="text-sm text-slate-500">Pick a template</div>
                   </div>
-                  <ChevronRight size={14} className="text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                  <ChevronRight size={16} className="text-slate-400 group-hover:text-indigo-600 transition-colors" />
                 </button>
 
                 <button
                   onClick={() => navigate('/profile')}
-                  className="w-full flex items-center gap-2.5 p-3 bg-slate-50 hover:bg-emerald-50 border border-slate-100 hover:border-emerald-100 rounded-xl text-left transition-all duration-300 group"
+                  className="w-full flex items-center gap-3 p-3.5 bg-slate-50 hover:bg-emerald-50 border border-slate-100 hover:border-emerald-100 rounded-2xl text-left transition-all duration-300 group"
                 >
-                  <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-lg group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex h-10 w-10 items-center justify-center bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl group-hover:scale-110 transition-transform duration-300">
                     <Zap size={16} />
                   </div>
                   <div className="flex-1">
                     <div className="font-semibold text-slate-900 text-sm">Edit Profile</div>
-                    <div className="text-xs text-slate-500">Update your details</div>
+                    <div className="text-sm text-slate-500">Update your details</div>
                   </div>
-                  <ChevronRight size={14} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
+                  <ChevronRight size={16} className="text-slate-400 group-hover:text-emerald-600 transition-colors" />
                 </button>
 
                 <button
                   onClick={() => navigate('/settings')}
-                  className="w-full flex items-center gap-2.5 p-3 bg-slate-50 hover:bg-blue-50 border border-slate-100 hover:border-blue-100 rounded-xl text-left transition-all duration-300 group"
+                  className="w-full flex items-center gap-3 p-3.5 bg-slate-50 hover:bg-blue-50 border border-slate-100 hover:border-blue-100 rounded-2xl text-left transition-all duration-300 group"
                 >
-                  <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-600 text-white rounded-lg group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex h-10 w-10 items-center justify-center bg-gradient-to-br from-blue-500 to-cyan-600 text-white rounded-2xl group-hover:scale-110 transition-transform duration-300">
                     <Settings size={16} />
                   </div>
                   <div className="flex-1">
                     <div className="font-semibold text-slate-900 text-sm">Settings</div>
-                    <div className="text-xs text-slate-500">Preferences</div>
+                    <div className="text-sm text-slate-500">Preferences</div>
                   </div>
-                  <ChevronRight size={14} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
+                  <ChevronRight size={16} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
                 </button>
               </div>
             </div>
@@ -332,50 +358,17 @@ export const DashboardOverview: React.FC = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {recommendedTemplates.map((tmpl) => {
-              const [imageError, setImageError] = useState(false);
-              
-              return (
-                <div
-                  key={tmpl.id}
-                  className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-400 hover:-translate-y-1 flex flex-col group"
-                >
-                  <div className={`h-36 ${tmpl.thumbnailClass || 'bg-gradient-to-br from-slate-100 to-slate-200'} flex items-center justify-center p-2 border-b border-slate-100 relative overflow-hidden`}>
-                    {tmpl.tag && (
-                      <span className="absolute top-2 left-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm z-10">
-                        {tmpl.tag}
-                      </span>
-                    )}
-                    {imageError ? (
-                      <div className="w-full h-full bg-white rounded-lg shadow-inner flex items-center justify-center">
-                        <FileText size={40} className="text-slate-300 group-hover:text-indigo-400 group-hover:scale-110 transition-all duration-300" />
-                      </div>
-                    ) : (
-                      <img
-                        src={tmpl.thumbnailUrl}
-                        alt={tmpl.name}
-                        className="w-full h-full object-cover rounded-lg shadow-inner group-hover:scale-105 transition-transform duration-300"
-                        onError={() => setImageError(true)}
-                      />
-                    )}
-                  </div>
-                  <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
-                    <div>
-                      <h4 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors text-base">{tmpl.name}</h4>
-                      <p className="text-xs text-slate-500 leading-relaxed mt-1">{tmpl.description}</p>
-                    </div>
-                    <button
-                      onClick={() => navigate(`/dashboard?template=${tmpl.id}`)}
-                      className="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg"
-                    >
-                      Use Template
-                      <ChevronRight size={14} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {recommendedTemplates.map(template => (
+              <TemplateCard
+                key={template.id}
+                template={template}
+                onSelect={handleUseTemplate}
+                isSelected={false}
+                isAuthenticated={isAuthenticated}
+                userPlan={user?.plan || 'Free'}
+              />
+            ))}
           </div>
         </div>
 
