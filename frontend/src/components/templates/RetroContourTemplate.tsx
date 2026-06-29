@@ -25,13 +25,15 @@ const CircleDot: React.FC = () => (
 );
 
 const RetroContourComponent: React.FC<RetroContourProps> = ({ data }) => {
-  const { personalInfo, education, experience, skills } = data;
+  const { personalInfo, education, experience, skills, projects, certifications } = data;
 
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
   const hasEducation = education.length > 0;
   const hasExperience = experience.length > 0;
+  const hasProjects = projects && projects.length > 0;
+  const hasCertifications = certifications.length > 0;
 
   const leftHasContent = hasSkills || hasSummary;
 
@@ -164,6 +166,45 @@ const RetroContourComponent: React.FC<RetroContourProps> = ({ data }) => {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Projects */}
+          {hasProjects && (
+            <div>
+              <h3 className="font-serif italic text-sm text-[#C8674F] mb-3">
+                Mes projets
+              </h3>
+              <div className="space-y-3">
+                {projects.map((proj) => (
+                  <div key={proj.id}>
+                    <p className="font-sans font-bold text-[12px] text-[#3D2B1F] uppercase">
+                      {proj.name}
+                    </p>
+                    <p className="text-[11px] text-[#3D2B1F] mt-0.5 leading-relaxed">{proj.description}</p>
+                    {proj.technologies && proj.technologies.length > 0 && (
+                      <p className="text-[10px] text-[#3D2B1F] mt-0.5 opacity-70">{proj.technologies.join(', ')}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Certifications */}
+          {hasCertifications && (
+            <div>
+              <h3 className="font-serif italic text-sm text-[#C8674F] mb-3">
+                Certifications
+              </h3>
+              <ul className="space-y-1">
+                {certifications.map((cert) => (
+                  <li key={cert.id} className="flex items-start gap-2 text-[11px] text-[#3D2B1F]">
+                    <span className="text-[#3D2B1F] mt-[5px] text-[6px]">&#x25CF;</span>
+                    {cert.name}{cert.issuer ? <span className="opacity-70"> — {cert.issuer}</span> : ''}{cert.date ? <span className="opacity-70"> ({cert.date})</span> : ''}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 

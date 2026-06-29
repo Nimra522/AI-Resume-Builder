@@ -14,7 +14,7 @@ const MonochromeFrameComponent: React.FC<MonochromeFrameProps> = ({ data }) => {
   const hasSummary = personalInfo.summary;
   const hasEducation = education.length > 0;
   const hasExperience = experience.length > 0;
-  const hasLanguages = certifications.length > 0;
+  const hasCertifications = certifications.length > 0;
   const hasMoreInfo = projects.length > 0;
   const photoSize = 100;
 
@@ -151,11 +151,11 @@ const MonochromeFrameComponent: React.FC<MonochromeFrameProps> = ({ data }) => {
                 </div>
               )}
 
-              {/* Languages */}
-              {hasLanguages && (
+              {/* Certifications */}
+              {hasCertifications && (
                 <div>
                   <h3 className="font-sans font-bold text-[10px] text-black uppercase tracking-[0.15em] mb-1">
-                    Languages
+                    Certifications
                   </h3>
                   <div className="space-y-1.5">
                     {certifications.map((lang) => (

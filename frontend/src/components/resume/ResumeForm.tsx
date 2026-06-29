@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ResumeData, Experience, Education, Project, Certification, Language, AdditionalInfo } from '../../types';
+import { ResumeData, Experience, Education, Project, Certification } from '../../types';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { FormSection } from '../ui/FormSection';

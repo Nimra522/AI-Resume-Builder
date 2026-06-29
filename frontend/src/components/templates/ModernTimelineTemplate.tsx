@@ -26,13 +26,15 @@ const TimelineDot: React.FC = () => (
 );
 
 const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
-  const { personalInfo, education, experience, skills } = data;
+  const { personalInfo, education, experience, skills, projects, certifications } = data;
 
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
   const hasEducation = education.length > 0;
   const hasExperience = experience.length > 0;
+  const hasProjects = projects && projects.length > 0;
+  const hasCertifications = certifications.length > 0;
 
   return (
     <div className="w-full h-full min-h-[1000px] bg-white text-gray-800 shadow-xl flex">
@@ -157,6 +159,54 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
                     {edu.graduationDate && (
                       <span className="text-[9px] text-gray-400 flex-shrink-0 ml-2 mt-0.5">{edu.graduationDate}</span>
                     )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Projects */}
+        {hasProjects && (
+          <div>
+            <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-3">
+              Projects
+            </h3>
+            <div className="relative pl-5 space-y-3">
+              <div className="absolute left-[4px] top-2 bottom-2 w-px bg-gray-300" />
+              {projects.map((proj) => (
+                <div key={proj.id} className="relative">
+                  <TimelineDot />
+                  <div>
+                    <p className="text-sm font-bold text-gray-900">
+                      {proj.name}
+                      {proj.link && <span className="text-[10px] font-normal text-gray-500 ml-2">| {proj.link}</span>}
+                    </p>
+                    <p className="text-[10px] leading-relaxed text-gray-600 mt-0.5">{proj.description}</p>
+                    {proj.technologies && proj.technologies.length > 0 && (
+                      <p className="text-[9px] text-gray-400 mt-0.5">{proj.technologies.join(', ')}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Certifications */}
+        {hasCertifications && (
+          <div>
+            <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-3">
+              Certifications
+            </h3>
+            <div className="relative pl-5 space-y-2">
+              <div className="absolute left-[4px] top-2 bottom-2 w-px bg-gray-300" />
+              {certifications.map((cert) => (
+                <div key={cert.id} className="relative">
+                  <TimelineDot />
+                  <div>
+                    <p className="text-sm font-bold text-gray-900">{cert.name}</p>
+                    <p className="text-[10px] text-gray-500">{cert.issuer}{cert.date ? ` | ${cert.date}` : ''}</p>
                   </div>
                 </div>
               ))}
