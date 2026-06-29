@@ -16,9 +16,7 @@ const BASE_DATA: ResumeData = {
   education: [],
   skills: [],
   projects: [],
-  certifications: [],
-  languages: [],
-  additionalInfo: []
+  certifications: []
 };
 
 // Fix: Use any for overrides to allow partial nested objects while maintaining a simple data creation helper

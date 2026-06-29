@@ -31,7 +31,7 @@ const parseSkillLevel = (skill: string): { name: string; level: number } => {
 };
 
 const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
-  const { personalInfo, education, experience, skills } = data;
+  const { personalInfo, education, experience, skills, projects, certifications } = data;
 
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website;
   const hasSkills = skills.length > 0;
@@ -115,6 +115,20 @@ const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
             </div>
           )}
 
+          {/* Certifications */}
+          {certifications.length > 0 && (
+            <div>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8B6F5C] mb-2.5">
+                Certifications
+              </h3>
+              <div className="space-y-1.5">
+                {certifications.map((cert) => (
+                  <p key={cert.id} className="text-[11px] text-gray-700">{cert.name}{cert.issuer ? ` — ${cert.issuer}` : ''}</p>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Contact */}
           {hasContact && (
             <div>
@@ -179,6 +193,23 @@ const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
                     {edu.degree && (
                       <p className="text-[11px] text-gray-500 mt-0.5">{edu.degree}</p>
                     )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Projects */}
+          {projects.length > 0 && (
+            <div>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8B6F5C] mb-3">
+                Projects
+              </h3>
+              <div className="space-y-2">
+                {projects.map((proj) => (
+                  <div key={proj.id}>
+                    <p className="text-sm font-bold text-[#2C2C2C]">{proj.name}</p>
+                    {proj.description && <p className="text-[11px] leading-relaxed text-gray-600">{proj.description}</p>}
                   </div>
                 ))}
               </div>

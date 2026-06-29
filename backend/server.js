@@ -1,4 +1,6 @@
 require('dotenv').config();
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -103,6 +105,11 @@ app.get('*', (req, res) => {
 /* =======================
    SERVER START
 ======================= */
+// Global handler to prevent crash on unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.error('⚠️ Unhandled Rejection:', err.message);
+});
+
 app.listen(PORT, () =>
   console.log(`🚀 Server running on port ${PORT}`)
 );

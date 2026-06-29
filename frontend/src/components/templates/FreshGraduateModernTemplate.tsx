@@ -18,12 +18,14 @@ const SectionBanner: React.FC<{ title: string }> = ({ title }) => (
 );
 
 const FreshGraduateModernComponent: React.FC<FreshGraduateModernProps> = ({ data }) => {
-  const { personalInfo, education, skills } = data;
+  const { personalInfo, education, skills, projects, certifications } = data;
 
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location;
   const hasEducation = education.length > 0;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
+  const hasProjects = projects && projects.length > 0;
+  const hasCertifications = certifications.length > 0;
 
   return (
     <div className="w-full h-full min-h-[1000px] bg-white text-gray-700 shadow-xl relative overflow-hidden">
@@ -151,6 +153,39 @@ const FreshGraduateModernComponent: React.FC<FreshGraduateModernProps> = ({ data
                   </li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          {/* Projects */}
+          {hasProjects && (
+            <div>
+              <SectionBanner title="Projects" />
+              <div className="mt-3 space-y-3">
+                {projects.map((proj) => (
+                  <div key={proj.id}>
+                    <p className="text-sm font-bold text-gray-800">{proj.name}</p>
+                    <p className="text-[11px] text-gray-600 mt-0.5 leading-relaxed">{proj.description}</p>
+                    {proj.technologies && proj.technologies.length > 0 && (
+                      <p className="text-[10px] text-gray-400 mt-0.5">{proj.technologies.join(', ')}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Certifications */}
+          {hasCertifications && (
+            <div>
+              <SectionBanner title="Certifications" />
+              <div className="mt-3 space-y-2">
+                {certifications.map((cert) => (
+                  <div key={cert.id}>
+                    <p className="text-sm font-bold text-gray-800">{cert.name}</p>
+                    <p className="text-[11px] text-gray-500">{cert.issuer}{cert.date ? ` | ${cert.date}` : ''}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

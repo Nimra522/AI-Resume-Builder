@@ -13,14 +13,15 @@ const NavyCircleIcon: React.FC<{ children: React.ReactNode }> = ({ children }) =
 );
 
 const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
-  const { personalInfo, education, experience, skills, certifications } = data;
+  const { personalInfo, education, experience, skills, certifications, projects } = data;
 
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
   const hasEducation = education.length > 0;
   const hasExperience = experience.length > 0;
-  const hasLanguages = certifications.length > 0;
+  const hasCertifications = certifications.length > 0;
+  const hasProjects = projects.length > 0;
 
   return (
     <div className="w-full h-full min-h-[1000px] bg-white text-gray-800 shadow-xl flex flex-col">
@@ -166,7 +167,7 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
           )}
 
           {/* Bottom Split: Skills | Languages */}
-          {(hasSkills || hasLanguages) && (
+          {(hasSkills || hasCertifications || hasProjects) && (
             <div className="flex gap-6 mt-auto pt-4">
               {/* Skills */}
               {hasSkills && (
@@ -180,20 +181,41 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
                 </div>
               )}
 
-              {/* Languages */}
-              {hasLanguages && (
+              {/* Certifications */}
+              {hasCertifications && (
                 <div className="flex-1">
                   <h3 className="font-serif font-bold text-[12px] text-[#1B2A4A] uppercase tracking-wider mb-2">
-                    Languages
+                    Certifications
                   </h3>
                   <div className="space-y-2">
-                    {certifications.map((lang) => (
-                      <div key={lang.id}>
+                    {certifications.map((cert) => (
+                      <div key={cert.id}>
                         <p className="font-sans font-bold text-[10px] text-[#1B2A4A]">
-                          {lang.name}
+                          {cert.name}
                         </p>
                         <p className="font-sans text-[9px] text-gray-600">
-                          {lang.issuer}
+                          {cert.issuer}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Projects */}
+              {hasProjects && (
+                <div className="flex-1">
+                  <h3 className="font-serif font-bold text-[12px] text-[#1B2A4A] uppercase tracking-wider mb-2">
+                    Projects
+                  </h3>
+                  <div className="space-y-2">
+                    {projects.map((proj) => (
+                      <div key={proj.id}>
+                        <p className="font-sans font-bold text-[10px] text-[#1B2A4A]">
+                          {proj.name}
+                        </p>
+                        <p className="font-sans text-[9px] text-gray-600">
+                          {proj.description}
                         </p>
                       </div>
                     ))}
