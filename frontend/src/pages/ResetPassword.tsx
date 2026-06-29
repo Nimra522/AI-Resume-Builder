@@ -1,31 +1,45 @@
-
 import React, { useState } from 'react';
-import { Mail, ArrowRight, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Lock, ArrowRight, AlertCircle } from 'lucide-react';
 import { AuthCard } from '../components/auth/AuthCard';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { Link, useLocation } from '../components/layout/Navbar';
 import { SuccessMessage } from '../components/ui/SuccessMessage';
 
-export const ForgotPassword: React.FC = () => {
-  const [email, setEmail] = useState('');
+export const ResetPassword: React.FC = () => {
+  const { pathname, navigate } = useLocation();
+  const token = pathname.split('/')[2] || '';
+  
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
-  const { navigate } = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch('/api/auth/forgot-password', {
+      const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ token, newPassword }),
       });
 
       if (response.ok) {
@@ -44,15 +58,15 @@ export const ForgotPassword: React.FC = () => {
   if (isSuccess) {
     return (
       <AuthCard
-        title="Check Your Email"
-        subtitle="Password reset instructions sent"
+        title="Password Reset"
+        subtitle="Your password has been updated"
         footerText="Back to"
         footerLinkText="Login"
         footerLinkTo="/login"
       >
         <SuccessMessage
-          title="Link Sent!"
-          message={`We have sent a password reset link to ${email}. Please check your inbox.`}
+          title="Password Changed!"
+          message="Your password has been successfully reset. You can now log in with your new password."
           buttonText="Return to Login"
           onButtonClick={() => navigate('/login')}
         />
@@ -62,8 +76,8 @@ export const ForgotPassword: React.FC = () => {
 
   return (
     <AuthCard
-      title="Reset Password"
-      subtitle="Enter your email to receive instructions"
+      title="Reset Your Password"
+      subtitle="Enter your new password below"
       footerText="Remember your password?"
       footerLinkText="Login"
       footerLinkTo="/login"
@@ -77,23 +91,33 @@ export const ForgotPassword: React.FC = () => {
         )}
 
         <Input
-          label="Email Address"
-          type="email"
-          placeholder="you@example.com"
-          icon={Mail}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          label="New Password"
+          type="password"
+          placeholder="••••••••"
+          icon={Lock}
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          required
+        />
+
+        <Input
+          label="Confirm Password"
+          type="password"
+          placeholder="••••••••"
+          icon={Lock}
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           required
         />
 
         <Button type="submit" fullWidth isLoading={isLoading}>
-          Send Reset Link <ArrowRight size={18} className="ml-2" />
+          Reset Password <ArrowRight size={18} className="ml-2" />
         </Button>
       </form>
       
       <div className="mt-4 text-center">
          <Link to="/login" className="text-sm font-medium text-text-muted hover:text-text-main flex items-center justify-center gap-1">
-            <ArrowLeft size={16} /> Back to Login
+            <Lock size={16} /> Back to Login
          </Link>
       </div>
     </AuthCard>

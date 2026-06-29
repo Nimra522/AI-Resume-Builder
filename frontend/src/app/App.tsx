@@ -10,6 +10,7 @@ import { PrivacyPolicy } from '../pages/PrivacyPolicy';
 import { TermsOfService } from '../pages/TermsOfService';
 import { CookiePolicy } from '../pages/CookiePolicy';
 import { ForgotPassword } from '../pages/ForgotPassword';
+import { ResetPassword } from '../pages/ResetPassword';
 import { GoogleCallback } from '../pages/GoogleCallback';
 import { BlogList } from '../pages/BlogList';
 import { BlogDetail } from '../pages/BlogDetail';
@@ -51,11 +52,12 @@ const AppRoutes: React.FC = () => {
     '/templates', '/examples', '/pricing'
   ];
 
-  if (pathname === '/login' || pathname === '/signup') {
+  if (pathname === '/login' || pathname === '/signup' || pathname.startsWith('/reset-password/')) {
     return (
       <FullWidthLayout>
         {pathname === '/login' && <Login />}
         {pathname === '/signup' && <Signup />}
+        {pathname.startsWith('/reset-password/') && <ResetPassword />}
       </FullWidthLayout>
     );
   }

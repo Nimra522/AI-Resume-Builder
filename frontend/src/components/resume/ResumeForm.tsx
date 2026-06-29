@@ -3,7 +3,7 @@ import { ResumeData, Experience, Education, Project, Certification, Language, Ad
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { FormSection } from '../ui/FormSection';
-import { Plus, User, Briefcase, GraduationCap, Code, FolderGit2, Award, ChevronLeft, ChevronRight, CheckCircle2, Sparkles, RefreshCw, Loader2, X } from 'lucide-react';
+import { Plus, User, Briefcase, GraduationCap, Code, FolderGit2, Award, ChevronLeft, ChevronRight, CheckCircle2, Sparkles, RefreshCw, Loader2, X, Save } from 'lucide-react';
 import { LOCATION_OPTIONS, LocationOption } from '../../data/locations';
 
 import { useAuth } from '../../context/AuthContext';
@@ -11,6 +11,8 @@ import { useAuth } from '../../context/AuthContext';
 interface ResumeFormProps {
   data: ResumeData;
   onChange: (data: ResumeData) => void;
+  onSave?: () => void;
+  isSaving?: boolean;
 }
 
 // Step configuration
@@ -23,7 +25,7 @@ const steps = [
   { id: 6, title: 'Certifications', icon: Award, color: 'text-indigo-600' },
 ];
 
-export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
+export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, isSaving }) => {
   const { token } = useAuth();
   
   // Multi-step wizard state
@@ -812,11 +814,24 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange }) => {
           </Button>
           
           {currentStep === steps.length ? (
-            <div className="flex-1 text-right">
-              <div className="inline-flex items-center gap-3 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg text-white font-bold shadow-lg">
-                <CheckCircle2 size={18} />
-                <span>All steps completed!</span>
+            <div className="flex-1 flex items-center justify-end gap-4">
+              <div className="inline-flex items-center gap-2 text-gray-600 font-medium">
+                <CheckCircle2 size={18} className="text-indigo-600" />
+                <span>All sections completed!</span>
               </div>
+              {onSave && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={onSave}
+                  disabled={isSaving}
+                  icon={isSaving ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
+                  iconPosition="right"
+                  className="px-3 py-1.5 shadow-sm text-xs h-8"
+                >
+                  {isSaving ? 'Saving...' : 'Save Resume'}
+                </Button>
+              )}
             </div>
           ) : (
             <Button

@@ -9,6 +9,12 @@ const isValidResumeId = (id) => typeof id === 'string' && mongoose.Types.ObjectI
 router.post('/save', authenticateToken, async (req, res) => {
   try {
     const { resumeId, title, data, templateId, atsScore } = req.body;
+    
+    // Validate required title
+    if (!title || !title.trim()) {
+      return res.status(400).json({ message: 'Resume title is required' });
+    }
+    
     const userId = req.user.id;
     const resolvedTemplateId = templateId || 'modern';
 

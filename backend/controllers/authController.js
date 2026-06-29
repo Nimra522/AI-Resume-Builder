@@ -9,6 +9,7 @@ const User = require('../models/User');
 const Resume = require('../models/Resume');
 const twilio = require('twilio');
 const crypto = require('crypto');
+const { sendEmail } = require('../utils/emailService');
 
 // Initialize Twilio client
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -849,7 +850,8 @@ const forgotPassword = async (req, res) => {
     // Find user by email
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      return res.status(404).json({ message: 'No account found with that email address' });
+      // Still return 200 OK for security (don't reveal email exists)
+      return res.json({ message: 'Password reset instructions sent to your email' });
     }
     
     // Check if user is a Google user (no password)
@@ -869,19 +871,30 @@ const forgotPassword = async (req, res) => {
     
     await user.save();
     
-    // In a real application, you would send an email with the reset link
-    // For now, we'll return the token in the response (for development)
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+    // Construct reset URL
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/#/reset-password/${resetToken}`;
     
     console.log('Password reset requested for:', email);
     console.log('Reset URL:', resetUrl);
     
-    // TODO: Implement actual email sending with nodemailer
-    // For now, we'll just return success
+    // Send password reset email (wrapped in try/catch for security)
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: 'Reset your ResumeAI password',
+        html: `<p>Hi ${user.name || 'User'},</p>
+               <p>Click the link below to reset your password. This link expires in 1 hour.</p>
+               <p><a href="${resetUrl}">Reset Password</a></p>
+               <p>If you didn't request this, you can safely ignore this email.</p>`
+      });
+    } catch (emailError) {
+      console.error('Failed to send password reset email:', emailError);
+      // Don't reveal email sending failure to user for security
+    }
+    
+    // Always return generic success message for security
     res.json({ 
       message: 'Password reset instructions sent to your email'
-      // In development, you can temporarily include the token for testing
-      // resetToken: resetToken // REMOVE IN PRODUCTION
     });
     
   } catch (error) {

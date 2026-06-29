@@ -5,8 +5,9 @@ import { ResumeForm } from '../components/resume/ResumeForm';
 import { LivePreview } from '../components/resume/LivePreview';
 import { INITIAL_RESUME_DATA, TEMPLATES } from '../data/templates';
 import { ResumeData, SavedResume } from '../types';
-import { Download, Eye, Palette, Save, Loader2, Sparkles } from 'lucide-react';
+import { Download, Eye, Palette, Save, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
 import { useNotifications } from '../context/NotificationContext';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from '../components/layout/Navbar';
@@ -20,6 +21,7 @@ export const ResumeBuilder: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [resumeTitle, setResumeTitle] = useState('');
+  const [titleError, setTitleError] = useState('');
   const hasLoadedResume = useRef(false); // Add ref to track if resume is already loaded
   
   const { search, navigate } = useLocation();
@@ -244,6 +246,13 @@ export const ResumeBuilder: React.FC = () => {
       return;
     }
     
+    // Validate title first
+    if (!resumeTitle || !resumeTitle.trim()) {
+      setTitleError('Resume title is required');
+      return;
+    }
+    setTitleError('');
+    
     setIsSaving(true);
     
     try {
@@ -268,7 +277,14 @@ export const ResumeBuilder: React.FC = () => {
         body: JSON.stringify(requestData)
       });
       
-      if (!response.ok) throw new Error('Failed to save resume');
+      if (!response.ok) {
+        let errorMsg = 'Failed to save resume. Please try again.';
+        try {
+          const errorData = await response.json();
+          if (errorData.message) errorMsg = errorData.message;
+        } catch (_) {}
+        throw new Error(errorMsg);
+      }
       
       const savedResume = await response.json();
       
@@ -296,7 +312,7 @@ export const ResumeBuilder: React.FC = () => {
       
       // Update URL with actual saved resume ID if not already there
       if (!editingId) {
-        navigate(`/dashboard?edit=${savedResume._id}`, { replace: true });
+        navigate(`/dashboard?edit=${savedResume._id}`);
       }
       
       // Update resume count
@@ -305,7 +321,8 @@ export const ResumeBuilder: React.FC = () => {
       addNotification(`"${resumeTitle}" saved successfully.`, 'success');
     } catch (err) {
       console.error(err);
-      addNotification("Failed to save resume. Please try again.", "error");
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save resume. Please try again.';
+      addNotification(errorMessage, "error");
     } finally {
       setIsSaving(false);
     }
@@ -404,20 +421,19 @@ export const ResumeBuilder: React.FC = () => {
       <div className="flex flex-col h-full overflow-hidden">
         {/* Builder Toolbar */}
         <div className="z-20 bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 px-4 sm:px-6 py-1.5 flex flex-wrap items-center justify-between gap-2 shadow-md flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="relative group">
-              <input 
-                type="text" 
-                value={resumeTitle}
-                onChange={(e) => setResumeTitle(e.target.value)}
-                className="text-base font-bold text-gray-900 bg-white border border-transparent hover:border-gray-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 rounded-lg px-2.5 py-1 outline-none transition-all shadow-sm"
-                placeholder="My Resume Title"
-              />
-            </div>
-            <span className="inline-flex items-center gap-1 text-[10px] text-indigo-700 px-2.5 py-0.5 bg-indigo-50 rounded-full font-bold uppercase tracking-wider border border-indigo-100">
-              <Sparkles size={10} />
-              Draft
-            </span>
+          <div className="flex items-start gap-3">
+            <Input 
+              label=""
+              type="text"
+              value={resumeTitle}
+              onChange={(e) => {
+                setResumeTitle(e.target.value);
+                if (titleError) setTitleError('');
+              }}
+              error={titleError}
+              placeholder="Untitled Resume"
+              className="text-base font-bold text-gray-900 shadow-sm !p-0 !w-64"
+            />
           </div>
           
           <div className="flex items-center gap-2 ml-auto">
@@ -494,7 +510,7 @@ export const ResumeBuilder: React.FC = () => {
            ${showMobilePreview ? 'hidden md:block' : 'block'}
          `}>
            <div className="p-5 sm:p-8 max-w-2xl mx-auto">
-             <ResumeForm data={resumeData} onChange={setResumeData} />
+             <ResumeForm data={resumeData} onChange={setResumeData} onSave={handleSave} isSaving={isSaving} />
            </div>
          </div>
 
