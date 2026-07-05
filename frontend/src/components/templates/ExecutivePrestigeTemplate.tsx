@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, User } from 'lucide-react';
+import { Phone, Mail, MapPin, User, Linkedin } from 'lucide-react';
 
 const ExecutivePrestigeComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
@@ -21,6 +21,7 @@ const ExecutivePrestigeComponent: React.FC<{ data: ResumeData }> = ({ data }) =>
             {personalInfo.phone && <span className="flex items-center gap-1"><Phone size={12} className="text-[#D4AF37]" />{personalInfo.phone}</span>}
             {personalInfo.email && <span className="flex items-center gap-1"><Mail size={12} className="text-[#D4AF37]" /><span className="break-all">{personalInfo.email}</span></span>}
             {personalInfo.location && <span className="flex items-center gap-1"><MapPin size={12} className="text-[#D4AF37]" />{personalInfo.location}</span>}
+            {personalInfo.linkedin && <span className="flex items-center gap-1"><Linkedin size={12} className="text-[#D4AF37]" /><span className="break-all">{personalInfo.linkedin}</span></span>}
           </div>
         </div>
         <div className="flex">

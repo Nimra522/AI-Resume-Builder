@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Globe, User } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
 interface GraphicDesignerPortfolioProps {
   data: ResumeData;
@@ -24,14 +24,14 @@ const WavyBottom: React.FC = () => (
 
 const SectionHeadingLeft: React.FC<{ text: string }> = ({ text }) => (
   <div className="mb-3.5">
-    <h3 className="text-[12px] font-bold text-[#2C2420] uppercase tracking-[0.15em]">{text}</h3>
+    <h3 className="text-[13px] font-bold text-[#2C2420] uppercase tracking-[0.15em]">{text}</h3>
     <div className="w-full h-px bg-[#2C2420] mt-1.5" />
   </div>
 );
 
 const SectionHeadingRight: React.FC<{ text: string }> = ({ text }) => (
   <div className="mb-3.5">
-    <h3 className="text-[11px] font-bold text-[#D96C2B] uppercase tracking-[0.15em]">{text}</h3>
+    <h3 className="text-[13px] font-bold text-[#D96C2B] uppercase tracking-[0.15em]">{text}</h3>
     <div className="w-full h-px bg-[#D96C2B] mt-1.5" />
   </div>
 );
@@ -44,7 +44,7 @@ const GraphicDesignerPortfolioComponent: React.FC<GraphicDesignerPortfolioProps>
   const hasSkills = skills.length > 0;
   const hasCertifications = certifications.length > 0;
   const hasProjects = projects.length > 0;
-  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website;
+  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website || personalInfo.linkedin;
 
   return (
     <div className="w-full h-full min-h-[1056px] bg-white text-gray-800 shadow-xl relative overflow-hidden flex">
@@ -62,7 +62,7 @@ const GraphicDesignerPortfolioComponent: React.FC<GraphicDesignerPortfolioProps>
           <h1 className="text-[32px] font-black text-[#2C2420] uppercase leading-[1.1] tracking-tight">
             {personalInfo.fullName || 'Your Full Name'}
           </h1>
-          <p className="text-[13px] font-bold text-[#D96C2B] uppercase tracking-[0.15em] mt-1.5">
+          <p className="text-[14px] font-bold text-[#D96C2B] uppercase tracking-[0.15em] mt-1.5">
             {personalInfo.jobTitle || 'Your Job Title'}
           </p>
         </div>
@@ -71,7 +71,7 @@ const GraphicDesignerPortfolioComponent: React.FC<GraphicDesignerPortfolioProps>
           {hasSummary && (
             <div>
               <SectionHeadingLeft text="About Me" />
-              <p className="text-[11px] leading-relaxed text-gray-700 whitespace-pre-wrap">{personalInfo.summary}</p>
+              <p className="text-[12px] leading-relaxed text-gray-700 whitespace-pre-wrap">{personalInfo.summary}</p>
             </div>
           )}
 
@@ -81,14 +81,14 @@ const GraphicDesignerPortfolioComponent: React.FC<GraphicDesignerPortfolioProps>
               <div className="space-y-3">
                 {experience.map((exp) => (
                   <div key={exp.id}>
-                    <p className="text-[12px] font-bold text-[#2C2420]">{exp.role}</p>
-                    <p className="text-[10px] font-semibold text-gray-600">
+                    <p className="text-[13px] font-bold text-[#2C2420]">{exp.role}</p>
+                    <p className="text-[11px] font-semibold text-gray-600">
                       {exp.company}{exp.company && (exp.startDate || exp.endDate) ? ' | ' : ''}{exp.startDate}{exp.startDate && exp.endDate ? ' - ' : ''}{exp.current ? 'Present' : exp.endDate}
                     </p>
                     {exp.description && (
                       <ul className="mt-1 space-y-0.5">
                         {exp.description.split('\n').filter(Boolean).map((line, i) => (
-                          <li key={i} className="flex items-start gap-1.5 text-[10px] text-gray-600">
+                          <li key={i} className="flex items-start gap-1.5 text-[11px] text-gray-600">
                             <span className="text-[#D96C2B] mt-0.5">&#x2022;</span>
                             <span>{line}</span>
                           </li>
@@ -108,9 +108,9 @@ const GraphicDesignerPortfolioComponent: React.FC<GraphicDesignerPortfolioProps>
               <div className="space-y-2">
                 {experience.slice(0, 2).map((ref, i) => (
                   <div key={ref.id}>
-                    <p className="text-[11px] font-bold text-[#2C2420]">{ref.role}</p>
-                    <p className="text-[10px] text-gray-600">{ref.company}</p>
-                    <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-600">
+                    <p className="text-[12px] font-bold text-[#2C2420]">{ref.role}</p>
+                    <p className="text-[11px] text-gray-600">{ref.company}</p>
+                    <div className="flex items-center gap-3 mt-1 text-[11px] text-gray-600">
                       <span className="flex items-center gap-1"><Phone size={10} className="text-[#D96C2B]" /> +1 234 567 890</span>
                       <span className="flex items-center gap-1"><Mail size={10} className="text-[#D96C2B]" /> email@example.com</span>
                     </div>
@@ -144,8 +144,8 @@ const GraphicDesignerPortfolioComponent: React.FC<GraphicDesignerPortfolioProps>
               <div className="space-y-2.5">
                 {education.map((edu) => (
                   <div key={edu.id}>
-                    <p className="text-[11px] font-bold text-white">{edu.degree}</p>
-                    <p className="text-[10px] text-white/70">
+                    <p className="text-[12px] font-bold text-white">{edu.degree}</p>
+                    <p className="text-[11px] text-white/70">
                       {edu.graduationDate}{edu.school ? ' | ' : ''}{edu.school}
                     </p>
                   </div>
@@ -161,7 +161,7 @@ const GraphicDesignerPortfolioComponent: React.FC<GraphicDesignerPortfolioProps>
                 {skills.map((skill, i) => {
                   const name = skill.includes(':') ? skill.split(':').map(s => s.trim())[0] : skill;
                   return (
-                    <li key={i} className="flex items-start gap-2 text-[10px] text-white">
+                    <li key={i} className="flex items-start gap-2 text-[11px] text-white">
                       <span className="text-[#D96C2B] mt-0.5">&#x2022;</span>
                       <span>{name}</span>
                     </li>
@@ -176,7 +176,7 @@ const GraphicDesignerPortfolioComponent: React.FC<GraphicDesignerPortfolioProps>
               <SectionHeadingRight text="Certifications" />
               <ul className="space-y-0.5">
                 {certifications.map((cert) => (
-                  <li key={cert.id} className="flex items-start gap-2 text-[10px] text-white">
+                  <li key={cert.id} className="flex items-start gap-2 text-[11px] text-white">
                     <span className="text-[#D96C2B] mt-0.5">&#x2022;</span>
                     <span>{cert.name}{cert.issuer ? ` (${cert.issuer})` : ''}</span>
                   </li>
@@ -190,7 +190,7 @@ const GraphicDesignerPortfolioComponent: React.FC<GraphicDesignerPortfolioProps>
               <SectionHeadingRight text="Projects" />
               <ul className="space-y-0.5">
                 {projects.map((proj) => (
-                  <li key={proj.id} className="flex items-start gap-2 text-[10px] text-white">
+                  <li key={proj.id} className="flex items-start gap-2 text-[11px] text-white">
                     <span className="text-[#D96C2B] mt-0.5">&#x2022;</span>
                     <span>{proj.name}{proj.description ? ` (${proj.description})` : ''}</span>
                   </li>
@@ -202,11 +202,12 @@ const GraphicDesignerPortfolioComponent: React.FC<GraphicDesignerPortfolioProps>
           {hasContact && (
             <div>
               <SectionHeadingRight text="Contact" />
-              <div className="space-y-1.5 text-[10px] text-white">
+              <div className="space-y-1.5 text-[11px] text-white">
                 {personalInfo.phone && <div className="flex items-center gap-2"><Phone size={11} className="text-[#D96C2B]" /><span>{personalInfo.phone}</span></div>}
                 {personalInfo.email && <div className="flex items-center gap-2"><Mail size={11} className="text-[#D96C2B]" /><span className="break-all">{personalInfo.email}</span></div>}
                 {personalInfo.location && <div className="flex items-center gap-2"><MapPin size={11} className="text-[#D96C2B]" /><span>{personalInfo.location}</span></div>}
                 {personalInfo.website && <div className="flex items-center gap-2"><Globe size={11} className="text-[#D96C2B]" /><span className="break-all">{personalInfo.website}</span></div>}
+                {personalInfo.linkedin && <div className="flex items-center gap-2"><Linkedin size={11} className="text-[#D96C2B]" /><span className="break-all">{personalInfo.linkedin}</span></div>}
               </div>
             </div>
           )}

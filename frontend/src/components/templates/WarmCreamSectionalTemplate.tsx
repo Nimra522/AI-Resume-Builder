@@ -15,6 +15,7 @@ const WarmCreamSectionalComponent: React.FC<Props> = ({ data }) => {
     { label: 'C.', value: personalInfo.phone },
     { label: '', value: personalInfo.email },
     { label: '', value: personalInfo.website },
+    { label: '', value: personalInfo.linkedin },
   ].filter(c => c.value);
 
   const skillList = skills || [];

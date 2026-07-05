@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, User } from 'lucide-react';
+import { Phone, Mail, MapPin, User, Linkedin } from 'lucide-react';
 
 const ChairmanSignatureComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
@@ -15,6 +15,7 @@ const ChairmanSignatureComponent: React.FC<{ data: ResumeData }> = ({ data }) =>
         {personalInfo.phone && <span>{personalInfo.phone}</span>}
         {personalInfo.email && <span className="break-all">{personalInfo.email}</span>}
         {personalInfo.location && <span>{personalInfo.location}</span>}
+        {personalInfo.linkedin && <span>{personalInfo.linkedin}</span>}
       </div>
       <div className="mx-9 h-px bg-[#0F172A]/15" />
       <div className="flex px-9 pt-6 pb-8 gap-7">

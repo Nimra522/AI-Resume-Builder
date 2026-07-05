@@ -68,21 +68,6 @@ const MinimalistMagazineTemplate: React.FC<{ data: ResumeData }> = ({ data }) =>
               </div>
             </div>
           )}
-          {projects.length > 0 && (
-            <div>
-              <h2 className="font-['Playfair_Display',Georgia,serif] font-bold uppercase tracking-[0.15em]" style={{ fontSize: '13px', color: '#1A1A1A', marginBottom: '16px' }}>Projects</h2>
-              <div style={{ width: '24px', height: '1px', backgroundColor: '#1A1A1A', marginBottom: '16px' }} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                {projects.map((proj) => (
-                  <div key={proj.id} className="flex items-center gap-2">
-                    <div style={{ width: '3px', height: '3px', borderRadius: '50%', backgroundColor: '#CFCFCF', flexShrink: 0 }} />
-                    <span style={{ fontSize: '11px', color: '#1A1A1A', lineHeight: '1.8' }}>{proj.name}</span>
-                    {proj.description && <span style={{ fontSize: '10px', color: '#1A1A1A' }}>({proj.description})</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         <div style={{ width: '1px', backgroundColor: '#CFCFCF', margin: '0 36px', flexShrink: 0 }} />
@@ -101,6 +86,20 @@ const MinimalistMagazineTemplate: React.FC<{ data: ResumeData }> = ({ data }) =>
                     </div>
                     <p style={{ fontSize: '12px', color: '#1A1A1A', marginTop: '2px' }}>{exp.company}</p>
                     {exp.description && <p className="leading-relaxed" style={{ fontSize: '11px', color: '#1A1A1A', marginTop: '8px', lineHeight: '1.8' }}>{exp.description}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {projects.length > 0 && (
+            <div style={{ marginTop: '28px' }}>
+              <h2 className="font-['Playfair_Display',Georgia,serif] font-bold uppercase tracking-[0.15em]" style={{ fontSize: '13px', color: '#1A1A1A', marginBottom: '16px' }}>Projects</h2>
+              <div style={{ width: '24px', height: '1px', backgroundColor: '#1A1A1A', marginBottom: '16px' }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {projects.map((proj) => (
+                  <div key={proj.id}>
+                    <p className="font-semibold" style={{ fontSize: '14px', color: '#1A1A1A' }}>{proj.name}</p>
+                    {proj.description && <p className="leading-relaxed" style={{ fontSize: '11px', color: '#1A1A1A', marginTop: '4px', lineHeight: '1.8' }}>{proj.description}</p>}
                   </div>
                 ))}
               </div>

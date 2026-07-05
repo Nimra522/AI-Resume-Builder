@@ -53,7 +53,7 @@ const GeometricCorner: React.FC<{ position: 'tr' | 'bl' }> = ({ position }) => {
 
 const ModernBlueGeometricComponent: React.FC<ModernBlueGeometricProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, certifications, projects } = data;
-  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location;
+  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
   const hasEducation = education.length > 0;
@@ -79,24 +79,25 @@ const ModernBlueGeometricComponent: React.FC<ModernBlueGeometricProps> = ({ data
 
           <div className="text-center w-full">
             <h1 className="text-xl font-bold text-gray-900 leading-tight">{personalInfo.fullName || 'Your Full Name'}</h1>
-            <p className="text-[11px] text-[#3B82F6] font-medium mt-0.5">{personalInfo.jobTitle || 'Your Job Title'}</p>
+            <p className="text-[12px] text-[#3B82F6] font-medium mt-0.5">{personalInfo.jobTitle || 'Your Job Title'}</p>
           </div>
 
           {hasContact && (
             <div className="w-full space-y-1.5">
-              <h3 className="text-[12px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200 pb-1">Contact</h3>
-              <div className="text-[10px] text-gray-700 space-y-1">
+              <h3 className="text-[13px] font-bold uppercase tracking-wider text-black border-b border-gray-200 pb-1">Contact</h3>
+              <div className="text-[11px] text-gray-700 space-y-1">
                 {personalInfo.phone && <p><span className="text-[#3B82F6] font-medium">P:</span> {personalInfo.phone}</p>}
                 {personalInfo.email && <p className="break-all"><span className="text-[#3B82F6] font-medium">E:</span> {personalInfo.email}</p>}
                 {personalInfo.location && <p><span className="text-[#3B82F6] font-medium">L:</span> {personalInfo.location}</p>}
+                {personalInfo.linkedin && <p className="break-all"><span className="text-[#3B82F6] font-medium">In:</span> {personalInfo.linkedin}</p>}
               </div>
             </div>
           )}
 
           {hasCertifications && (
             <div className="w-full space-y-1.5">
-              <h3 className="text-[12px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200 pb-1">Certifications</h3>
-              <div className="space-y-0.5 text-[10px] text-gray-700">
+              <h3 className="text-[13px] font-bold uppercase tracking-wider text-black border-b border-gray-200 pb-1">Certifications</h3>
+              <div className="space-y-0.5 text-[11px] text-gray-700">
                 {certifications.map((c) => (
                   <div key={c.id} className="flex justify-between">
                     <span>{c.name}</span>
@@ -113,26 +114,26 @@ const ModernBlueGeometricComponent: React.FC<ModernBlueGeometricProps> = ({ data
           {/* About Me */}
           {hasSummary && (
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">About Me</h3>
+              <h3 className="text-[13px] font-bold uppercase tracking-wider text-black mb-1.5">About Me</h3>
               <div className="w-8 h-[2px] bg-[#3B82F6] mb-2" />
-              <p className="text-[11px] leading-relaxed text-gray-600 whitespace-pre-wrap">{personalInfo.summary}</p>
+              <p className="text-[12px] leading-relaxed text-gray-600 whitespace-pre-wrap">{personalInfo.summary}</p>
             </div>
           )}
 
           {/* Work Experience */}
           {hasExperience && (
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Work Experience</h3>
+              <h3 className="text-[13px] font-bold uppercase tracking-wider text-black mb-1.5">Work Experience</h3>
               <div className="w-8 h-[2px] bg-[#3B82F6] mb-2" />
               <div className="space-y-2.5">
                 {experience.map((exp) => (
                   <div key={exp.id}>
                     <div className="flex justify-between items-start">
-                      <p className="text-sm font-bold text-gray-900">{exp.role}</p>
-                      <span className="text-[12px] text-gray-400 flex-shrink-0 ml-2">{exp.startDate}{exp.startDate && exp.endDate ? ' - ' : ''}{exp.current ? 'Present' : exp.endDate}</span>
+                      <p className="text-[15px] font-bold text-gray-900">{exp.role}</p>
+                      <span className="text-[13px] text-gray-400 flex-shrink-0 ml-2">{exp.startDate}{exp.startDate && exp.endDate ? ' - ' : ''}{exp.current ? 'Present' : exp.endDate}</span>
                     </div>
-                    <p className="text-[10px] text-gray-500 font-medium">{exp.company}</p>
-                    <p className="text-[10px] text-gray-600 mt-0.5 leading-relaxed whitespace-pre-wrap">{exp.description}</p>
+                    <p className="text-[11px] text-gray-500 font-medium">{exp.company}</p>
+                    <p className="text-[11px] text-gray-600 mt-0.5 leading-relaxed whitespace-pre-wrap">{exp.description}</p>
                   </div>
                 ))}
               </div>
@@ -142,16 +143,16 @@ const ModernBlueGeometricComponent: React.FC<ModernBlueGeometricProps> = ({ data
           {/* Education */}
           {hasEducation && (
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Education</h3>
+              <h3 className="text-[13px] font-bold uppercase tracking-wider text-black mb-1.5">Education</h3>
               <div className="w-8 h-[2px] bg-[#3B82F6] mb-2" />
               <div className="space-y-2">
                 {education.map((edu) => (
                   <div key={edu.id}>
                     <div className="flex justify-between items-start">
-                      <p className="text-sm font-bold text-gray-900">{edu.school}</p>
-                      <span className="text-[12px] text-gray-400 flex-shrink-0 ml-2">{edu.graduationDate}</span>
+                      <p className="text-[15px] font-bold text-gray-900">{edu.school}</p>
+                      <span className="text-[13px] text-gray-400 flex-shrink-0 ml-2">{edu.graduationDate}</span>
                     </div>
-                    <p className="text-[10px] text-gray-500">{edu.degree}</p>
+                    <p className="text-[11px] text-gray-500">{edu.degree}</p>
                   </div>
                 ))}
               </div>
@@ -161,14 +162,14 @@ const ModernBlueGeometricComponent: React.FC<ModernBlueGeometricProps> = ({ data
           {/* Skills */}
           {hasSkills && (
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Skills</h3>
+              <h3 className="text-[13px] font-bold uppercase tracking-wider text-black mb-1.5">Skills</h3>
               <div className="w-8 h-[2px] bg-[#3B82F6] mb-2" />
               <div className="space-y-1.5">
                 {skills.map((skill, i) => {
                   const { name, level } = parseSkillLevel(skill);
                   return (
                     <div key={i} className="flex items-center gap-2">
-                      <span className="text-[10px] text-gray-700 flex-1">{name}</span>
+                      <span className="text-[11px] text-gray-700 flex-1">{name}</span>
                       <SemiCircleProgress level={level} />
                     </div>
                   );
@@ -180,9 +181,9 @@ const ModernBlueGeometricComponent: React.FC<ModernBlueGeometricProps> = ({ data
           {/* Additional Information */}
           {hasAddInfo && (
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Additional Information</h3>
+              <h3 className="text-[13px] font-bold uppercase tracking-wider text-black mb-1.5">Additional Information</h3>
               <div className="w-8 h-[2px] bg-[#3B82F6] mb-2" />
-              <ul className="space-y-0.5 text-[10px] text-gray-700">
+              <ul className="space-y-0.5 text-[11px] text-gray-700">
                 {projects.map((p) => (
                   <li key={p.id} className="flex items-start gap-2">
                     <span className="text-[#3B82F6] mt-0.5">&#x2022;</span>

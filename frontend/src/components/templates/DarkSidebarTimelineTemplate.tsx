@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Camera, Phone, Mail, MapPin, GraduationCap, Briefcase, User, Settings } from 'lucide-react';
+import { Camera, Phone, Mail, MapPin, GraduationCap, Briefcase, User, Settings, Linkedin } from 'lucide-react';
 
 interface Props { data: ResumeData; }
 
@@ -26,6 +26,7 @@ const DarkSidebarTimelineComponent: React.FC<Props> = ({ data }) => {
     { icon: Phone, value: personalInfo.phone },
     { icon: Mail, value: personalInfo.email },
     { icon: MapPin, value: personalInfo.location },
+    { icon: Linkedin, value: personalInfo.linkedin },
   ].filter(c => c.value);
 
   const nameParts = (personalInfo.fullName || 'Your Name').split(' ');

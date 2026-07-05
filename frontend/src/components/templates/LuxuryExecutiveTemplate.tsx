@@ -14,6 +14,7 @@ const LuxuryExecutiveTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
           {personalInfo.phone && <p>{personalInfo.phone}</p>}
           {personalInfo.email && <p className="break-all">{personalInfo.email}</p>}
           {personalInfo.location && <p>{personalInfo.location}</p>}
+          {personalInfo.linkedin && <p className="break-all">{personalInfo.linkedin}</p>}
         </div>
       </div>
       <div className="px-9 pt-5 pb-8">

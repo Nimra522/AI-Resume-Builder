@@ -26,6 +26,7 @@ const SerifExecutiveComponent: React.FC<Props> = ({ data }) => {
     { label: 'Address', value: personalInfo.location },
     { label: 'Phone', value: personalInfo.phone },
     { label: 'Website', value: personalInfo.website },
+    { label: 'LinkedIn', value: personalInfo.linkedin },
   ].filter(c => c.value);
 
   const mid = Math.ceil(contactItems.length / 2);

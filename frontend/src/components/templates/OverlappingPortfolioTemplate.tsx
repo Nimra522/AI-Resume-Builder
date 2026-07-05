@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Globe, User } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
 interface OverlappingPortfolioProps { data: ResumeData; }
 
@@ -12,6 +12,7 @@ const OverlappingPortfolioComponent: React.FC<OverlappingPortfolioProps> = ({ da
     { icon: Mail, value: personalInfo.email, label: 'Email' },
     { icon: MapPin, value: personalInfo.location, label: 'Address' },
     { icon: Globe, value: personalInfo.website, label: 'Website' },
+    { icon: Linkedin, value: personalInfo.linkedin, label: 'LinkedIn' },
   ].filter(item => item.value);
 
   const SkillBar: React.FC<{ name: string; pct: number }> = ({ name, pct }) => (
@@ -119,8 +120,8 @@ const OverlappingPortfolioComponent: React.FC<OverlappingPortfolioProps> = ({ da
 
         {/* Profile Photo - overlaps both columns and banner */}
         <div style={{
-          position: 'absolute', top: '0', left: '-60px', zIndex: 10,
-          width: '185px', height: '185px', borderRadius: '30px', overflow: 'hidden',
+          position: 'absolute', top: '0', left: '-90px', zIndex: 10,
+          width: '140px', height: '140px', borderRadius: '30px', overflow: 'hidden',
           border: '3px solid #FFFFFF', boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
         }}>
           {personalInfo.photoUrl ? (
@@ -130,7 +131,7 @@ const OverlappingPortfolioComponent: React.FC<OverlappingPortfolioProps> = ({ da
               width: '100%', height: '100%', background: '#E0E0E0',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <User size={56} color="#999" />
+              <User size={42} color="#999" />
             </div>
           )}
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, Globe, MapPin, Camera, User, Briefcase, GraduationCap, Award, Circle } from 'lucide-react';
+import { Phone, Mail, Globe, MapPin, Linkedin, Camera, User, Briefcase, GraduationCap, Award, Circle } from 'lucide-react';
 
 interface Props { data: ResumeData; }
 
@@ -37,6 +37,7 @@ const BlackHeaderMinimalComponent: React.FC<Props> = ({ data }) => {
     { icon: Phone, value: personalInfo.phone },
     { icon: Mail, value: personalInfo.email },
     { icon: Globe, value: personalInfo.website },
+    { icon: Linkedin, value: personalInfo.linkedin },
     { icon: MapPin, value: personalInfo.location },
   ].filter(c => c.value);
 

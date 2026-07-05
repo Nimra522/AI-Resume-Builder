@@ -13,6 +13,7 @@ const SingleColumnProfessionalComponent: React.FC<SingleColumnProfessionalProps>
     personalInfo.email,
     personalInfo.website,
     personalInfo.location,
+    personalInfo.linkedin,
   ].filter(Boolean);
 
   const columns = (() => {

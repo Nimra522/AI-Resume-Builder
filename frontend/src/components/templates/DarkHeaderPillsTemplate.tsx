@@ -26,6 +26,7 @@ const DarkHeaderPillsComponent: React.FC<Props> = ({ data }) => {
     personalInfo.phone,
     personalInfo.email,
     personalInfo.website,
+    personalInfo.linkedin,
     personalInfo.location,
   ].filter(Boolean);
 

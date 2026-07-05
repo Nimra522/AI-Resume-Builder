@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, User } from 'lucide-react';
+import { Phone, Mail, MapPin, User, Linkedin } from 'lucide-react';
 
 interface FluidCapsuleProps {
   data: ResumeData;
@@ -36,7 +36,7 @@ const DotGridCorner: React.FC<{ position: 'tr' | 'bl' }> = ({ position }) => (
 
 const FluidCapsuleComponent: React.FC<FluidCapsuleProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, certifications, projects } = data;
-  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location;
+  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
   const hasEducation = education.length > 0;
@@ -72,6 +72,7 @@ const FluidCapsuleComponent: React.FC<FluidCapsuleProps> = ({ data }) => {
                   {personalInfo.location && <div className="flex items-center gap-1"><MapPin size={10} className="text-[#7a97a9]" /><span>{personalInfo.location}</span></div>}
                   {personalInfo.phone && <div className="flex items-center gap-1"><Phone size={10} className="text-[#7a97a9]" /><span>{personalInfo.phone}</span></div>}
                   {personalInfo.email && <div className="flex items-center gap-1"><Mail size={10} className="text-[#7a97a9]" /><span className="break-all">{personalInfo.email}</span></div>}
+                  {personalInfo.linkedin && <div className="flex items-center gap-1"><Linkedin size={10} className="text-[#7a97a9]" /><span className="break-all">{personalInfo.linkedin}</span></div>}
                 </div>
               )}
             </div>

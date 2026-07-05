@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { MapPin, Phone, Mail, Globe, User } from 'lucide-react';
+import { MapPin, Phone, Mail, Globe, Linkedin, User } from 'lucide-react';
 
 interface ModernTimelineProps {
   data: ResumeData;
@@ -17,7 +17,7 @@ const SkillCircles: React.FC<{ skill: string }> = ({ skill }) => (
         />
       ))}
     </div>
-    <span className="text-[10px] text-gray-700">{skill}</span>
+    <span className="text-[11px] text-gray-700">{skill}</span>
   </div>
 );
 
@@ -28,7 +28,7 @@ const TimelineDot: React.FC = () => (
 const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, projects, certifications } = data;
 
-  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website;
+  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
   const hasEducation = education.length > 0;
@@ -69,12 +69,12 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
         {/* Contact */}
         {hasContact && (
           <div className="w-full space-y-2.5">
-            <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-2">
+            <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-2">
               Contact
             </h3>
             <div className="space-y-2">
               {personalInfo.location && (
-                <div className="flex items-center gap-2.5 text-[10px] text-gray-600">
+                <div className="flex items-center gap-2.5 text-[11px] text-gray-600">
                   <div className="w-4 flex justify-center flex-shrink-0">
                     <MapPin size={12} className="text-gray-500" />
                   </div>
@@ -82,7 +82,7 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
                 </div>
               )}
               {personalInfo.phone && (
-                <div className="flex items-center gap-2.5 text-[10px] text-gray-600">
+                <div className="flex items-center gap-2.5 text-[11px] text-gray-600">
                   <div className="w-4 flex justify-center flex-shrink-0">
                     <Phone size={12} className="text-gray-500" />
                   </div>
@@ -90,7 +90,7 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
                 </div>
               )}
               {personalInfo.email && (
-                <div className="flex items-center gap-2.5 text-[10px] text-gray-600">
+                <div className="flex items-center gap-2.5 text-[11px] text-gray-600">
                   <div className="w-4 flex justify-center flex-shrink-0">
                     <Mail size={12} className="text-gray-500" />
                   </div>
@@ -98,11 +98,19 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
                 </div>
               )}
               {personalInfo.website && (
-                <div className="flex items-center gap-2.5 text-[10px] text-gray-600">
+                <div className="flex items-center gap-2.5 text-[11px] text-gray-600">
                   <div className="w-4 flex justify-center flex-shrink-0">
                     <Globe size={12} className="text-gray-500" />
                   </div>
                   <span className="break-all">{personalInfo.website}</span>
+                </div>
+              )}
+              {personalInfo.linkedin && (
+                <div className="flex items-center gap-2.5 text-[11px] text-gray-600">
+                  <div className="w-4 flex justify-center flex-shrink-0">
+                    <Linkedin size={12} className="text-gray-500" />
+                  </div>
+                  <span className="break-all">{personalInfo.linkedin}</span>
                 </div>
               )}
             </div>
@@ -112,7 +120,7 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
         {/* Skills */}
         {hasSkills && (
           <div className="w-full space-y-2">
-            <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-2">
+            <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-2">
               Skills
             </h3>
             <div className="space-y-1.5">
@@ -129,7 +137,7 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
         {/* About Me */}
         {hasSummary && (
           <div>
-            <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-3">
+            <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-3">
               About Me
             </h3>
             <p className="text-[11px] leading-relaxed text-gray-600 whitespace-pre-wrap">
@@ -141,7 +149,7 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
         {/* Education Timeline */}
         {hasEducation && (
           <div>
-            <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-3">
+            <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-3">
               Education
             </h3>
             <div className="relative pl-5 space-y-4">
@@ -149,15 +157,15 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
               {education.map((edu) => (
                 <div key={edu.id} className="relative">
                   <TimelineDot />
-                  <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start ml-3">
                     <div>
                       <p className="text-sm font-bold text-gray-900">{edu.school || 'School Name'}</p>
                       {edu.degree && (
-                        <p className="text-[10px] text-gray-500 mt-0.5">{edu.degree}</p>
+                        <p className="text-[11px] text-gray-500 mt-0.5">{edu.degree}</p>
                       )}
                     </div>
                     {edu.graduationDate && (
-                      <span className="text-[9px] text-gray-400 flex-shrink-0 ml-2 mt-0.5">{edu.graduationDate}</span>
+                      <span className="text-[10px] text-gray-400 flex-shrink-0 ml-2 mt-0.5">{edu.graduationDate}</span>
                     )}
                   </div>
                 </div>
@@ -169,7 +177,7 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
         {/* Projects */}
         {hasProjects && (
           <div>
-            <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-3">
+            <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-3">
               Projects
             </h3>
             <div className="relative pl-5 space-y-3">
@@ -177,14 +185,14 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
               {projects.map((proj) => (
                 <div key={proj.id} className="relative">
                   <TimelineDot />
-                  <div>
+                  <div className="ml-3">
                     <p className="text-sm font-bold text-gray-900">
                       {proj.name}
-                      {proj.link && <span className="text-[10px] font-normal text-gray-500 ml-2">| {proj.link}</span>}
+                      {proj.link && <span className="text-[11px] font-normal text-gray-500 ml-2">| {proj.link}</span>}
                     </p>
-                    <p className="text-[10px] leading-relaxed text-gray-600 mt-0.5">{proj.description}</p>
+                    <p className="text-[11px] leading-relaxed text-gray-600 mt-0.5">{proj.description}</p>
                     {proj.technologies && proj.technologies.length > 0 && (
-                      <p className="text-[9px] text-gray-400 mt-0.5">{proj.technologies.join(', ')}</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">{proj.technologies.join(', ')}</p>
                     )}
                   </div>
                 </div>
@@ -196,7 +204,7 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
         {/* Certifications */}
         {hasCertifications && (
           <div>
-            <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-3">
+            <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-3">
               Certifications
             </h3>
             <div className="relative pl-5 space-y-2">
@@ -204,9 +212,9 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
               {certifications.map((cert) => (
                 <div key={cert.id} className="relative">
                   <TimelineDot />
-                  <div>
+                  <div className="ml-3">
                     <p className="text-sm font-bold text-gray-900">{cert.name}</p>
-                    <p className="text-[10px] text-gray-500">{cert.issuer}{cert.date ? ` | ${cert.date}` : ''}</p>
+                    <p className="text-[11px] text-gray-500">{cert.issuer}{cert.date ? ` | ${cert.date}` : ''}</p>
                   </div>
                 </div>
               ))}
@@ -217,7 +225,7 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
         {/* Work Experience Timeline */}
         {hasExperience && (
           <div>
-            <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-3">
+            <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-gray-800 mb-3">
               Work Experience
             </h3>
             <div className="relative pl-5 space-y-4">
@@ -225,14 +233,14 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
               {experience.map((exp) => (
                 <div key={exp.id} className="relative">
                   <TimelineDot />
-                  <div className="flex justify-between items-start mb-0.5">
+                  <div className="flex justify-between items-start mb-0.5 ml-3">
                     <p className="text-sm font-bold text-gray-900">{exp.role || 'Job Title'}</p>
-                    <span className="text-[9px] text-gray-400 flex-shrink-0 ml-2 mt-0.5">
+                    <span className="text-[10px] text-gray-400 flex-shrink-0 ml-2 mt-0.5">
                       {exp.startDate}{exp.startDate && exp.endDate ? ' - ' : ''}{exp.current ? 'Present' : exp.endDate}
                     </span>
                   </div>
-                  <p className="text-[10px] text-gray-500 font-medium mb-1">{exp.company || 'Company Name'}</p>
-                  <p className="text-[10px] leading-relaxed text-gray-600 whitespace-pre-wrap">{exp.description}</p>
+                  <p className="text-[11px] text-gray-500 font-medium mb-1">{exp.company || 'Company Name'}</p>
+                  <p className="text-[11px] leading-relaxed text-gray-600 whitespace-pre-wrap">{exp.description}</p>
                 </div>
               ))}
             </div>

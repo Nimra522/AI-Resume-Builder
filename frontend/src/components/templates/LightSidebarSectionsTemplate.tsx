@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Globe } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, Linkedin } from 'lucide-react';
 
 interface Props { data: ResumeData; }
 
@@ -17,6 +17,7 @@ const LightSidebarSectionsComponent: React.FC<Props> = ({ data }) => {
     { icon: Mail, value: personalInfo.email },
     { icon: MapPin, value: personalInfo.location },
     { icon: Globe, value: personalInfo.website },
+    { icon: Linkedin, value: personalInfo.linkedin },
   ].filter(c => c.value);
 
   const skillList = skills || [];

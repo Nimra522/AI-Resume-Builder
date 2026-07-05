@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, Globe, Camera } from 'lucide-react';
+import { Phone, Mail, Globe, Linkedin, Camera } from 'lucide-react';
 
 interface Props { data: ResumeData; }
 
@@ -47,6 +47,7 @@ const EditorialThinComponent: React.FC<Props> = ({ data }) => {
     { icon: Phone, value: personalInfo.phone },
     { icon: Mail, value: personalInfo.email },
     { icon: Globe, value: personalInfo.website },
+    { icon: Linkedin, value: personalInfo.linkedin },
   ].filter(c => c.value);
 
   const nameParts = (personalInfo.fullName || 'Your Name').split(' ');

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Camera, Phone, Mail, MapPin } from 'lucide-react';
+import { Camera, Phone, Mail, MapPin, Linkedin } from 'lucide-react';
 
 interface Props { data: ResumeData; }
 
@@ -26,6 +26,7 @@ const SingleColumnNavyCorporateComponent: React.FC<Props> = ({ data }) => {
     { icon: Phone, value: personalInfo.phone },
     { icon: Mail, value: personalInfo.email },
     { icon: MapPin, value: personalInfo.location },
+    { icon: Linkedin, value: personalInfo.linkedin },
   ].filter(c => c.value);
 
   const skillList = skills || [];

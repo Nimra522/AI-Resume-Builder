@@ -28,6 +28,7 @@ const SidebarGrayProfileComponent: React.FC<Props> = ({ data }) => {
     personalInfo.email,
     personalInfo.location,
     personalInfo.website,
+    personalInfo.linkedin,
   ].filter(Boolean);
 
   const skillList = skills || [];

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Camera } from 'lucide-react';
+import { Phone, Mail, MapPin, Camera, Linkedin } from 'lucide-react';
 
 interface Props { data: ResumeData; }
 
@@ -26,6 +26,7 @@ const PillRotatedTimelineComponent: React.FC<Props> = ({ data }) => {
     { icon: Mail, value: personalInfo.email },
     { icon: Phone, value: personalInfo.phone },
     { icon: MapPin, value: personalInfo.location },
+    { icon: Linkedin, value: personalInfo.linkedin },
   ].filter(c => c.value);
 
   const nameParts = (personalInfo.fullName || 'Your Name').split(' ');

@@ -15,6 +15,7 @@ const ModernProfessionalTemplate: React.FC<{ data: ResumeData }> = ({ data }) =>
         <div className="flex gap-4 mt-3 text-[13px] text-[#D1D5DB]">
           {personalInfo.phone && <span>{personalInfo.phone}</span>}
           {personalInfo.email && <span className="break-all">{personalInfo.email}</span>}
+          {personalInfo.linkedin && <span className="break-all">{personalInfo.linkedin}</span>}
           {personalInfo.location && <span>{personalInfo.location}</span>}
         </div>
       </div>

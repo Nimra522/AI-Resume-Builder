@@ -14,6 +14,7 @@ const BlueFramedTimelineComponent: React.FC<Props> = ({ data }) => {
     personalInfo.phone,
     personalInfo.location,
     personalInfo.website,
+    personalInfo.linkedin,
     personalInfo.email,
   ].filter(Boolean);
 

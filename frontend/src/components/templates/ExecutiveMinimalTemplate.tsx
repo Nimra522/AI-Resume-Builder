@@ -16,6 +16,7 @@ const ExecutiveMinimalTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
             {personalInfo.phone && <p>{personalInfo.phone}</p>}
             {personalInfo.email && <p className="break-all">{personalInfo.email}</p>}
             {personalInfo.location && <p>{personalInfo.location}</p>}
+            {personalInfo.linkedin && <p>{personalInfo.linkedin}</p>}
           </div>
         </div>
         <div className="h-px bg-[#E5E7EB] mb-5" />

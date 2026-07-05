@@ -95,6 +95,22 @@ const BlueFramedTimelineTemplate = lazy(() => import('../templates/BlueFramedTim
 const NavyProfileTimelineTemplate = lazy(() => import('../templates/NavyProfileTimelineTemplate'));
 const NavySidebarRoundedPhotoTemplate = lazy(() => import('../templates/NavySidebarRoundedPhotoTemplate'));
 const BlueSidebarDotIndicatorsTemplate = lazy(() => import('../templates/BlueSidebarDotIndicatorsTemplate'));
+const CorporateCleanTemplate = lazy(() => import('../templates/CorporateCleanTemplate'));
+const CorporateTimelineTemplate = lazy(() => import('../templates/CorporateTimelineTemplate'));
+const HalftoneTimelineTemplate = lazy(() => import('../templates/HalftoneTimelineTemplate'));
+const RoyalBlueTimelineTemplate = lazy(() => import('../templates/RoyalBlueTimelineTemplate'));
+const EngineerPortfolioTemplate = lazy(() => import('../templates/EngineerPortfolioTemplate'));
+const ExecutiveBlueBannerTemplate = lazy(() => import('../templates/ExecutiveBlueBannerTemplate'));
+const MinimalBlackPhotoTemplate = lazy(() => import('../templates/MinimalBlackPhotoTemplate'));
+const SingleColumnBlackPanelTemplate = lazy(() => import('../templates/SingleColumnBlackPanelTemplate'));
+const OrangeAccentTimelineTemplate = lazy(() => import('../templates/OrangeAccentTimelineTemplate'));
+const GreenHeroExecutiveTemplate = lazy(() => import('../templates/GreenHeroExecutiveTemplate'));
+const GreenGeoCorporateTemplate = lazy(() => import('../templates/GreenGeoCorporateTemplate'));
+const TealBlockHeaderTemplate = lazy(() => import('../templates/TealBlockHeaderTemplate'));
+const GraphicDesignerSplitHeaderTemplate = lazy(() => import('../templates/GraphicDesignerSplitHeaderTemplate'));
+const MinimalCorporateBlueBannerTemplate = lazy(() => import('../templates/MinimalCorporateBlueBannerTemplate'));
+const YellowHeaderMinimalTemplate = lazy(() => import('../templates/YellowHeaderMinimalTemplate'));
+const ThreePanelBlackTimelineTemplate = lazy(() => import('../templates/ThreePanelBlackTimelineTemplate'));
 
 const TEMPLATE_MAP: Record<string, React.LazyExoticComponent<React.ComponentType<{ data: ResumeData }>>> = {
   modern: ModernTemplate,
@@ -185,6 +201,22 @@ const TEMPLATE_MAP: Record<string, React.LazyExoticComponent<React.ComponentType
   'navy-profile-timeline': NavyProfileTimelineTemplate,
   'navy-sidebar-rounded-photo': NavySidebarRoundedPhotoTemplate,
   'blue-sidebar-dot-indicators': BlueSidebarDotIndicatorsTemplate,
+  'corporate-clean': CorporateCleanTemplate,
+  'corporate-timeline': CorporateTimelineTemplate,
+  'halftone-timeline': HalftoneTimelineTemplate,
+  'royal-blue-timeline': RoyalBlueTimelineTemplate,
+  'engineer-portfolio': EngineerPortfolioTemplate,
+  'executive-blue-banner': ExecutiveBlueBannerTemplate,
+  'minimal-black-photo': MinimalBlackPhotoTemplate,
+  'single-column-black-panel': SingleColumnBlackPanelTemplate,
+  'orange-accent-timeline': OrangeAccentTimelineTemplate,
+  'green-hero-executive': GreenHeroExecutiveTemplate,
+  'green-geo-corporate': GreenGeoCorporateTemplate,
+  'teal-block-header': TealBlockHeaderTemplate,
+  'graphic-designer-split-header': GraphicDesignerSplitHeaderTemplate,
+  'minimal-corporate-blue-banner': MinimalCorporateBlueBannerTemplate,
+  'yellow-header-minimal': YellowHeaderMinimalTemplate,
+  'three-panel-black-timeline': ThreePanelBlackTimelineTemplate,
 };
 
 const LoadingFallback: React.FC = () => (

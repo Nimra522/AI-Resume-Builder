@@ -15,6 +15,7 @@ const BlueHeaderThreeColumnComponent: React.FC<Props> = ({ data }) => {
     { label: 'Phone', value: personalInfo.phone },
     { label: 'Address', value: personalInfo.location },
     { label: 'Website', value: personalInfo.website },
+    { label: 'LinkedIn', value: personalInfo.linkedin },
     { label: 'Email', value: personalInfo.email },
   ].filter(c => c.value);
 

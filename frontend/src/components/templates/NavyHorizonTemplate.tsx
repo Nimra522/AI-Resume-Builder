@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Globe, User } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
 interface NavyHorizonProps {
   data: ResumeData;
@@ -26,7 +26,7 @@ const parseSkillLevel = (skill: string): { name: string; level: number } => {
 
 const NavyHorizonComponent: React.FC<NavyHorizonProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, certifications, projects } = data;
-  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website;
+  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
   const hasEducation = education.length > 0;
@@ -55,7 +55,7 @@ const NavyHorizonComponent: React.FC<NavyHorizonProps> = ({ data }) => {
           </div>
           <div className="pl-16 pt-7">
             <h1 className="text-2xl font-bold text-white leading-tight">{personalInfo.fullName || 'Your Full Name'}</h1>
-            <p className="text-[10px] text-white/70 uppercase tracking-[0.25em] mt-1.5">{personalInfo.jobTitle || 'Your Job Title'}</p>
+            <p className="text-[12px] text-white/70 uppercase tracking-[0.25em] mt-1.5">{personalInfo.jobTitle || 'Your Job Title'}</p>
           </div>
         </div>
       </div>
@@ -67,36 +67,22 @@ const NavyHorizonComponent: React.FC<NavyHorizonProps> = ({ data }) => {
           {/* Contact */}
           {hasContact && (
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#1a365d] mb-2">Contact</h3>
-              <div className="space-y-1.5 text-[10px] text-gray-700">
-                {personalInfo.phone && <div className="flex items-center gap-2"><Phone size={10} className="text-[#1a365d]" /><span>{personalInfo.phone}</span></div>}
-                {personalInfo.email && <div className="flex items-center gap-2"><Mail size={10} className="text-[#1a365d]" /><span className="break-all">{personalInfo.email}</span></div>}
-                {personalInfo.website && <div className="flex items-center gap-2"><Globe size={10} className="text-[#1a365d]" /><span className="break-all">{personalInfo.website}</span></div>}
-                {personalInfo.location && <div className="flex items-center gap-2"><MapPin size={10} className="text-[#1a365d]" /><span>{personalInfo.location}</span></div>}
+              <h3 className="text-[12px] font-bold uppercase tracking-wider text-[#1a365d] mb-2">Contact</h3>
+              <div className="space-y-1.5 text-[12px] text-gray-700">
+                {personalInfo.phone && <div className="flex items-center gap-2"><span className="w-3 flex-shrink-0 flex justify-center"><Phone size={10} className="text-[#1a365d]" /></span><span>{personalInfo.phone}</span></div>}
+                {personalInfo.email && <div className="flex items-center gap-2"><span className="w-3 flex-shrink-0 flex justify-center"><Mail size={10} className="text-[#1a365d]" /></span><span className="break-all">{personalInfo.email}</span></div>}
+                {personalInfo.website && <div className="flex items-center gap-2"><span className="w-3 flex-shrink-0 flex justify-center"><Globe size={10} className="text-[#1a365d]" /></span><span className="break-all">{personalInfo.website}</span></div>}
+                {personalInfo.linkedin && <div className="flex items-center gap-2"><span className="w-3 flex-shrink-0 flex justify-center"><Linkedin size={10} className="text-[#1a365d]" /></span><span className="break-all">{personalInfo.linkedin}</span></div>}
+                {personalInfo.location && <div className="flex items-center gap-2"><span className="w-3 flex-shrink-0 flex justify-center"><MapPin size={10} className="text-[#1a365d]" /></span><span>{personalInfo.location}</span></div>}
               </div>
-            </div>
-          )}
-
-          {/* Information */}
-          {personalInfo.summary && (
-            <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#1a365d] mb-2">Information</h3>
-              <ul className="space-y-0.5 text-[10px] text-gray-700">
-                {personalInfo.summary.split('\n').filter(Boolean).slice(0, 4).map((line, i) => (
-                  <li key={i} className="flex items-start gap-1.5">
-                    <span className="text-gray-500 mt-0.5">&#x2022;</span>
-                    <span>{line}</span>
-                  </li>
-                ))}
-              </ul>
             </div>
           )}
 
           {/* Certifications */}
           {hasCertifications && (
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#1a365d] mb-2">Certifications</h3>
-              <div className="space-y-1 text-[10px] text-gray-700">
+              <h3 className="text-[12px] font-bold uppercase tracking-wider text-[#1a365d] mb-2">Certifications</h3>
+              <div className="space-y-1 text-[12px] text-gray-700">
                 {certifications.map((c) => (
                   <div key={c.id} className="flex justify-between">
                     <span className="font-medium">{c.name}</span>
@@ -110,8 +96,8 @@ const NavyHorizonComponent: React.FC<NavyHorizonProps> = ({ data }) => {
           {/* Projects */}
           {hasProjects && (
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#1a365d] mb-2">Projects</h3>
-              <div className="space-y-1 text-[10px] text-gray-700">
+              <h3 className="text-[12px] font-bold uppercase tracking-wider text-[#1a365d] mb-2">Projects</h3>
+              <div className="space-y-1 text-[12px] text-gray-700">
                 {projects.map((proj) => (
                   <div key={proj.id} className="flex justify-between">
                     <span className="font-medium">{proj.name}</span>
@@ -128,25 +114,25 @@ const NavyHorizonComponent: React.FC<NavyHorizonProps> = ({ data }) => {
           {/* My Profile */}
           {hasSummary && (
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#1a365d] mb-1.5 border-b border-gray-200 pb-1">My Profile</h3>
-              <p className="text-[10px] leading-relaxed text-gray-600 whitespace-pre-wrap mt-2">{personalInfo.summary}</p>
+              <h3 className="text-[12px] font-bold uppercase tracking-wider text-[#1a365d] mb-1.5 border-b border-gray-200 pb-1">My Profile</h3>
+              <p className="text-[12px] leading-relaxed text-gray-600 whitespace-pre-wrap mt-2">{personalInfo.summary}</p>
             </div>
           )}
 
           {/* Experience */}
           {hasExperience && (
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#1a365d] mb-2.5 border-b border-gray-200 pb-1">Experience</h3>
+              <h3 className="text-[12px] font-bold uppercase tracking-wider text-[#1a365d] mb-2.5 border-b border-gray-200 pb-1">Experience</h3>
               <div className="space-y-2.5">
                 {experience.map((exp) => (
                   <div key={exp.id}>
-                    <p className="text-xs font-bold uppercase text-[#1a365d]">
+                    <p className="text-[13px] font-bold uppercase text-[#1a365d]">
                       <span className="mr-1.5">&#x2022;</span>{exp.role}
                     </p>
-                    <p className="text-[10px] italic text-gray-500 mt-0.5 ml-3.5">
+                    <p className="text-[12px] italic text-gray-500 mt-0.5 ml-3.5">
                       {exp.company}{exp.company && (exp.startDate || exp.endDate) ? ' | ' : ''}{exp.startDate}{exp.startDate && exp.endDate ? ' - ' : ''}{exp.current ? 'Present' : exp.endDate}
                     </p>
-                    <p className="text-[10px] text-gray-600 mt-1 leading-relaxed ml-3.5 whitespace-pre-wrap">{exp.description}</p>
+                    <p className="text-[12px] text-gray-600 mt-1 leading-relaxed ml-3.5 whitespace-pre-wrap">{exp.description}</p>
                   </div>
                 ))}
               </div>
@@ -156,15 +142,15 @@ const NavyHorizonComponent: React.FC<NavyHorizonProps> = ({ data }) => {
           {/* Education */}
           {hasEducation && (
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#1a365d] mb-2 border-b border-gray-200 pb-1">Education</h3>
+              <h3 className="text-[12px] font-bold uppercase tracking-wider text-[#1a365d] mb-2 border-b border-gray-200 pb-1">Education</h3>
               <div className="space-y-2">
                 {education.map((edu) => (
                   <div key={edu.id}>
                     <div className="flex justify-between items-start">
-                      <p className="text-xs font-bold uppercase text-gray-900">{edu.school}</p>
-                      <span className="text-[12px] text-gray-500 flex-shrink-0 ml-2">{edu.graduationDate}</span>
+                      <p className="text-[13px] font-bold uppercase text-gray-900">{edu.school}</p>
+                      <span className="text-[13px] text-gray-500 flex-shrink-0 ml-2">{edu.graduationDate}</span>
                     </div>
-                    <p className="text-[10px] text-gray-600 mt-0.5">{edu.degree}</p>
+                    <p className="text-[12px] text-gray-600 mt-0.5">{edu.degree}</p>
                   </div>
                 ))}
               </div>
@@ -174,13 +160,13 @@ const NavyHorizonComponent: React.FC<NavyHorizonProps> = ({ data }) => {
           {/* Tools/Skills */}
           {hasSkills && (
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#1a365d] mb-2 border-b border-gray-200 pb-1">Tools/Skills</h3>
+              <h3 className="text-[12px] font-bold uppercase tracking-wider text-[#1a365d] mb-2 border-b border-gray-200 pb-1">Tools/Skills</h3>
               <div className="space-y-1.5 mt-2">
                 {skills.map((skill, i) => {
                   const { name, level } = parseSkillLevel(skill);
                   return (
                     <div key={i} className="flex items-center gap-3">
-                      <span className="text-[10px] text-gray-700 w-24 flex-shrink-0">{name}</span>
+                      <span className="text-[12px] text-gray-700 w-24 flex-shrink-0">{name}</span>
                       <ProgressBar level={level} />
                     </div>
                   );

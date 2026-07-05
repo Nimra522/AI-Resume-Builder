@@ -73,19 +73,19 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
                 {personalInfo.phone && (
                   <div className="flex items-center gap-2.5">
                     <NavyCircleIcon><Phone size={12} /></NavyCircleIcon>
-                    <span className="font-sans text-[10px] text-gray-700">{personalInfo.phone}</span>
+                    <span className="font-sans text-[11px] text-gray-700">{personalInfo.phone}</span>
                   </div>
                 )}
                 {personalInfo.email && (
                   <div className="flex items-center gap-2.5">
                     <NavyCircleIcon><Mail size={12} /></NavyCircleIcon>
-                    <span className="font-sans text-[10px] text-gray-700 break-all">{personalInfo.email}</span>
+                    <span className="font-sans text-[11px] text-gray-700 break-all">{personalInfo.email}</span>
                   </div>
                 )}
                 {personalInfo.location && (
                   <div className="flex items-center gap-2.5">
                     <NavyCircleIcon><MapPin size={12} /></NavyCircleIcon>
-                    <span className="font-sans text-[10px] text-gray-700">{personalInfo.location}</span>
+                    <span className="font-sans text-[11px] text-gray-700">{personalInfo.location}</span>
                   </div>
                 )}
               </div>
@@ -105,6 +105,12 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
                     {item}
                   </li>
                 ))}
+                {personalInfo.linkedin && (
+                  <li className="flex items-start gap-2 font-sans text-[11px] text-gray-700">
+                    <span className="text-gray-500">-</span>
+                    {personalInfo.linkedin}
+                  </li>
+                )}
               </ul>
             </div>
           )}
@@ -124,14 +130,14 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
                     <p className="font-sans font-bold text-[11px] text-[#1B2A4A]">
                       {exp.role || 'Job Title'}
                     </p>
-                    <p className="font-sans text-[10px] text-gray-500 mt-0.5">
+                    <p className="font-sans text-[11px] text-gray-500 mt-0.5">
                       {exp.company || 'Company Name'}
                       {exp.company && (exp.startDate || exp.endDate) ? ' | ' : ''}
                       {exp.startDate}{exp.startDate && exp.endDate ? ' - ' : ''}{exp.current ? 'Present' : exp.endDate}
                     </p>
                     <ul className="mt-1 space-y-0.5">
                       {exp.description.split('\n').filter(Boolean).map((line, i) => (
-                        <li key={i} className="flex items-start gap-2 font-sans text-[10px] text-gray-700">
+                        <li key={i} className="flex items-start gap-2 font-sans text-[11px] text-gray-700">
                           <span className="text-gray-500 mt-0.5">-</span>
                           {line}
                         </li>
@@ -155,7 +161,7 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
                     <p className="font-sans font-bold text-[11px] text-[#1B2A4A]">
                       {edu.school || 'School Name'}
                     </p>
-                    <p className="font-sans text-[10px] text-gray-500 mt-0.5">
+                    <p className="font-sans text-[11px] text-gray-500 mt-0.5">
                       {edu.degree || ''}
                       {edu.degree && edu.graduationDate ? ' | ' : ''}
                       {edu.graduationDate || ''}
@@ -168,14 +174,14 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
 
           {/* Bottom Split: Skills | Languages */}
           {(hasSkills || hasCertifications || hasProjects) && (
-            <div className="flex gap-6 mt-auto pt-4">
+            <div className="flex flex-col gap-6 mt-auto pt-4">
               {/* Skills */}
               {hasSkills && (
                 <div className="flex-1">
                   <h3 className="font-serif font-bold text-[12px] text-[#1B2A4A] uppercase tracking-wider mb-2">
                     Skills
                   </h3>
-                  <p className="font-sans text-[10px] text-gray-700 leading-relaxed">
+                  <p className="font-sans text-[11px] text-gray-700 leading-relaxed">
                     {skills.join(', ')}
                   </p>
                 </div>
@@ -190,10 +196,10 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
                   <div className="space-y-2">
                     {certifications.map((cert) => (
                       <div key={cert.id}>
-                        <p className="font-sans font-bold text-[10px] text-[#1B2A4A]">
+                        <p className="font-sans font-bold text-[11px] text-[#1B2A4A]">
                           {cert.name}
                         </p>
-                        <p className="font-sans text-[9px] text-gray-600">
+                        <p className="font-sans text-[10px] text-gray-600">
                           {cert.issuer}
                         </p>
                       </div>
@@ -211,10 +217,10 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
                   <div className="space-y-2">
                     {projects.map((proj) => (
                       <div key={proj.id}>
-                        <p className="font-sans font-bold text-[10px] text-[#1B2A4A]">
+                        <p className="font-sans font-bold text-[11px] text-[#1B2A4A]">
                           {proj.name}
                         </p>
-                        <p className="font-sans text-[9px] text-gray-600">
+                        <p className="font-sans text-[10px] text-gray-600">
                           {proj.description}
                         </p>
                       </div>

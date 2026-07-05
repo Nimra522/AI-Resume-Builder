@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin } from 'lucide-react';
+import { Phone, Mail, MapPin, Linkedin } from 'lucide-react';
 
 interface CorporateBandProps {
   data: ResumeData;
@@ -32,6 +32,7 @@ const CorporateBandComponent: React.FC<CorporateBandProps> = ({ data }) => {
             {personalInfo.location && <div className="flex items-center gap-1.5 justify-end"><MapPin size={11} className="text-gray-500 flex-shrink-0" /><span>{personalInfo.location}</span></div>}
             {personalInfo.phone && <div className="flex items-center gap-1.5 justify-end"><Phone size={11} className="text-gray-500 flex-shrink-0" /><span>{personalInfo.phone}</span></div>}
             {personalInfo.email && <div className="flex items-center gap-1.5 justify-end"><Mail size={11} className="text-gray-500 flex-shrink-0" /><span className="break-all">{personalInfo.email}</span></div>}
+            {personalInfo.linkedin && <div className="flex items-center gap-1.5 justify-end"><Linkedin size={11} className="text-gray-500 flex-shrink-0" /><span className="break-all">{personalInfo.linkedin}</span></div>}
           </div>
         </div>
       </div>

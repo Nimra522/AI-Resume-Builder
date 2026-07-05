@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { User } from 'lucide-react';
+import { User, Linkedin } from 'lucide-react';
 
 const ExecutiveVogueComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
@@ -20,6 +20,7 @@ const ExecutiveVogueComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
               {personalInfo.phone && <p>{personalInfo.phone}</p>}
               {personalInfo.email && <p>{personalInfo.email}</p>}
               {personalInfo.location && <p>{personalInfo.location}</p>}
+              {personalInfo.linkedin && <p>{personalInfo.linkedin}</p>}
             </div>
           </div>
           {skills.length > 0 && (

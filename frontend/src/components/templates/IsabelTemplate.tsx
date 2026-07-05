@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin } from 'lucide-react';
+import { Phone, Mail, MapPin, Linkedin } from 'lucide-react';
 
 interface IsabelProps {
   data: ResumeData;
@@ -76,6 +76,7 @@ const IsabelComponent: React.FC<IsabelProps> = ({ data }) => {
             {personalInfo.phone && <ContactLine icon={<Phone size={9} className="text-black" />} text={personalInfo.phone} />}
             {personalInfo.email && <ContactLine icon={<Mail size={9} className="text-black" />} text={personalInfo.email} />}
             {personalInfo.location && <ContactLine icon={<MapPin size={9} className="text-black" />} text={personalInfo.location} />}
+            {personalInfo.linkedin && <ContactLine icon={<Linkedin size={9} className="text-black" />} text={personalInfo.linkedin} />}
           </div>
 
           {/* Education */}

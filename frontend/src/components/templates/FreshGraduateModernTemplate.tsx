@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin } from 'lucide-react';
+import { Phone, Mail, MapPin, Linkedin } from 'lucide-react';
 
 interface FreshGraduateModernProps {
   data: ResumeData;
@@ -18,9 +18,10 @@ const SectionBanner: React.FC<{ title: string }> = ({ title }) => (
 );
 
 const FreshGraduateModernComponent: React.FC<FreshGraduateModernProps> = ({ data }) => {
-  const { personalInfo, education, skills, projects, certifications } = data;
+  const { personalInfo, education, experience, skills, projects, certifications } = data;
 
-  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location;
+  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.linkedin;
+  const hasExperience = experience.length > 0;
   const hasEducation = education.length > 0;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
@@ -102,6 +103,14 @@ const FreshGraduateModernComponent: React.FC<FreshGraduateModernProps> = ({ data
                     <span>{personalInfo.location}</span>
                   </div>
                 )}
+                {personalInfo.linkedin && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <span className="w-3.5 flex-shrink-0 flex justify-center">
+                      <Linkedin size={12} className="text-[#B07D65]" />
+                    </span>
+                    <span className="break-all">{personalInfo.linkedin}</span>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -116,6 +125,28 @@ const FreshGraduateModernComponent: React.FC<FreshGraduateModernProps> = ({ data
               <p className="mt-3 text-[11px] leading-relaxed text-gray-600 whitespace-pre-wrap">
                 {personalInfo.summary}
               </p>
+            </div>
+          )}
+
+          {/* Experience */}
+          {hasExperience && (
+            <div>
+              <SectionBanner title="Experience" />
+              <div className="mt-3 space-y-3">
+                {experience.map((exp) => (
+                  <div key={exp.id}>
+                    <div className="flex justify-between items-start">
+                      <p className="text-sm font-bold text-gray-800">{exp.role || 'Job Title'} <span className="font-normal text-gray-500">{exp.company ? `— ${exp.company}` : ''}</span></p>
+                      <span className="text-[10px] text-gray-400 flex-shrink-0 ml-4 mt-0.5 font-medium">
+                        {exp.startDate}{exp.startDate && exp.endDate ? ' — ' : ''}{exp.current ? 'Present' : exp.endDate}
+                      </span>
+                    </div>
+                    {exp.description && (
+                      <p className="text-[11px] text-gray-600 mt-1 leading-relaxed whitespace-pre-wrap">{exp.description}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

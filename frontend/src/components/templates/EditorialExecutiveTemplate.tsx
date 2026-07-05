@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, MapPin, Mail, Globe } from 'lucide-react';
+import { Phone, MapPin, Mail, Globe, Linkedin } from 'lucide-react';
 
 interface EditorialExecutiveProps {
   data: ResumeData;
@@ -14,6 +14,7 @@ const EditorialExecutiveComponent: React.FC<EditorialExecutiveProps> = ({ data }
     { icon: MapPin, value: personalInfo.location, key: 'location' },
     { icon: Mail, value: personalInfo.email, key: 'email' },
     { icon: Globe, value: personalInfo.website, key: 'website' },
+    { icon: Linkedin, value: personalInfo.linkedin, key: 'linkedin' },
   ].filter(item => item.value);
 
   return (

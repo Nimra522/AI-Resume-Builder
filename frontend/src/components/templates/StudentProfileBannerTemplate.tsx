@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Globe, Camera } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, Linkedin, Camera } from 'lucide-react';
 
 interface Props { data: ResumeData; }
 
@@ -27,6 +27,7 @@ const StudentProfileBannerComponent: React.FC<Props> = ({ data }) => {
     { icon: Mail, value: personalInfo.email },
     { icon: MapPin, value: personalInfo.location },
     { icon: Globe, value: personalInfo.website },
+    { icon: Linkedin, value: personalInfo.linkedin },
   ].filter(c => c.value);
 
   const skillList = skills || [];

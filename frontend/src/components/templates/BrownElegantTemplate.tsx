@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { User, Phone, Mail, MapPin } from 'lucide-react';
+import { User, Phone, Mail, MapPin, Linkedin } from 'lucide-react';
 
 const BROWN = '#9C6B52';
 const BG = '#F8F6F1';
@@ -28,6 +28,7 @@ const BrownElegantTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
           {personalInfo.phone && <span className="flex items-center gap-1.5"><Phone size={12} style={{ color: BROWN }} />{personalInfo.phone}</span>}
           {personalInfo.location && <span className="flex items-center gap-1.5"><MapPin size={12} style={{ color: BROWN }} />{personalInfo.location}</span>}
           {personalInfo.email && <span className="flex items-center gap-1.5"><Mail size={12} style={{ color: BROWN }} /><span className="break-all">{personalInfo.email}</span></span>}
+          {personalInfo.linkedin && <span className="flex items-center gap-1.5"><Linkedin size={12} style={{ color: BROWN }} /><span className="break-all">{personalInfo.linkedin}</span></span>}
         </div>
       </div>
 

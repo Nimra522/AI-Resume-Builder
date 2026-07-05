@@ -15,6 +15,7 @@ const ElegantMonochromeTemplate: React.FC<{ data: ResumeData }> = ({ data }) => 
           {personalInfo.phone && <span>{personalInfo.phone}</span>}
           {personalInfo.email && <span className="break-all">{personalInfo.email}</span>}
           {personalInfo.location && <span>{personalInfo.location}</span>}
+          {personalInfo.linkedin && <span>{personalInfo.linkedin}</span>}
         </div>
       </div>
       <div className="h-px bg-[#E4E4E7] mx-9" />

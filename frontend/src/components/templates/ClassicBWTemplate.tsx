@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Globe, User } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, User, Linkedin } from 'lucide-react';
 
 interface ClassicBWProps { data: ResumeData; }
 
@@ -16,6 +16,7 @@ const ClassicBWComponent: React.FC<ClassicBWProps> = ({ data }) => {
     { icon: Mail, value: personalInfo.email },
     { icon: MapPin, value: personalInfo.location },
     { icon: Globe, value: personalInfo.website },
+    { icon: Linkedin, value: personalInfo.linkedin },
   ].filter(item => item.value);
 
   const SectionHeading: React.FC<{ title: string }> = ({ title }) => (

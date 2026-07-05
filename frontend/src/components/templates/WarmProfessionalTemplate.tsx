@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Globe, User, Star } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, Linkedin, User, Star } from 'lucide-react';
 
 interface IsabelMercadoProps {
   data: ResumeData;
@@ -33,7 +33,7 @@ const parseSkillLevel = (skill: string): { name: string; level: number } => {
 const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, projects, certifications } = data;
 
-  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website;
+  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
   const hasEducation = education.length > 0;
@@ -166,6 +166,14 @@ const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
                       <Globe size={11} className="text-[#8B6F5C]" />
                     </div>
                     <span className="break-all">{personalInfo.website}</span>
+                  </div>
+                )}
+                {personalInfo.linkedin && (
+                  <div className="flex items-center gap-2.5 text-[10px] text-gray-600">
+                    <div className="w-4 flex justify-center flex-shrink-0">
+                      <Linkedin size={11} className="text-[#8B6F5C]" />
+                    </div>
+                    <span className="break-all">{personalInfo.linkedin}</span>
                   </div>
                 )}
               </div>

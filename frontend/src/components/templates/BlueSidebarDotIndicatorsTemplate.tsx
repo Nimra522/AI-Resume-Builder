@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Camera } from 'lucide-react';
+import { Phone, Mail, MapPin, Camera, Linkedin } from 'lucide-react';
 
 interface Props { data: ResumeData; }
 
@@ -38,6 +38,7 @@ const BlueSidebarDotIndicatorsComponent: React.FC<Props> = ({ data }) => {
     { icon: Phone, value: personalInfo.phone },
     { icon: Mail, value: personalInfo.email },
     { icon: MapPin, value: personalInfo.location },
+    { icon: Linkedin, value: personalInfo.linkedin },
   ].filter(c => c.value);
 
   const skillList = skills || [];

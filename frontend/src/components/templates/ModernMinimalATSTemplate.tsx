@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, Globe, MapPin } from 'lucide-react';
+import { Phone, Mail, Globe, MapPin, Linkedin } from 'lucide-react';
 
 interface ModernMinimalATSProps {
   data: ResumeData;
@@ -17,6 +17,7 @@ const ModernMinimalATSComponent: React.FC<ModernMinimalATSProps> = ({ data }) =>
     { icon: Mail, value: personalInfo.email },
     { icon: MapPin, value: personalInfo.location },
     { icon: Globe, value: personalInfo.website },
+    { icon: Linkedin, value: personalInfo.linkedin },
   ].filter(item => item.value);
 
   const nameParts = personalInfo.fullName?.trim().split(' ') || [];

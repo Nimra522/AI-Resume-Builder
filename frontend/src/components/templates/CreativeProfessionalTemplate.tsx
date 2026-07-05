@@ -1,13 +1,22 @@
 import React from 'react';
 import { ResumeData } from '../../types';
+import { User, Linkedin } from 'lucide-react';
 
 const CreativeProfessionalTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
   return (
     <div className="w-full bg-[#FFFFFF] text-[#0F766E] font-['Inter',sans-serif] shadow-xl mx-auto min-h-[1122px]" style={{ maxWidth: '793px' }}>
       <div className="flex min-h-[1122px]">
-        <div className="w-20 flex-shrink-0 bg-[#0F766E]" />
-        <div className="flex-1 pt-8 pb-8 pr-8">
+        <div className="w-60 flex-shrink-0 bg-[#0F766E] mr-6 flex flex-col items-center pt-8">
+          <div className="w-[100px] h-[100px] rounded-full overflow-hidden border-[3px] border-white/30 bg-[#14B8A6]/30 flex items-center justify-center mb-4">
+            {personalInfo.photoUrl ? (
+              <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <User size={36} className="text-white/60" />
+            )}
+          </div>
+          </div>
+          <div className="flex-1 pt-8 pb-8 pr-8">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h1 className="text-[34px] font-bold text-[#111111] tracking-tight">{personalInfo.fullName || 'Full Name'}</h1>
@@ -17,6 +26,7 @@ const CreativeProfessionalTemplate: React.FC<{ data: ResumeData }> = ({ data }) 
               {personalInfo.phone && <p>{personalInfo.phone}</p>}
               {personalInfo.email && <p className="break-all">{personalInfo.email}</p>}
               {personalInfo.location && <p>{personalInfo.location}</p>}
+              {personalInfo.linkedin && <p className="break-all">{personalInfo.linkedin}</p>}
             </div>
           </div>
           <div className="h-px bg-[#E5E7EB] mb-5" />

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { User, Phone, Mail, MapPin } from 'lucide-react';
+import { User, Phone, Mail, MapPin, Linkedin } from 'lucide-react';
 
 const NAVY = '#1B2A4A';
 const LIGHT_NAVY = '#2C3E6B';
@@ -31,6 +31,7 @@ const MinimalistFullWidthTemplate: React.FC<{ data: ResumeData }> = ({ data }) =
           {personalInfo.phone && <span className="flex items-center gap-1.5"><Phone size={12} style={{ color: NAVY }} />{personalInfo.phone}</span>}
           {personalInfo.location && <span className="flex items-center gap-1.5"><MapPin size={12} style={{ color: NAVY }} />{personalInfo.location}</span>}
           {personalInfo.email && <span className="flex items-center gap-1.5"><Mail size={12} style={{ color: NAVY }} /><span className="break-all">{personalInfo.email}</span></span>}
+          {personalInfo.linkedin && <span className="flex items-center gap-1.5"><Linkedin size={12} style={{ color: NAVY }} /><span className="break-all">{personalInfo.linkedin}</span></span>}
         </div>
       </div>
 

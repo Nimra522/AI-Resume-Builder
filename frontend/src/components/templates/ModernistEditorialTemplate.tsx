@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin } from 'lucide-react';
+import { Phone, Mail, MapPin, Linkedin } from 'lucide-react';
 
 interface ModernistEditorialProps {
   data: ResumeData;
@@ -35,6 +35,7 @@ const ModernistEditorialComponent: React.FC<ModernistEditorialProps> = ({ data }
     { icon: Phone, label: 'Phone', value: personalInfo.phone },
     { icon: Mail, label: 'Email', value: personalInfo.email },
     { icon: MapPin, label: 'Address', value: personalInfo.location },
+    { icon: Linkedin, label: 'LinkedIn', value: personalInfo.linkedin },
   ].filter(item => item.value);
 
   const DecorativeLine: React.FC<{ style?: React.CSSProperties }> = ({ style: extraStyle }) => (

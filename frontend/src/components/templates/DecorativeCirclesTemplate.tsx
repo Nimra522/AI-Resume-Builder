@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Globe, User } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
 interface DecorativeCirclesProps { data: ResumeData; }
 
@@ -18,6 +18,7 @@ const DecorativeCirclesComponent: React.FC<DecorativeCirclesProps> = ({ data }) 
     { icon: Mail, value: personalInfo.email },
     { icon: MapPin, value: personalInfo.location },
     { icon: Globe, value: personalInfo.website },
+    { icon: Linkedin, value: personalInfo.linkedin },
   ].filter(item => item.value);
 
   const SkillBar: React.FC<{ name: string; pct: number }> = ({ name, pct }) => (

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Phone, MapPin, Mail, Camera } from 'lucide-react';
+import { Phone, MapPin, Mail, Camera, Linkedin } from 'lucide-react';
 
 interface Props { data: ResumeData; }
 
@@ -27,6 +27,7 @@ const GreyBoxedHeadingsComponent: React.FC<Props> = ({ data }) => {
     { icon: Phone, label: 'Phone', value: personalInfo.phone },
     { icon: MapPin, label: 'Address', value: personalInfo.location },
     { icon: Mail, label: 'Email', value: personalInfo.email },
+    { icon: Linkedin, label: 'LinkedIn', value: personalInfo.linkedin },
   ].filter(c => c.value);
 
   const skillList = skills || [];

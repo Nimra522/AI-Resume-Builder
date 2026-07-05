@@ -17,6 +17,7 @@ const PlatinumBoardComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
             <div className="text-right text-[13px] text-[#777777] space-y-1">
               {personalInfo.phone && <p>{personalInfo.phone}</p>}
               {personalInfo.email && <p className="break-all">{personalInfo.email}</p>}
+              {personalInfo.linkedin && <p className="break-all">{personalInfo.linkedin}</p>}
               {personalInfo.location && <p>{personalInfo.location}</p>}
             </div>
           </div>

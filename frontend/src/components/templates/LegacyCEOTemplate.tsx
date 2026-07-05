@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, User } from 'lucide-react';
+import { Phone, Mail, MapPin, User, Linkedin } from 'lucide-react';
 
 const LegacyCEOComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
@@ -16,16 +16,15 @@ const LegacyCEOComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
           {personalInfo.phone && <span>{personalInfo.phone}</span>}
           {personalInfo.email && <span className="break-all">{personalInfo.email}</span>}
           {personalInfo.location && <span>{personalInfo.location}</span>}
+          {personalInfo.linkedin && <span className="break-all">{personalInfo.linkedin}</span>}
         </div>
       </div>
       <div className="mx-9 h-px bg-[#000000]/10" />
       <div className="flex px-9 pt-6 pb-8 gap-7">
         <div className="w-[30%] flex-shrink-0 space-y-5">
-          <div className="w-full aspect-square">
+          <div className="w-full aspect-square rounded-full overflow-hidden border-2 border-[#C9A227]/30 shadow-sm">
             {personalInfo.photoUrl ? (
-              <div className="w-full h-full overflow-hidden">
-                <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
-              </div>
+              <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-[#F5F0E8] flex items-center justify-center">
                 <User size={32} className="text-[#C9A227]" />

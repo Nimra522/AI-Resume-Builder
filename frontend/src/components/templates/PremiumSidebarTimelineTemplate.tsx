@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Globe, User } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
 interface PremiumSidebarTimelineProps {
   data: ResumeData;
@@ -56,6 +56,7 @@ const PremiumSidebarTimelineComponent: React.FC<PremiumSidebarTimelineProps> = (
     { icon: Mail, label: 'Email', value: personalInfo.email },
     { icon: MapPin, label: 'Address', value: personalInfo.location },
     { icon: Globe, label: 'Website', value: personalInfo.website },
+    { icon: Linkedin, label: 'LinkedIn', value: personalInfo.linkedin },
   ].filter(item => item.value);
 
   return (

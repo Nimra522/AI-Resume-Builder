@@ -12,6 +12,7 @@ const LavenderAccentRepeatingComponent: React.FC<Props> = ({ data }) => {
   const contactItems = [
     personalInfo.phone,
     personalInfo.website,
+    personalInfo.linkedin,
     personalInfo.email,
     personalInfo.location,
   ].filter(Boolean);

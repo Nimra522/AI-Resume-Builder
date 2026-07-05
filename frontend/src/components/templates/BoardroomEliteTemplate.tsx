@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, User } from 'lucide-react';
+import { Phone, Mail, MapPin, User, Linkedin } from 'lucide-react';
 
 const BoardroomEliteComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
@@ -14,6 +14,7 @@ const BoardroomEliteComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
           {personalInfo.phone && <span className="flex items-center gap-1"><Phone size={12} className="text-[#2E86AB]" />{personalInfo.phone}</span>}
           {personalInfo.email && <span className="flex items-center gap-1"><Mail size={12} className="text-[#2E86AB]" /><span className="break-all">{personalInfo.email}</span></span>}
           {personalInfo.location && <span className="flex items-center gap-1"><MapPin size={12} className="text-[#2E86AB]" />{personalInfo.location}</span>}
+          {personalInfo.linkedin && <span className="flex items-center gap-1"><Linkedin size={12} className="text-[#2E86AB]" />{personalInfo.linkedin}</span>}
         </div>
       </div>
       <div className="mx-9 my-5 h-px bg-[#2E86AB]/30" />
