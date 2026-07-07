@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { User, Phone, Mail, MapPin, Linkedin } from 'lucide-react';
 
 const MinimalistMagazineTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   return (
     <div className="w-full font-['Inter',sans-serif] shadow-xl mx-auto min-h-[1122px]" style={{ maxWidth: '793px', backgroundColor: '#F5F5F5', color: '#1A1A1A' }}>
@@ -11,8 +21,9 @@ const MinimalistMagazineTemplate: React.FC<{ data: ResumeData }> = ({ data }) =>
         <div className="relative flex flex-col items-center">
           <div className="w-full" style={{ height: '1px', backgroundColor: '#CFCFCF' }} />
           <div className="absolute" style={{ top: '-45px' }}>
-            <div className="flex items-center justify-center" style={{ width: '90px', height: '90px', borderRadius: '50%', overflow: 'hidden', border: '2px solid #FFFFFF', boxShadow: '0 0 0 1px #CFCFCF', backgroundColor: '#FFFFFF' }}>
-              {personalInfo.photoUrl ? <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" /> : <User size={32} style={{ color: '#CFCFCF' }} />}
+            <div className="flex items-center justify-center cursor-pointer" style={{ width: '90px', height: '90px', borderRadius: '50%', overflow: 'hidden', border: '2px solid #FFFFFF', boxShadow: '0 0 0 1px #CFCFCF', backgroundColor: '#FFFFFF' }} onClick={() => fileRef.current?.click()}>
+              <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+              {photoSrc ? <img src={photoSrc} alt="" className="w-full h-full object-cover" /> : <User size={32} style={{ color: '#CFCFCF' }} />}
             </div>
           </div>
         </div>

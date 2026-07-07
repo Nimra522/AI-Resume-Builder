@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Linkedin } from 'lucide-react';
+import { Phone, Mail, MapPin, Linkedin, User } from 'lucide-react';
 
 const GreenHeroExecutiveTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   return (
     <div className="w-full bg-white text-[#222222] font-['Inter',sans-serif] shadow-xl mx-auto overflow-hidden" style={{ maxWidth: '793px', minHeight: '1122px' }}>
@@ -15,18 +25,16 @@ const GreenHeroExecutiveTemplate: React.FC<{ data: ResumeData }> = ({ data }) =>
           <div className="absolute -top-3 -left-3 w-[80px] h-[60px] bg-[#123B2A] z-0" />
           <div className="absolute -top-1 -left-1 w-[100px] h-[40px] bg-[#123B2A] z-0" />
           {/* Profile Image */}
-          <div className="relative z-10 w-full h-full overflow-hidden">
-            {personalInfo.photoUrl ? (
-              <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+          <div className="relative z-10 w-full h-full overflow-hidden cursor-pointer" onClick={() => fileRef.current?.click()}>
+            {photoSrc ? (
+              <img src={photoSrc} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#999999" strokeWidth="1.5" className="w-10 h-10">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
+                <User size={40} className="text-gray-400" />
               </div>
             )}
           </div>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
         </div>
 
         {/* Right — Name + Job Title */}

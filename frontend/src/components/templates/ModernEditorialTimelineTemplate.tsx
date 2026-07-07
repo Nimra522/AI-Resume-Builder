@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, Globe, MapPin, Linkedin, User } from 'lucide-react';
 
@@ -8,6 +8,16 @@ interface ModernEditorialTimelineProps {
 
 const ModernEditorialTimelineComponent: React.FC<ModernEditorialTimelineProps> = ({ data }) => {
   const { personalInfo, experience, education, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const ACCENT = '#C7A37A';
 
@@ -29,15 +39,16 @@ const ModernEditorialTimelineComponent: React.FC<ModernEditorialTimelineProps> =
       {/* Header */}
       <div className="flex gap-8 mb-4">
         {/* Profile Photo */}
-        {personalInfo.photoUrl ? (
-          <div className="w-28 h-28 rounded-full overflow-hidden flex-shrink-0 border-4 shadow-sm" style={{ borderColor: ACCENT }}>
-            <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
-          </div>
-        ) : (
-          <div className="w-28 h-28 rounded-full overflow-hidden flex-shrink-0 border-4 flex items-center justify-center" style={{ borderColor: ACCENT, backgroundColor: '#F5EDE4' }}>
-            <User size={36} style={{ color: ACCENT }} />
-          </div>
-        )}
+        <div className="w-28 h-28 rounded-full overflow-hidden flex-shrink-0 border-4 shadow-sm cursor-pointer" style={{ borderColor: ACCENT }} onClick={() => fileRef.current?.click()}>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+          {photoSrc ? (
+            <img src={photoSrc} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#F5EDE4' }}>
+              <User size={36} style={{ color: ACCENT }} />
+            </div>
+          )}
+        </div>
 
         {/* Name & Title */}
         <div className="flex-1 min-w-0">

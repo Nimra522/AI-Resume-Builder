@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, Globe, MapPin, Linkedin } from 'lucide-react';
+import { Phone, Mail, Globe, MapPin, Linkedin, User } from 'lucide-react';
 
 interface ModernMinimalATSProps {
   data: ResumeData;
@@ -8,6 +8,16 @@ interface ModernMinimalATSProps {
 
 const ModernMinimalATSComponent: React.FC<ModernMinimalATSProps> = ({ data }) => {
   const { personalInfo, experience, education, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const ACCENT = '#2454FF';
   const DARK = '#111111';
@@ -43,15 +53,18 @@ const ModernMinimalATSComponent: React.FC<ModernMinimalATSProps> = ({ data }) =>
           </div>
 
           {/* Right: Profile Photo */}
-          {personalInfo.photoUrl ? (
-            <div className="w-[140px] flex-shrink-0 relative overflow-hidden">
+          <div className="w-[140px] flex-shrink-0 relative overflow-hidden cursor-pointer flex items-center justify-center bg-gray-100" onClick={() => fileRef.current?.click()}>
+            <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+            {photoSrc ? (
               <img
-                src={personalInfo.photoUrl}
+                src={photoSrc}
                 alt=""
                 className="absolute inset-0 w-full h-full object-cover"
               />
-            </div>
-          ) : null}
+            ) : (
+              <User size={40} style={{ color: '#999999' }} />
+            )}
+          </div>
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { User, Phone, Mail, MapPin, Linkedin } from 'lucide-react';
 
@@ -11,6 +11,16 @@ const ACCENT = '#333333';
 
 const MinimalistFullWidthTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   return (
     <div className="w-full bg-white font-['Inter',sans-serif] shadow-xl mx-auto min-h-[1122px]" style={{ maxWidth: '793px', color: TEXT_DARK }}>
@@ -20,11 +30,14 @@ const MinimalistFullWidthTemplate: React.FC<{ data: ResumeData }> = ({ data }) =
             <h1 className="font-bold leading-tight" style={{ fontSize: '38px', color: '#337FCF' }}>{personalInfo.fullName || 'Full Name'}</h1>
             <p className="font-light mt-1" style={{ fontSize: '16px', letterSpacing: '3px', color: TEXT_MUTED, textTransform: 'uppercase' }}>{personalInfo.jobTitle || 'Professional Title'}</p>
           </div>
-          {personalInfo.photoUrl && (
-            <div className="flex items-center justify-center flex-shrink-0" style={{ width: '80px', height: '80px', overflow: 'hidden', border: '2px solid', borderColor: DIVIDER }}>
-              <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
-            </div>
-          )}
+          <div className="flex items-center justify-center flex-shrink-0 cursor-pointer" style={{ width: '80px', height: '80px', overflow: 'hidden', border: '2px solid', borderColor: DIVIDER }} onClick={() => fileRef.current?.click()}>
+            <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+            {photoSrc ? (
+              <img src={photoSrc} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <User size={32} style={{ color: DIVIDER }} />
+            )}
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-x-6 gap-y-1 mt-5 text-[12px]" style={{ color: TEXT_MUTED }}>

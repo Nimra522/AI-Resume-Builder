@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, User, Linkedin } from 'lucide-react';
 
 const LegacyCEOComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
   return (
     <div className="w-full bg-[#FEFCF8] text-[#1C1C1C] font-['Georgia',serif] shadow-xl mx-auto min-h-[1122px]" style={{ maxWidth: '793px' }}>
       <div className="px-9 pt-10 pb-5">
@@ -22,15 +32,16 @@ const LegacyCEOComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
       <div className="mx-9 h-px bg-[#000000]/10" />
       <div className="flex px-9 pt-6 pb-8 gap-7">
         <div className="w-[30%] flex-shrink-0 space-y-5">
-          <div className="w-full aspect-square rounded-full overflow-hidden border-2 border-[#C9A227]/30 shadow-sm">
-            {personalInfo.photoUrl ? (
-              <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
+          <div className="w-full aspect-square rounded-full overflow-hidden border-2 border-[#C9A227]/30 shadow-sm cursor-pointer" onClick={() => fileRef.current?.click()}>
+            {photoSrc ? (
+              <img src={photoSrc} alt="" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-[#F5F0E8] flex items-center justify-center">
                 <User size={32} className="text-[#C9A227]" />
               </div>
             )}
           </div>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
           {personalInfo.summary && (
             <div>
               <h2 className="text-[16px] font-bold text-[#C9A227] uppercase tracking-[0.18em] mb-3">About</h2>

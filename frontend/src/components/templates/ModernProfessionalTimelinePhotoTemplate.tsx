@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, MapPin, Mail, Globe, Linkedin, User } from 'lucide-react';
 
@@ -8,6 +8,16 @@ interface ModernProfessionalTimelinePhotoProps {
 
 const ModernProfessionalTimelinePhotoComponent: React.FC<ModernProfessionalTimelinePhotoProps> = ({ data }) => {
   const { personalInfo, experience, education, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const contactLeft = [
     { icon: Phone, value: personalInfo.phone },
@@ -32,15 +42,16 @@ const ModernProfessionalTimelinePhotoComponent: React.FC<ModernProfessionalTimel
             {personalInfo.jobTitle || 'Professional Title'}
           </p>
         </div>
-        {personalInfo.photoUrl ? (
-          <div className="w-20 h-20 rounded overflow-hidden flex-shrink-0 ml-4">
-            <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
-          </div>
-        ) : (
-          <div className="w-20 h-20 rounded bg-[#EDEDED] flex items-center justify-center flex-shrink-0 ml-4">
-            <User size={28} className="text-[#666666]" />
-          </div>
-        )}
+        <div className="w-20 h-20 rounded overflow-hidden flex-shrink-0 ml-4 cursor-pointer" onClick={() => fileRef.current?.click()}>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+          {photoSrc ? (
+            <img src={photoSrc} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-20 h-20 rounded bg-[#EDEDED] flex items-center justify-center">
+              <User size={28} className="text-[#666666]" />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Divider */}

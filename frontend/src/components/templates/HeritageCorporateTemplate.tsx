@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, User, Linkedin } from 'lucide-react';
 
@@ -13,6 +13,16 @@ const parseSkillLevel = (skill: string): { name: string; level: number } => {
 
 const HeritageCorporateComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
   return (
     <div className="w-full bg-white text-[#2C2C2C] font-['Inter',sans-serif] shadow-xl mx-auto overflow-hidden" style={{ maxWidth: '793px', minHeight: '1122px' }}>
       <div className="mx-9 pt-7">
@@ -29,13 +39,14 @@ const HeritageCorporateComponent: React.FC<{ data: ResumeData }> = ({ data }) =>
               {personalInfo.jobTitle || 'Professional Title'}
             </p>
           </div>
-          <div className="w-[70px] h-[70px] rounded-full overflow-hidden border-2 border-[#E8E8E8] bg-[#F9F9F9] flex items-center justify-center flex-shrink-0 mt-1">
-            {personalInfo.photoUrl ? (
-              <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
+          <div className="w-[70px] h-[70px] rounded-full overflow-hidden border-2 border-[#E8E8E8] bg-[#F9F9F9] flex items-center justify-center flex-shrink-0 mt-1 cursor-pointer" onClick={() => fileRef.current?.click()}>
+            {photoSrc ? (
+              <img src={photoSrc} alt="" className="w-full h-full object-cover" />
             ) : (
               <User size={42} className="text-[#5A6A8A]" />
             )}
           </div>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
         </div>
 
         {(personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.linkedin) && (

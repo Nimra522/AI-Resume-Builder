@@ -1,18 +1,30 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Linkedin, User } from 'lucide-react';
 
 const ModernPurpleTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
   return (
     <div className="w-full bg-[#FEFCF9] text-[#1F2937] font-['Inter',sans-serif] shadow-xl mx-auto overflow-hidden" style={{ maxWidth: '793px', minHeight: '1122px' }}>
       <div className="flex min-h-[1122px]">
 
         {/* Left Sidebar — Dark Navy */}
         <div className="w-[33%] flex-shrink-0 bg-[#1A2A3A] pt-8 pb-8 px-6 flex flex-col items-center relative">
-          <div className="w-[110px] h-[110px] rounded-full overflow-hidden border-[3px] border-[#C49A6C]/50 bg-[#2D4A5A] flex items-center justify-center shadow-lg mb-5">
-            {personalInfo.photoUrl ? (
-              <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
+          <div className="w-[110px] h-[110px] rounded-full overflow-hidden border-[3px] border-[#C49A6C]/50 bg-[#2D4A5A] flex items-center justify-center shadow-lg mb-5 cursor-pointer" onClick={() => fileRef.current?.click()}>
+            <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+            {photoSrc ? (
+              <img src={photoSrc} alt="" className="w-full h-full object-cover" />
             ) : (
               <User size={40} className="text-[#C49A6C]/60" />
             )}

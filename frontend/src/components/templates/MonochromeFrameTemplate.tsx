@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { User } from 'lucide-react';
 
@@ -8,6 +8,16 @@ interface MonochromeFrameProps {
 
 const MonochromeFrameComponent: React.FC<MonochromeFrameProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
@@ -104,12 +114,13 @@ const MonochromeFrameComponent: React.FC<MonochromeFrameProps> = ({ data }) => {
         {/* Right Column */}
         <div className="w-[38%] relative flex flex-col">
           {/* Profile Photo - top right, extends above frame */}
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
           <div className="self-end relative z-10" style={{ width: photoSize, height: photoSize }}>
-            <div className="w-full h-full bg-gray-200 overflow-hidden flex items-center justify-center">
-              {personalInfo.photoUrl ? (
-                <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+            <div className="w-full h-full bg-gray-200 overflow-hidden flex items-center justify-center cursor-pointer" onClick={() => fileRef.current?.click()}>
+              {photoSrc ? (
+                <img src={photoSrc} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <img src="/profile-placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
+                <User size={36} className="text-gray-400" />
               )}
             </div>
           </div>

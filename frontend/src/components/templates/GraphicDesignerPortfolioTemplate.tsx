@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
@@ -38,6 +38,18 @@ const SectionHeadingRight: React.FC<{ text: string }> = ({ text }) => (
 
 const GraphicDesignerPortfolioComponent: React.FC<GraphicDesignerPortfolioProps> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
   const hasSummary = personalInfo.summary;
   const hasExperience = experience.length > 0;
   const hasEducation = education.length > 0;
@@ -128,13 +140,14 @@ const GraphicDesignerPortfolioComponent: React.FC<GraphicDesignerPortfolioProps>
 
         {/* Profile Photo */}
         <div className="relative z-10 flex justify-center pt-8 pb-2">
-          <div className="w-[110px] h-[110px] rounded-full bg-gray-600 overflow-hidden border-[3px] border-[#D96C2B] flex items-center justify-center">
-            {data.personalInfo.photoUrl ? (
-              <img src={data.personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
+          <div className="w-[110px] h-[110px] rounded-full bg-gray-600 overflow-hidden border-[3px] border-[#D96C2B] flex items-center justify-center cursor-pointer" onClick={() => fileRef.current?.click()}>
+            {photoSrc ? (
+              <img src={photoSrc} alt="" className="w-full h-full object-cover" />
             ) : (
-              <User size={40} className="text-white/50" />
+              <User size={40} className="text-white/50 cursor-pointer" onClick={() => fileRef.current?.click()} />
             )}
           </div>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
         </div>
 
         <div className="relative z-10 flex-1 px-5 pt-4 pb-4 space-y-4">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { User } from 'lucide-react';
 
@@ -53,6 +53,16 @@ const GeometricCorner: React.FC<{ position: 'tr' | 'bl' }> = ({ position }) => {
 
 const ModernBlueGeometricComponent: React.FC<ModernBlueGeometricProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
@@ -69,9 +79,10 @@ const ModernBlueGeometricComponent: React.FC<ModernBlueGeometricProps> = ({ data
       <div className="flex relative z-10">
         {/* Left Panel */}
         <div className="w-[30%] bg-gray-50 p-5 flex flex-col items-center space-y-4 min-h-[1000px]">
-          <div className="w-32 h-32 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center border-4 border-white shadow-md">
-            {data.personalInfo.photoUrl ? (
-              <img src={data.personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
+          <div className="w-32 h-32 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center border-4 border-white shadow-md cursor-pointer" onClick={() => fileRef.current?.click()}>
+            <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+            {photoSrc ? (
+              <img src={photoSrc} alt="" className="w-full h-full object-cover" />
             ) : (
               <User size={48} className="text-gray-400" />
             )}

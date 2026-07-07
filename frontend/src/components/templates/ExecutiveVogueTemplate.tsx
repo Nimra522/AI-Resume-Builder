@@ -1,17 +1,30 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { User, Linkedin } from 'lucide-react';
 
 const ExecutiveVogueComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
   return (
     <div className="w-full bg-[#FFFFFF] text-[#222222] font-['Inter',sans-serif] shadow-xl mx-auto min-h-[1122px]" style={{ maxWidth: '793px' }}>
       <div className="flex min-h-[1122px]">
         <div className="w-[30%] flex-shrink-0 bg-[#111111] pt-[30px] pb-[30px] pl-[20px] pr-[20px] flex flex-col items-center">
           <div className="flex justify-center mb-5">
-            <div className="w-[100px] h-[100px] overflow-hidden border-2 border-white/30 bg-[#FFFFFF] flex items-center justify-center">
-              {personalInfo.photoUrl ? <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" /> : <User size={36} className="text-[#2563EB]" />}
+            <div className="w-[100px] h-[100px] overflow-hidden border-2 border-white/30 bg-[#FFFFFF] flex items-center justify-center cursor-pointer" onClick={() => fileRef.current?.click()}>
+              {photoSrc ? <img src={photoSrc} alt="" className="w-full h-full object-cover" /> : <User size={36} className="text-[#2563EB] cursor-pointer" onClick={() => fileRef.current?.click()} />}
             </div>
+            <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
           </div>
           <div className="mb-6 w-full">
             <h2 className="text-[15px] font-semibold text-white tracking-wider text-center">CONTACT</h2>

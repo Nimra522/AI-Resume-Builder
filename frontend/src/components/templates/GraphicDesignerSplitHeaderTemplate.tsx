@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Linkedin } from 'lucide-react';
 
 const GraphicDesignerSplitHeaderTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   return (
     <div className="w-full bg-gray-100 font-['Poppins',sans-serif] shadow-xl mx-auto overflow-hidden relative" style={{ maxWidth: '793px', minHeight: '1122px' }}>
@@ -20,9 +30,9 @@ const GraphicDesignerSplitHeaderTemplate: React.FC<{ data: ResumeData }> = ({ da
 
         {/* Profile Photo — centered, overlapping header and content */}
         <div className="absolute left-1/2 -translate-x-1/2 top-[130px] z-10">
-          <div className="w-[180px] h-[180px] rounded-full overflow-hidden shadow-lg">
-            {personalInfo.photoUrl ? (
-              <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+          <div className="w-[180px] h-[180px] rounded-full overflow-hidden shadow-lg cursor-pointer" onClick={() => fileRef.current?.click()}>
+            {photoSrc ? (
+              <img src={photoSrc} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-gray-100 flex items-center justify-center">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#999999" strokeWidth="1.5" className="w-16 h-16">
@@ -32,6 +42,7 @@ const GraphicDesignerSplitHeaderTemplate: React.FC<{ data: ResumeData }> = ({ da
               </div>
             )}
           </div>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
         </div>
 
         {/* Name + Title */}

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Linkedin } from 'lucide-react';
+import { Phone, Mail, MapPin, Linkedin, User } from 'lucide-react';
 
 interface ModernistEditorialProps {
   data: ResumeData;
@@ -26,6 +26,16 @@ const s = {
 
 const ModernistEditorialComponent: React.FC<ModernistEditorialProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const nameParts = personalInfo.fullName?.trim().split(' ') || [];
   const firstName = nameParts[0] || 'Your';
@@ -75,11 +85,14 @@ const ModernistEditorialComponent: React.FC<ModernistEditorialProps> = ({ data }
         </div>
 
         {/* Right: Photo */}
-        {personalInfo.photoUrl ? (
-          <div style={{ width: '160px', height: '200px', flexShrink: 0, overflow: 'hidden' }}>
-            <img src={personalInfo.photoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          </div>
-        ) : null}
+        <div style={{ width: '160px', height: '200px', flexShrink: 0, overflow: 'hidden', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f3f3', border: '1px solid #ddd' }} onClick={() => fileRef.current?.click()}>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+          {photoSrc ? (
+            <img src={photoSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <User size={48} style={{ color: '#888888' }} />
+          )}
+        </div>
       </div>
 
       {/* Contact */}

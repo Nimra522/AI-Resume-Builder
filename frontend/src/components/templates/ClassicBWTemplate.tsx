@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Globe, User, Linkedin } from 'lucide-react';
 
@@ -6,6 +6,17 @@ interface ClassicBWProps { data: ResumeData; }
 
 const ClassicBWComponent: React.FC<ClassicBWProps> = ({ data }) => {
   const { personalInfo, experience, education, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const nameParts = personalInfo.fullName?.trim().split(' ') || [];
   const firstName = nameParts[0] || 'YOUR';
@@ -34,22 +45,23 @@ const ClassicBWComponent: React.FC<ClassicBWProps> = ({ data }) => {
     }}>
       {/* Header */}
       <div style={{ display: 'flex', gap: '28px', padding: '28px 32px 24px', alignItems: 'center' }}>
-        {personalInfo.photoUrl ? (
+        {photoSrc ? (
           <div style={{
             width: '130px', height: '130px', borderRadius: '50%', overflow: 'hidden',
-            flexShrink: 0, border: '2px solid #000',
-          }}>
-            <img src={personalInfo.photoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            flexShrink: 0, border: '2px solid #000', cursor: 'pointer',
+          }} onClick={() => fileRef.current?.click()}>
+            <img src={photoSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         ) : (
           <div style={{
             width: '130px', height: '130px', borderRadius: '50%', flexShrink: 0,
             border: '2px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: '#F5F5F5',
-          }}>
+            background: '#F5F5F5', cursor: 'pointer',
+          }} onClick={() => fileRef.current?.click()}>
             <User size={48} color="#999" />
           </div>
         )}
+        <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
         <div>
           <h1 style={{ fontSize: '52px', fontWeight: 800, lineHeight: 1, letterSpacing: '0.02em', margin: 0, color: '#000' }}>
             {personalInfo.fullName ? personalInfo.fullName.toUpperCase() : 'YOUR NAME'}

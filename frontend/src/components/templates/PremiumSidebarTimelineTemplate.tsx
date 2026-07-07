@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
@@ -50,6 +50,16 @@ const SectionTimeline: React.FC<{ title: string; icon: string; children: React.R
 
 const PremiumSidebarTimelineComponent: React.FC<PremiumSidebarTimelineProps> = ({ data }) => {
   const { personalInfo, education, projects, skills, experience, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const contactItems = [
     { icon: Phone, label: 'Phone', value: personalInfo.phone },
@@ -70,18 +80,19 @@ const PremiumSidebarTimelineComponent: React.FC<PremiumSidebarTimelineProps> = (
         padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: '24px',
       }}>
         {/* Profile Photo */}
-        {personalInfo.photoUrl ? (
+        <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+        {photoSrc ? (
           <div style={{
             width: '130px', height: '130px', borderRadius: '50%', overflow: 'hidden',
-            border: `3px solid ${COLORS.primary}`, margin: '0 auto',
-          }}>
-            <img src={personalInfo.photoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            border: `3px solid ${COLORS.primary}`, margin: '0 auto', cursor: 'pointer',
+          }} onClick={() => fileRef.current?.click()}>
+            <img src={photoSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         ) : (
           <div style={{
             width: '130px', height: '130px', borderRadius: '50%', margin: '0 auto',
-            background: '#E8E0E8', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
+            background: '#E8E0E8', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+          }} onClick={() => fileRef.current?.click()}>
             <User size={48} color={COLORS.divider} />
           </div>
         )}

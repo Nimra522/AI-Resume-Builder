@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
@@ -30,6 +30,17 @@ const SplitEntry: React.FC<{
 
 const AnaishaComponent: React.FC<AnaishaProps> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const nameParts = personalInfo.fullName
     ? personalInfo.fullName.trim().split(/\s+/)
@@ -52,13 +63,14 @@ const AnaishaComponent: React.FC<AnaishaProps> = ({ data }) => {
           </div>
 
           {/* Center: Profile Photo */}
-          <div className="w-[85px] h-[85px] rounded-full overflow-hidden flex-shrink-0 bg-gray-200 flex items-center justify-center">
-            {personalInfo.photoUrl ? (
-              <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
+          <div className="w-[85px] h-[85px] rounded-full overflow-hidden flex-shrink-0 bg-gray-200 flex items-center justify-center cursor-pointer" onClick={() => fileRef.current?.click()}>
+            {photoSrc ? (
+              <img src={photoSrc} alt="" className="w-full h-full object-cover" />
             ) : (
-              <User size={32} className="text-gray-400" />
+              <User size={32} className="text-gray-400 cursor-pointer" onClick={() => fileRef.current?.click()} />
             )}
           </div>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
 
           {/* Right: Contact */}
           <div className="text-right text-[13px] text-gray-700 space-y-1.5 flex-shrink-0">

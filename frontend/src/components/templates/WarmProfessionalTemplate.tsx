@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Globe, Linkedin, User, Star } from 'lucide-react';
 
@@ -32,6 +32,16 @@ const parseSkillLevel = (skill: string): { name: string; level: number } => {
 
 const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
@@ -54,17 +64,19 @@ const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
       <div className="relative z-10 px-8 pt-8 pb-6">
         <div className="flex items-start gap-6">
           {/* Profile Photo - custom shape */}
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
           <div
-            className="w-24 h-28 bg-gray-200 overflow-hidden flex-shrink-0 border border-gray-300 flex items-center justify-center"
+            className="w-24 h-28 bg-gray-200 overflow-hidden flex-shrink-0 border border-gray-300 flex items-center justify-center cursor-pointer"
             style={{
               clipPath: 'polygon(0 0, 100% 0, 100% 70%, 85% 100%, 0 100%)',
               borderRadius: '0 20px 0 0',
             }}
+            onClick={() => fileRef.current?.click()}
           >
-            {personalInfo.photoUrl ? (
-              <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+            {photoSrc ? (
+              <img src={photoSrc} alt="Profile" className="w-full h-full object-cover" />
             ) : (
-              <img src="/profile-placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
+              <User size={36} className="text-gray-400" />
             )}
           </div>
           <div className="flex-1 min-w-0 pt-1">

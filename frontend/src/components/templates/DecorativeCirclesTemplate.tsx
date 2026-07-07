@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
@@ -12,6 +12,17 @@ const STYLE = {
 
 const DecorativeCirclesComponent: React.FC<DecorativeCirclesProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const contactItems = [
     { icon: Phone, value: personalInfo.phone },
@@ -56,10 +67,10 @@ const DecorativeCirclesComponent: React.FC<DecorativeCirclesProps> = ({ data }) 
           <div style={{
             width: '130px', height: '130px', borderRadius: '50%', overflow: 'hidden',
             border: '4px solid #FFFFFF', boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            marginBottom: '16px', flexShrink: 0,
-          }}>
-            {personalInfo.photoUrl ? (
-              <img src={personalInfo.photoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            marginBottom: '16px', flexShrink: 0, cursor: 'pointer',
+          }} onClick={() => fileRef.current?.click()}>
+            {photoSrc ? (
+              <img src={photoSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
               <div style={{
                 width: '100%', height: '100%', background: '#E8E8E8',
@@ -69,6 +80,7 @@ const DecorativeCirclesComponent: React.FC<DecorativeCirclesProps> = ({ data }) 
               </div>
             )}
           </div>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
 
           {/* Contact below photo */}
           {contactItems.length > 0 && (

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, User, Linkedin } from 'lucide-react';
 
@@ -8,6 +8,18 @@ const Pill: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 const EditorialLuxeComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
   return (
     <div className="w-full min-h-[1122px] bg-[#FCFAF7] text-[#1F1F1F] font-['Inter',sans-serif] shadow-xl mx-auto" style={{ maxWidth: '793px' }}>
       {/* Top decorative line */}
@@ -21,9 +33,10 @@ const EditorialLuxeComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
             <div className="w-16 h-px bg-[#D6C4AF] my-5" />
             <p className="text-[13px] text-[#555555] uppercase tracking-[0.25em] font-light">{personalInfo.jobTitle || 'Professional Title'}</p>
           </div>
-          <div className="w-[68px] h-[68px] overflow-hidden border border-[#D6C4AF] bg-[#EEE6DD] flex items-center justify-center flex-shrink-0 ml-6">
-            {personalInfo.photoUrl ? <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" /> : <User size={26} className="text-[#8B7D6B]" />}
+          <div className="w-[68px] h-[68px] overflow-hidden border border-[#D6C4AF] bg-[#EEE6DD] flex items-center justify-center flex-shrink-0 ml-6 cursor-pointer" onClick={() => fileRef.current?.click()}>
+            {photoSrc ? <img src={photoSrc} alt="" className="w-full h-full object-cover" /> : <User size={26} className="text-[#8B7D6B] cursor-pointer" onClick={() => fileRef.current?.click()} />}
           </div>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
         </div>
 
         {/* Contact — horizontal editorial spread */}

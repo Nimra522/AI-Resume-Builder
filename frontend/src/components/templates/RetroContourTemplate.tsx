@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin } from 'lucide-react';
+import { Phone, Mail, MapPin, User } from 'lucide-react';
 
 interface RetroContourProps {
   data: ResumeData;
@@ -12,6 +12,16 @@ const CircleDot: React.FC = () => (
 
 const RetroContourComponent: React.FC<RetroContourProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
@@ -32,11 +42,12 @@ const RetroContourComponent: React.FC<RetroContourProps> = ({ data }) => {
           {/* Flower and Photo group */}
           <div className="flex-shrink-0 flex items-start mr-[-12px] relative">
             {/* Circular Profile Photo */}
-            <div className="w-[78px] h-[78px] rounded-full bg-gray-200 overflow-hidden border-2 border-[#3D2B1F] flex items-center justify-center relative z-10">
-              {personalInfo.photoUrl ? (
-                <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+            <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+            <div className="w-[78px] h-[78px] rounded-full bg-gray-200 overflow-hidden border-2 border-[#3D2B1F] flex items-center justify-center relative z-10 cursor-pointer" onClick={() => fileRef.current?.click()}>
+              {photoSrc ? (
+                <img src={photoSrc} alt="Profile" className="w-full h-full object-cover" />
               ) : (
-                <img src="/profile-placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
+                <User size={28} className="text-gray-400" />
               )}
             </div>
           </div>

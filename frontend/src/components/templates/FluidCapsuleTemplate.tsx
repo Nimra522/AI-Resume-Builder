@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, User, Linkedin } from 'lucide-react';
 
@@ -36,6 +36,18 @@ const DotGridCorner: React.FC<{ position: 'tr' | 'bl' }> = ({ position }) => (
 
 const FluidCapsuleComponent: React.FC<FluidCapsuleProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
@@ -76,13 +88,14 @@ const FluidCapsuleComponent: React.FC<FluidCapsuleProps> = ({ data }) => {
                 </div>
               )}
             </div>
-            <div className="w-[85px] h-[85px] rounded-full bg-gray-200 overflow-hidden flex items-center justify-center border-2 border-white shadow flex-shrink-0">
-              {personalInfo.photoUrl ? (
-                <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
+            <div className="w-[85px] h-[85px] rounded-full bg-gray-200 overflow-hidden flex items-center justify-center border-2 border-white shadow flex-shrink-0 cursor-pointer" onClick={() => fileRef.current?.click()}>
+              {photoSrc ? (
+                <img src={photoSrc} alt="" className="w-full h-full object-cover" />
               ) : (
-                <User size={32} className="text-gray-400" />
+                <User size={32} className="text-gray-400 cursor-pointer" onClick={() => fileRef.current?.click()} />
               )}
             </div>
+            <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
           </div>
         </div>
 

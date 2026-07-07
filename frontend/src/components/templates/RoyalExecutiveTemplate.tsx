@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Linkedin, User } from 'lucide-react';
 
 const RoyalExecutiveComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
   return (
     <div className="w-full bg-[#FFFFFF] text-[#222222] font-['Cormorant_Garamond',Georgia,serif] shadow-xl mx-auto min-h-[1122px]" style={{ maxWidth: '793px' }}>
       <div className="px-9 pt-8 pb-4 text-center">
-        <div className="w-[100px] h-[100px] overflow-hidden rounded-full border-2 border-black bg-[#FFFFFF] flex items-center justify-center mx-auto mb-4">
-          {personalInfo.photoUrl ? <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" /> : <User size={38} className="text-black" />}
+        <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+        <div className="w-[100px] h-[100px] overflow-hidden rounded-full border-2 border-black bg-[#FFFFFF] flex items-center justify-center mx-auto mb-4 cursor-pointer" onClick={() => fileRef.current?.click()}>
+          {photoSrc ? <img src={photoSrc} alt="" className="w-full h-full object-cover" /> : <User size={38} className="text-black" />}
         </div>
         <h1 className="text-[30px] font-medium text-[#669BBC] tracking-[0.04em] font-['Lora',Georgia,serif]">{personalInfo.fullName || 'Full Name'}</h1>
         <div className="w-14 h-px bg-[#FF6B35] mx-auto my-4" />

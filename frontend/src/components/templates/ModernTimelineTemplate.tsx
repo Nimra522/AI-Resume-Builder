@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { MapPin, Phone, Mail, Globe, Linkedin, User } from 'lucide-react';
 
@@ -27,6 +27,16 @@ const TimelineDot: React.FC = () => (
 
 const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
@@ -41,9 +51,10 @@ const ModernTimelineComponent: React.FC<ModernTimelineProps> = ({ data }) => {
       {/* Left Column */}
       <div className="w-[34%] bg-gray-50 p-6 flex flex-col items-center space-y-5">
         {/* Profile Photo */}
-        <div className="w-28 h-28 rounded-sm bg-gray-200 overflow-hidden flex items-center justify-center border border-gray-300">
-          {personalInfo.photoUrl ? (
-            <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+        <div className="w-28 h-28 rounded-sm bg-gray-200 overflow-hidden flex items-center justify-center border border-gray-300 cursor-pointer" onClick={() => fileRef.current?.click()}>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+          {photoSrc ? (
+            <img src={photoSrc} alt="Profile" className="w-full h-full object-cover" />
           ) : (
             <img src="/profile-placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
           )}

@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { User, Linkedin } from 'lucide-react';
 
 const ForestGreenTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const c = {
     sidebarBg: '#9C9583',
@@ -26,9 +37,10 @@ const ForestGreenTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
       <div className="flex min-h-[1122px]">
         <div className="w-[30%] flex-shrink-0 pt-[30px] pb-[30px] pl-[20px] pr-[20px] flex flex-col" style={{ backgroundColor: c.sidebarBg }}>
           <div className="flex justify-center mb-5">
-            <div className="w-[100px] h-[100px] overflow-hidden border-2 flex items-center justify-center" style={{ borderColor: `${c.sidebarAccent}80`, backgroundColor: c.mainBg }}>
-              {personalInfo.photoUrl ? <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" /> : <User size={36} style={{ color: c.sidebarBg }} />}
+            <div className="w-[100px] h-[100px] overflow-hidden border-2 flex items-center justify-center cursor-pointer" style={{ borderColor: `${c.sidebarAccent}80`, backgroundColor: c.mainBg }} onClick={() => fileRef.current?.click()}>
+              {photoSrc ? <img src={photoSrc} alt="" className="w-full h-full object-cover" /> : <User size={36} style={{ color: c.sidebarBg, cursor: 'pointer' }} onClick={() => fileRef.current?.click()} />}
             </div>
+            <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
           </div>
           <div className="mb-6">
             <h2 className="text-[15px] font-semibold tracking-wider" style={{ color: c.sidebarText }}>CONTACT</h2>

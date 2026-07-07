@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Linkedin } from 'lucide-react';
+import { Phone, Mail, MapPin, Linkedin, User } from 'lucide-react';
 
 interface FreshGraduateModernProps {
   data: ResumeData;
@@ -19,6 +19,17 @@ const SectionBanner: React.FC<{ title: string }> = ({ title }) => (
 
 const FreshGraduateModernComponent: React.FC<FreshGraduateModernProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.linkedin;
   const hasExperience = experience.length > 0;
@@ -52,13 +63,14 @@ const FreshGraduateModernComponent: React.FC<FreshGraduateModernProps> = ({ data
 
       {/* Header */}
       <div className="flex items-start gap-6 px-8 pt-8 pb-6 border-b border-gray-200 relative z-10">
-        <div className="w-24 h-24 rounded-lg bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-200 flex items-center justify-center">
-          {personalInfo.photoUrl ? (
-            <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+        <div className="w-24 h-24 rounded-lg bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-200 flex items-center justify-center cursor-pointer" onClick={() => fileRef.current?.click()}>
+          {photoSrc ? (
+            <img src={photoSrc} alt="Profile" className="w-full h-full object-cover" />
           ) : (
-            <img src="/profile-placeholder.svg" alt="Profile" className="w-full h-full object-cover" />
+            <User size={36} className="text-gray-400 cursor-pointer" onClick={() => fileRef.current?.click()} />
           )}
         </div>
+        <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
         <div className="flex-1 min-w-0">
           <h1 className="text-3xl font-bold uppercase tracking-[0.15em] text-gray-900 leading-tight">
             {personalInfo.fullName || 'Your Full Name'}

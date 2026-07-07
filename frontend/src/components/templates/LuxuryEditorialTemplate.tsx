@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, Globe, MapPin, Linkedin, User, Briefcase, GraduationCap, Star } from 'lucide-react';
 
@@ -8,6 +8,16 @@ interface LuxuryEditorialProps {
 
 const LuxuryEditorialComponent: React.FC<LuxuryEditorialProps> = ({ data }) => {
   const { personalInfo, experience, education, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const contactItems = [
     { icon: Phone, value: personalInfo.phone },
@@ -23,15 +33,18 @@ const LuxuryEditorialComponent: React.FC<LuxuryEditorialProps> = ({ data }) => {
       <div className="w-[34%] flex flex-col">
         {/* Brown top section with profile photo */}
         <div className="bg-[#A86A34] pt-8 pb-12 flex justify-center">
-          {personalInfo.photoUrl ? (
-            <div className="w-32 h-36 rounded-[20px] overflow-hidden border-4 border-white shadow-lg">
-              <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
-            </div>
-          ) : (
-            <div className="w-32 h-36 rounded-[20px] bg-white/20 flex items-center justify-center border-4 border-white shadow-lg">
-              <User size={40} className="text-white/60" />
-            </div>
-          )}
+          <div className="cursor-pointer" onClick={() => fileRef.current?.click()}>
+            {photoSrc ? (
+              <div className="w-32 h-36 rounded-[20px] overflow-hidden border-4 border-white shadow-lg">
+                <img src={photoSrc} alt="" className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <div className="w-32 h-36 rounded-[20px] bg-white/20 flex items-center justify-center border-4 border-white shadow-lg">
+                <User size={40} className="text-white/60" />
+              </div>
+            )}
+          </div>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
         </div>
 
         {/* White sidebar content */}

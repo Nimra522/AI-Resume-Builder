@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
@@ -8,6 +8,16 @@ interface PremiumExecutiveMinimalProps {
 
 const PremiumExecutiveMinimalComponent: React.FC<PremiumExecutiveMinimalProps> = ({ data }) => {
   const { personalInfo, experience, education, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const ACCENT = '#C7AB95';
   const skillColumns = (() => {
@@ -49,12 +59,13 @@ const PremiumExecutiveMinimalComponent: React.FC<PremiumExecutiveMinimalProps> =
             </div>
           )}
         </div>
-        {personalInfo.photoUrl ? (
-          <div className="w-16 h-16 rounded overflow-hidden flex-shrink-0 ml-4 shadow-sm">
-            <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
+        <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+        {photoSrc ? (
+          <div className="w-16 h-16 rounded overflow-hidden flex-shrink-0 ml-4 shadow-sm cursor-pointer" onClick={() => fileRef.current?.click()}>
+            <img src={photoSrc} alt="" className="w-full h-full object-cover" />
           </div>
         ) : (
-          <div className="w-16 h-16 rounded bg-[#F5F0EB] flex items-center justify-center flex-shrink-0 ml-4">
+          <div className="w-16 h-16 rounded bg-[#F5F0EB] flex items-center justify-center flex-shrink-0 ml-4 cursor-pointer" onClick={() => fileRef.current?.click()}>
             <User size={22} className="text-[#C7AB95]" />
           </div>
         )}

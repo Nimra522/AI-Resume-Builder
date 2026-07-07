@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, User, Linkedin } from 'lucide-react';
 
 const ExecutivePrestigeComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
   return (
     <div className="w-full bg-[#FFFFFF] text-[#1C1C1C] font-['Inter',sans-serif] shadow-xl mx-auto min-h-[1122px]" style={{ maxWidth: '793px' }}>
       <div className="bg-white mx-8 my-8">
@@ -13,9 +25,10 @@ const ExecutivePrestigeComponent: React.FC<{ data: ResumeData }> = ({ data }) =>
               <h1 className="text-[32px] font-light text-[#1C1C1C] tracking-[0.03em] font-['Georgia',serif]">{personalInfo.fullName || 'Full Name'}</h1>
               <p className="text-[18px] text-[#D4AF37] uppercase tracking-[0.2em] font-medium mt-2">{personalInfo.jobTitle || 'Executive Title'}</p>
             </div>
-            <div className="w-[100px] h-[100px] overflow-hidden border border-[#D4AF37]/40 bg-[#FFFFFF] flex items-center justify-center flex-shrink-0 ml-4">
-              {personalInfo.photoUrl ? <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" /> : <User size={36} className="text-[#D4AF37]" />}
+            <div className="w-[100px] h-[100px] overflow-hidden border border-[#D4AF37]/40 bg-[#FFFFFF] flex items-center justify-center flex-shrink-0 ml-4 cursor-pointer" onClick={() => fileRef.current?.click()}>
+              {photoSrc ? <img src={photoSrc} alt="" className="w-full h-full object-cover" /> : <User size={36} className="text-[#D4AF37] cursor-pointer" onClick={() => fileRef.current?.click()} />}
             </div>
+            <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
           </div>
           <div className="flex flex-wrap gap-x-6 gap-y-2 mt-5 pt-4 border-t border-[#0B1F3B]/10 text-[13px] text-[#777777] uppercase tracking-[0.12em]">
             {personalInfo.phone && <span className="flex items-center gap-1"><Phone size={12} className="text-[#D4AF37]" />{personalInfo.phone}</span>}

@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, Globe, MapPin, Linkedin } from 'lucide-react';
+import { Phone, Mail, Globe, MapPin, Linkedin, User } from 'lucide-react';
 
 const OrangeAccentTimelineTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
   const languages = certifications || [];
   const references = projects || [];
 
@@ -29,11 +39,16 @@ const OrangeAccentTimelineTemplate: React.FC<{ data: ResumeData }> = ({ data }) 
 
           <div className="pl-5 pr-6">
             {/* Photo */}
-            {personalInfo.photoUrl && (
-              <div className="mb-5">
-                <img src={personalInfo.photoUrl} alt="Profile" className="w-[180px] h-[180px] rounded-full object-cover mx-auto" />
-              </div>
-            )}
+            <div className="mb-5">
+              <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+              {photoSrc ? (
+                <img src={photoSrc} alt="Profile" className="w-[180px] h-[180px] rounded-full object-cover mx-auto cursor-pointer" onClick={() => fileRef.current?.click()} />
+              ) : (
+                <div className="w-[180px] h-[180px] rounded-full bg-gray-200 flex items-center justify-center mx-auto cursor-pointer" onClick={() => fileRef.current?.click()}>
+                  <User size={60} className="text-gray-400" />
+                </div>
+              )}
+            </div>
 
             {/* Contact Panel */}
             <div className="space-y-0">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, Globe, MapPin, Linkedin, User } from 'lucide-react';
 
@@ -8,6 +8,16 @@ interface ModernCorporatePhotoProps {
 
 const ModernCorporatePhotoComponent: React.FC<ModernCorporatePhotoProps> = ({ data }) => {
   const { personalInfo, experience, education, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const contactItems = [
     { icon: Phone, value: personalInfo.phone },
@@ -22,15 +32,16 @@ const ModernCorporatePhotoComponent: React.FC<ModernCorporatePhotoProps> = ({ da
       {/* Left Column (34%) - Pastel Blue */}
       <div className="w-[34%] bg-[#EAF5FF] p-6 flex flex-col items-center space-y-6">
         {/* Profile Photo */}
-        {personalInfo.photoUrl ? (
-          <div className="w-28 h-28 rounded overflow-hidden flex-shrink-0 mt-2">
-            <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
-          </div>
-        ) : (
-          <div className="w-28 h-28 rounded bg-white/60 flex items-center justify-center flex-shrink-0 mt-2">
-            <User size={36} className="text-[#555555]" />
-          </div>
-        )}
+        <div className="w-28 h-28 rounded overflow-hidden flex-shrink-0 mt-2 cursor-pointer" onClick={() => fileRef.current?.click()}>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+          {photoSrc ? (
+            <img src={photoSrc} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full rounded bg-white/60 flex items-center justify-center">
+              <User size={36} className="text-[#555555]" />
+            </div>
+          )}
+        </div>
 
         {/* Contact */}
         {contactItems.length > 0 && (

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
@@ -6,6 +6,16 @@ interface OverlappingPortfolioProps { data: ResumeData; }
 
 const OverlappingPortfolioComponent: React.FC<OverlappingPortfolioProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const contactItems = [
     { icon: Phone, value: personalInfo.phone, label: 'Phone' },
@@ -119,13 +129,15 @@ const OverlappingPortfolioComponent: React.FC<OverlappingPortfolioProps> = ({ da
         </div>
 
         {/* Profile Photo - overlaps both columns and banner */}
+        <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
         <div style={{
           position: 'absolute', top: '0', left: '-90px', zIndex: 10,
           width: '140px', height: '140px', borderRadius: '30px', overflow: 'hidden',
           border: '3px solid #FFFFFF', boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-        }}>
-          {personalInfo.photoUrl ? (
-            <img src={personalInfo.photoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          cursor: 'pointer',
+        }} onClick={() => fileRef.current?.click()}>
+          {photoSrc ? (
+            <img src={photoSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
             <div style={{
               width: '100%', height: '100%', background: '#E0E0E0',

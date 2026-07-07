@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
@@ -26,6 +26,16 @@ const parseSkillLevel = (skill: string): { name: string; level: number } => {
 
 const NavyHorizonComponent: React.FC<NavyHorizonProps> = ({ data }) => {
   const { personalInfo, education, experience, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
@@ -44,10 +54,11 @@ const NavyHorizonComponent: React.FC<NavyHorizonProps> = ({ data }) => {
         {/* Navy header */}
         <div className="flex-1 bg-[#1a365d] h-[140px] relative">
           {/* Profile photo overlapping both */}
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
           <div className="absolute left-[-60px] top-1/2 -translate-y-1/2 z-10">
-            <div className="w-[100px] h-[100px] rounded-full bg-gray-200 overflow-hidden border-4 border-white shadow-md flex items-center justify-center">
-              {data.personalInfo.photoUrl ? (
-                <img src={data.personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
+            <div className="w-[100px] h-[100px] rounded-full bg-gray-200 overflow-hidden border-4 border-white shadow-md flex items-center justify-center cursor-pointer" onClick={() => fileRef.current?.click()}>
+              {photoSrc ? (
+                <img src={photoSrc} alt="" className="w-full h-full object-cover" />
               ) : (
                 <User size={40} className="text-gray-400" />
               )}

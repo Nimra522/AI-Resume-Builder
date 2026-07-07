@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
@@ -8,6 +8,16 @@ const Tag: React.FC<{ text: string }> = ({ text }) => (
 
 const VerticalElegantComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
   return (
     <div className="w-full min-h-[1122px] bg-[#FAF8F5] text-[#2D2D2D] font-['Inter',sans-serif] shadow-xl mx-auto" style={{ maxWidth: '793px' }}>
       <div className="bg-white px-9 py-7">
@@ -16,8 +26,9 @@ const VerticalElegantComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
             <h1 className="text-[36px] font-light text-[#2D2D2D] tracking-[0.02em] font-['Georgia',serif]">{personalInfo.fullName || 'Full Name'}</h1>
             <p className="text-[12px] text-black mt-1">{personalInfo.jobTitle || 'Professional Title'}</p>
           </div>
-          <div className="w-[76px] h-[76px] rounded overflow-hidden bg-[#FAF8F5] flex items-center justify-center flex-shrink-0 border border-[#CBB9A8]/40">
-            {personalInfo.photoUrl ? <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" /> : <User size={30} className="text-[#CBB9A8]" />}
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+          <div className="w-[76px] h-[76px] rounded overflow-hidden bg-[#FAF8F5] flex items-center justify-center flex-shrink-0 border border-[#CBB9A8]/40 cursor-pointer" onClick={() => fileRef.current?.click()}>
+            {photoSrc ? <img src={photoSrc} alt="" className="w-full h-full object-cover" /> : <User size={30} className="text-[#CBB9A8]" />}
           </div>
         </div>
       </div>

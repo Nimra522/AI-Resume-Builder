@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Linkedin } from 'lucide-react';
 
 const MinimalBlackPhotoTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
   const nameParts = (personalInfo.fullName || 'Full Name').split(' ');
   const firstName = nameParts[0] || '';
   const lastName = nameParts.slice(1).join(' ') || '';
@@ -26,9 +36,10 @@ const MinimalBlackPhotoTemplate: React.FC<{ data: ResumeData }> = ({ data }) => 
 
       {/* Header */}
       <div className="flex items-center gap-8 px-8 py-7">
-        <div className="flex-shrink-0 w-[160px] h-[160px] bg-gray-100 flex items-center justify-center overflow-hidden">
-          {personalInfo.photoUrl ? (
-            <img src={personalInfo.photoUrl} alt="Profile" className="w-full h-full object-cover" />
+        <div className="flex-shrink-0 w-[160px] h-[160px] bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer" onClick={() => fileRef.current?.click()}>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+          {photoSrc ? (
+            <img src={photoSrc} alt="Profile" className="w-full h-full object-cover" />
           ) : (
             <svg viewBox="0 0 24 24" fill="none" stroke="#999999" strokeWidth="1.5" className="w-12 h-12">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />

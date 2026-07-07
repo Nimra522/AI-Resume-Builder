@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, Globe, Linkedin, User } from 'lucide-react';
 
@@ -23,6 +23,16 @@ const ContactItem: React.FC<ContactItemProps> = ({ icon, label, value, breakAll 
 
 const MaisonEliteComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
   const { personalInfo, experience, education, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   return (
     <div className="w-[210mm] min-h-[297mm] bg-[#FAF8F5] text-[#222222] font-['Inter',sans-serif] shadow-xl mx-auto overflow-hidden">
@@ -41,9 +51,10 @@ const MaisonEliteComponent: React.FC<{ data: ResumeData }> = ({ data }) => {
             <div className="w-14 h-[3px] bg-[#B89C7A] my-4" />
             <p className="text-[18px] text-[#555555] font-['Inter',sans-serif] font-normal">{personalInfo.jobTitle || 'Professional Title'}</p>
           </div>
-          <div className="w-[100px] h-[100px] overflow-hidden rounded-lg border-2 border-[#E8DED2] bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
-            {personalInfo.photoUrl ? (
-              <img src={personalInfo.photoUrl} alt="" className="w-full h-full object-cover" />
+          <div className="w-[100px] h-[100px] overflow-hidden rounded-lg border-2 border-[#E8DED2] bg-white flex items-center justify-center flex-shrink-0 shadow-sm cursor-pointer" onClick={() => fileRef.current?.click()}>
+            <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+            {photoSrc ? (
+              <img src={photoSrc} alt="" className="w-full h-full object-cover" />
             ) : (
               <User size={36} className="text-[#B89C7A]" />
             )}
