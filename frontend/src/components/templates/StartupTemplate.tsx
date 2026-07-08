@@ -9,7 +9,6 @@ const StartupTemplateComponent: React.FC<StartupTemplateProps> = ({ data }) => {
   // Check if we're in PDF generation context
   const isPdfContext = typeof document !== 'undefined' && 
     (document.querySelector && document.querySelector('[data-pdf-mode="true"]') !== null || 
-     (window.location && window.location.hash.includes('pdf')) ||
      (document.documentElement && document.documentElement.classList.contains('html2canvas')));
   const { personalInfo, experience, education, skills, projects, certifications } = data;
   const fullName = personalInfo.fullName || 'Your Full Name';

@@ -21,31 +21,26 @@ const RouterContext = createContext<RouterContextType>({
 });
 
 export const HashRouter: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const getPath = () => window.location.hash.slice(1).split('?')[0] || '/';
-  const getSearch = () => {
-    const parts = window.location.hash.slice(1).split('?');
-    return parts.length > 1 ? `?${parts[1]}` : '';
-  };
+  const getPath = () => window.location.pathname || '/';
+  const getSearch = () => window.location.search;
 
   const [pathname, setPathname] = useState(getPath());
   const [search, setSearch] = useState(getSearch());
 
   useEffect(() => {
-    const handleHashChange = () => {
+    const handlePopState = () => {
       setPathname(getPath());
       setSearch(getSearch());
     };
 
-    if (!window.location.hash) {
-      window.location.hash = '#/';
-    }
-
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   const navigate = (path: string) => {
-    window.location.hash = path;
+    window.history.pushState(null, '', path);
+    setPathname(getPath());
+    setSearch(getSearch());
   };
 
   return (
@@ -63,11 +58,15 @@ export const Link: React.FC<{
   className?: string;
   onClick?: () => void;
 }> = ({ to, children, className, onClick }) => {
+  const { navigate } = useLocation();
+
   return (
     <a
-      href={`#${to}`}
+      href={to}
       className={className}
       onClick={(e) => {
+        e.preventDefault();
+        navigate(to);
         if (onClick) onClick();
       }}
     >

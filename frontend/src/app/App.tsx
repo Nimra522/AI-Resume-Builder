@@ -26,7 +26,7 @@ import { DashboardOverview } from '../pages/DashboardOverview';
 import { HelpSupportPage } from '../pages/HelpSupportPage';
 import { PaymentSuccess } from '../pages/PaymentSuccess';
 import { PaymentCancel } from '../pages/PaymentCancel';
-import { HashRouter, useLocation } from '../components/layout/Navbar';
+import { HashRouter, useLocation, Link } from '../components/layout/Navbar';
 import { AuthProvider } from '../context/AuthContext';
 import { LoginModal } from '../components/ui/LoginModal';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
@@ -37,7 +37,7 @@ const PlaceholderDashboard: React.FC<{ title: string }> = ({ title }) => (
       <h2 className="text-2xl font-bold text-primary">{title}</h2>
     </div>
     <p className="text-text-muted max-w-md">This dashboard feature is coming soon.</p>
-    <a href="#/dashboard" className="text-primary hover:underline">Back to Builder</a>
+    <Link to="/dashboard" className="text-primary hover:underline">Back to Builder</Link>
   </div>
 );
 

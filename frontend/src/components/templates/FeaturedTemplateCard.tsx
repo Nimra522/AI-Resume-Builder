@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Template } from '../../types';
 import { Link } from '../layout/Navbar';
@@ -10,44 +9,45 @@ interface FeaturedTemplateCardProps {
 
 export const FeaturedTemplateCard: React.FC<FeaturedTemplateCardProps> = ({ template }) => {
   return (
-    <Link 
+    <Link
       to={`/templates?id=${template.id}`}
-      className="group relative flex-shrink-0 w-80 bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+      className="group relative flex-shrink-0 w-80 bg-white rounded-[20px] border-2 border-[#33CFFF] shadow-[0_10px_25px_rgba(0,180,255,0.12),0_0_0_1px_rgba(51,207,255,0.25),0_0_18px_rgba(51,207,255,0.18)] hover:shadow-[0_16px_40px_rgba(0,180,255,0.2),0_0_0_2px_rgba(51,207,255,0.4),0_0_28px_rgba(51,207,255,0.25)] hover:-translate-y-[6px] transition-all duration-250 ease-out overflow-hidden flex flex-col p-6"
     >
-      {/* Thumbnail Area */}
-      <div className="relative h-64 bg-gray-100 overflow-hidden">
-         {/* Actual Preview Image */}
-         <img 
-           src={template.thumbnailUrl} 
-           alt={`${template.name} template preview`}
-           className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
-           onError={(event) => {
-             if (event.currentTarget.src.endsWith('/thumbnails/placeholder.svg')) return;
-             event.currentTarget.src = '/thumbnails/placeholder.svg';
-           }}
-         />
-         
-         {/* Overlay with template style */}
-         <div className={`absolute inset-0 ${template.thumbnailClass} opacity-20 pointer-events-none`}></div>
-         
-         {/* Badge */}
-         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-yellow-500 p-1.5 rounded-full shadow-sm">
-           <Star size={14} fill="currentColor" />
-         </div>
+      {/* Thumbnail Container */}
+      <div className="relative w-full rounded-[14px] bg-gray-100 overflow-hidden flex items-center justify-center aspect-[4/5]">
+        <img
+          src={template.thumbnailUrl}
+          alt={`${template.name} template preview`}
+          className="w-full h-full object-contain object-center bg-white transform transition-transform duration-300 group-hover:scale-[1.02]"
+          onError={(event) => {
+            if (event.currentTarget.src.endsWith('/thumbnails/placeholder.svg')) return;
+            event.currentTarget.src = '/thumbnails/placeholder.svg';
+          }}
+        />
 
-         {/* Hover Overlay */}
-         <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-300" />
+        {/* Style Overlay */}
+        <div className={`absolute inset-0 ${template.thumbnailClass} opacity-20 pointer-events-none`} />
+
+        {/* Star Badge */}
+        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-yellow-500 p-1.5 rounded-full shadow-sm">
+          <Star size={14} fill="currentColor" />
+        </div>
       </div>
 
-      {/* Info Content */}
-      <div className="p-5">
-        <div className="flex justify-between items-center mb-2">
-          <h3 className="font-bold text-lg text-text-main group-hover:text-primary transition-colors">{template.name}</h3>
-        </div>
-        <p className="text-sm text-text-muted mb-4 line-clamp-2">{template.description}</p>
-        
-        <div className="flex items-center text-primary font-semibold text-sm">
-           Edit Template <ArrowRight size={16} className="ml-2 transform group-hover:translate-x-1 transition-transform" />
+      {/* Spacer */}
+      <div className="h-6" />
+
+      {/* Text Section */}
+      <div className="flex flex-col">
+        <h3 className="font-bold text-[34px] text-[#374151] leading-none group-hover:text-primary transition-colors">
+          {template.name}
+        </h3>
+        <p className="text-[18px] font-medium text-[#6B7280] mt-2">
+          Resume Template
+        </p>
+
+        <div className="flex items-center text-primary font-semibold text-sm mt-4">
+          Edit Template <ArrowRight size={16} className="ml-2 transform group-hover:translate-x-1 transition-transform" />
         </div>
       </div>
     </Link>

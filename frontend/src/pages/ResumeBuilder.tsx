@@ -203,7 +203,7 @@ export const ResumeBuilder: React.FC = () => {
         const savedResumes: SavedResume[] = JSON.parse(localStorage.getItem(storeKey) || '[]');
         
         // Find if we're editing an existing resume
-        const urlParams = new URLSearchParams(window.location.hash.split('?')[1] || '');
+        const urlParams = new URLSearchParams(window.location.search);
         const editingId = urlParams.get('edit');
         
         let existingIdx = -1;

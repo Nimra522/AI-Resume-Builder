@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { FileText } from 'lucide-react';
 import { EXAMPLES } from '../data/examples';
 import { ExampleCard } from '../components/examples/ExampleCard';
-import { useLocation } from '../components/layout/Navbar';
+import { useLocation, Link } from '../components/layout/Navbar';
 import { useAuth } from '../context/AuthContext';
 import { Example } from '../types';
 
@@ -56,7 +56,7 @@ export const ExamplesPage: React.FC = () => {
 
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <p className="text-slate-600 text-sm">
-          <a href="#/templates" className="text-indigo-600 font-bold hover:text-indigo-800 underline">Choose Your Template</a>.
+          <Link to="/templates" className="text-indigo-600 font-bold hover:text-indigo-800 underline">Choose Your Template</Link>.
         </p>
       </section>
     </div>

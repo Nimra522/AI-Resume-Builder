@@ -33,7 +33,7 @@ export const EXAMPLES: Example[] = [
     role: 'Tech & Engineering',
     description: 'A performance-focused resume highlighting cloud architecture and full-stack expertise.',
     layoutType: 'modern',
-    thumbnailUrl: '/dist/assets/templates/Teck stack.jpg',
+    thumbnailUrl: '/thumbnails/example-software-engineer.png',
     colorAccent: 'bg-green-500',
     data: createData({
       personalInfo: {
@@ -71,7 +71,7 @@ export const EXAMPLES: Example[] = [
     role: 'Creative & UI/UX',
     description: 'Portfolio-style layout emphasizing visual design and user research methodologies.',
     layoutType: 'creative',
-    thumbnailUrl: '/dist/assets/templates/creative.jpg',
+    thumbnailUrl: '/thumbnails/example-designer.png',
     colorAccent: 'bg-pink-500',
     data: createData({
       personalInfo: {
@@ -109,7 +109,7 @@ export const EXAMPLES: Example[] = [
     role: 'Marketing & Growth',
     description: 'Results-driven layout focusing on campaign analytics and revenue growth.',
     layoutType: 'modern',
-    thumbnailUrl: '/dist/assets/templates/modern.jpg',
+    thumbnailUrl: '/thumbnails/example-marketing-manager.png',
     colorAccent: 'bg-indigo-500',
     data: createData({
       personalInfo: {
@@ -147,7 +147,7 @@ export const EXAMPLES: Example[] = [
     role: 'Academic & Internship',
     description: 'Clean layout prioritizing education, internships, and campus leadership.',
     layoutType: 'academic',
-    thumbnailUrl: '/dist/assets/templates/academic.jpg',
+    thumbnailUrl: '/thumbnails/example-student.png',
     colorAccent: 'bg-blue-400',
     data: createData({
       personalInfo: {
@@ -185,7 +185,7 @@ export const EXAMPLES: Example[] = [
     role: 'Data Science & BI',
     description: 'Logical structure highlighting technical toolsets and data-driven insights.',
     layoutType: 'professional',
-    thumbnailUrl: '/dist/assets/templates/professional.jpg',
+    thumbnailUrl: '/thumbnails/example-data-analyst.png',
     colorAccent: 'bg-slate-700',
     data: createData({
       personalInfo: {
@@ -223,7 +223,7 @@ export const EXAMPLES: Example[] = [
     role: 'Product & Strategy',
     description: 'Executive layout focused on roadmap delivery and stakeholder management.',
     layoutType: 'executive',
-    thumbnailUrl: '/dist/assets/templates/Executive.jpg',
+    thumbnailUrl: '/thumbnails/example-product-manager.png',
     colorAccent: 'bg-yellow-600',
     data: createData({
       personalInfo: {
@@ -262,7 +262,7 @@ export const EXAMPLES: Example[] = [
     role: 'Independent Work',
     description: 'Versatile layout showcasing project variety and specialized skills.',
     layoutType: 'compact',
-    thumbnailUrl: '/dist/assets/templates/compact.jpg',
+    thumbnailUrl: '/thumbnails/example-freelancer.png',
     colorAccent: 'bg-orange-500',
     data: createData({
       personalInfo: {
@@ -302,7 +302,7 @@ export const EXAMPLES: Example[] = [
     role: 'Early Career',
     description: 'ATS-friendly design perfect for entry-level positions and career changes.',
     layoutType: 'minimalist',
-    thumbnailUrl: '/dist/assets/templates/minimalist.jpg',
+    thumbnailUrl: '/thumbnails/example-fresh-graduate.png',
     colorAccent: 'bg-gray-400',
     data: createData({
       personalInfo: {
