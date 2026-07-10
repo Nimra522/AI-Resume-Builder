@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { CheckCircle, ArrowRight, Loader } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useLocation } from '../components/layout/Navbar';
-import { useAuth } from '../context/AuthContext';
+
 
 export const PaymentSuccess: React.FC = () => {
   const { navigate } = useLocation();
@@ -11,6 +12,7 @@ export const PaymentSuccess: React.FC = () => {
   const [pollingCount, setPollingCount] = useState(0);
 
   useEffect(() => {
+    
     const pollForPlanUpdate = async () => {
       console.log('PaymentSuccess page loaded, starting plan update polling...');
       

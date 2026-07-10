@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Layout } from '../components/layout/Layout';
+import { Layout, FullWidthLayout } from '../components/layout/Layout';
 import { Home } from '../pages/Home';
 import { Login } from '../pages/Login';
 import { Signup } from '../pages/Signup';
@@ -10,6 +10,7 @@ import { PrivacyPolicy } from '../pages/PrivacyPolicy';
 import { TermsOfService } from '../pages/TermsOfService';
 import { CookiePolicy } from '../pages/CookiePolicy';
 import { ForgotPassword } from '../pages/ForgotPassword';
+import { ResetPassword } from '../pages/ResetPassword';
 import { GoogleCallback } from '../pages/GoogleCallback';
 import { BlogList } from '../pages/BlogList';
 import { BlogDetail } from '../pages/BlogDetail';
@@ -21,10 +22,11 @@ import { MyResumesPage } from '../pages/MyResumesPage';
 import { SettingsPage } from '../pages/SettingsPage';
 import { PricingPage } from '../pages/PricingPage';
 import { UserProfilePage } from '../pages/UserProfilePage';
+import { DashboardOverview } from '../pages/DashboardOverview';
 import { HelpSupportPage } from '../pages/HelpSupportPage';
 import { PaymentSuccess } from '../pages/PaymentSuccess';
 import { PaymentCancel } from '../pages/PaymentCancel';
-import { HashRouter, useLocation } from '../components/layout/Navbar';
+import { HashRouter, useLocation, Link } from '../components/layout/Navbar';
 import { AuthProvider } from '../context/AuthContext';
 import { LoginModal } from '../components/ui/LoginModal';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
@@ -35,20 +37,30 @@ const PlaceholderDashboard: React.FC<{ title: string }> = ({ title }) => (
       <h2 className="text-2xl font-bold text-primary">{title}</h2>
     </div>
     <p className="text-text-muted max-w-md">This dashboard feature is coming soon.</p>
-    <a href="#/dashboard" className="text-primary hover:underline">Back to Builder</a>
+    <Link to="/dashboard" className="text-primary hover:underline">Back to Builder</Link>
   </div>
 );
 
 const AppRoutes: React.FC = () => {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
 
-  if (pathname === '/') return <Layout><Home /></Layout>;
+  if (pathname === '/') return <FullWidthLayout><Home /></FullWidthLayout>;
 
   const mainLayoutRoutes = [
-    '/login', '/signup', '/about', '/contact', 
+    '/about', '/contact', 
     '/privacy', '/terms', '/cookies', '/forgot-password', 
     '/templates', '/examples', '/pricing'
   ];
+
+  if (pathname === '/login' || pathname === '/signup' || pathname.startsWith('/reset-password/')) {
+    return (
+      <FullWidthLayout>
+        {pathname === '/login' && <Login />}
+        {pathname === '/signup' && <Signup />}
+        {pathname.startsWith('/reset-password/') && <ResetPassword />}
+      </FullWidthLayout>
+    );
+  }
 
   if (pathname === '/blog' || pathname.startsWith('/blog/')) {
     return (
@@ -66,8 +78,6 @@ const AppRoutes: React.FC = () => {
   if (mainLayoutRoutes.includes(pathname)) {
     return (
       <Layout>
-        {pathname === '/login' && <Login />}
-        {pathname === '/signup' && <Signup />}
         {pathname === '/about' && <About />}
         {pathname === '/contact' && <Contact />}
         {pathname === '/privacy' && <PrivacyPolicy />}
@@ -82,7 +92,10 @@ const AppRoutes: React.FC = () => {
   }
 
   if (pathname === '/dashboard') {
-    return <ResumeBuilder />;
+    if (search.includes('?edit=') || search.includes('?template=')) {
+      return <ResumeBuilder />;
+    }
+    return <DashboardOverview />;
   }
 
   if (pathname.startsWith('/dashboard') || pathname === '/settings' || pathname === '/profile') {
@@ -104,7 +117,7 @@ const AppRoutes: React.FC = () => {
   if (pathname === '/payment-success') return <PaymentSuccess />;
   if (pathname === '/payment-cancel') return <PaymentCancel />;
 
-  return <Layout><Home /></Layout>;
+  return <FullWidthLayout><Home /></FullWidthLayout>;
 };
 
 const App: React.FC = () => {

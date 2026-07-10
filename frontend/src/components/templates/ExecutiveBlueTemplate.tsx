@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, User } from 'lucide-react';
 
@@ -13,14 +13,26 @@ const NavyCircleIcon: React.FC<{ children: React.ReactNode }> = ({ children }) =
 );
 
 const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
-  const { personalInfo, education, experience, skills, certifications } = data;
+  const { personalInfo, education, experience, skills, certifications, projects } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
   const hasEducation = education.length > 0;
   const hasExperience = experience.length > 0;
-  const hasLanguages = certifications.length > 0;
+  const hasCertifications = certifications.length > 0;
+  const hasProjects = projects.length > 0;
 
   return (
     <div className="w-full h-full min-h-[1000px] bg-white text-gray-800 shadow-xl flex flex-col">
@@ -28,9 +40,14 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
       <div className="w-full bg-[#1B2A4A] px-8 pt-6 pb-7 relative">
         <div className="flex items-center gap-5">
           {/* Square Profile Photo - overlaps header and sidebar */}
-          <div className="w-[88px] h-[88px] bg-gray-300 overflow-hidden border-2 border-white shadow-md flex-shrink-0 flex items-center justify-center relative z-10 -mb-[-32px]">
-            <User size={36} className="text-gray-500" />
+          <div className="w-[88px] h-[88px] bg-gray-300 overflow-hidden border-2 border-white shadow-md flex-shrink-0 flex items-center justify-center relative z-10 -mb-[-32px] cursor-pointer" onClick={() => fileRef.current?.click()}>
+            {photoSrc ? (
+              <img src={photoSrc} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <User size={32} className="text-gray-400 cursor-pointer" onClick={() => fileRef.current?.click()} />
+            )}
           </div>
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
           <div className="flex-1 min-w-0 pt-2">
             <h1 className="font-serif font-bold text-2xl text-white leading-tight">
               {personalInfo.fullName || 'Your Full Name'}
@@ -68,19 +85,19 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
                 {personalInfo.phone && (
                   <div className="flex items-center gap-2.5">
                     <NavyCircleIcon><Phone size={12} /></NavyCircleIcon>
-                    <span className="font-sans text-[10px] text-gray-700">{personalInfo.phone}</span>
+                    <span className="font-sans text-[11px] text-gray-700">{personalInfo.phone}</span>
                   </div>
                 )}
                 {personalInfo.email && (
                   <div className="flex items-center gap-2.5">
                     <NavyCircleIcon><Mail size={12} /></NavyCircleIcon>
-                    <span className="font-sans text-[10px] text-gray-700 break-all">{personalInfo.email}</span>
+                    <span className="font-sans text-[11px] text-gray-700 break-all">{personalInfo.email}</span>
                   </div>
                 )}
                 {personalInfo.location && (
                   <div className="flex items-center gap-2.5">
                     <NavyCircleIcon><MapPin size={12} /></NavyCircleIcon>
-                    <span className="font-sans text-[10px] text-gray-700">{personalInfo.location}</span>
+                    <span className="font-sans text-[11px] text-gray-700">{personalInfo.location}</span>
                   </div>
                 )}
               </div>
@@ -100,6 +117,12 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
                     {item}
                   </li>
                 ))}
+                {personalInfo.linkedin && (
+                  <li className="flex items-start gap-2 font-sans text-[11px] text-gray-700">
+                    <span className="text-gray-500">-</span>
+                    {personalInfo.linkedin}
+                  </li>
+                )}
               </ul>
             </div>
           )}
@@ -119,14 +142,14 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
                     <p className="font-sans font-bold text-[11px] text-[#1B2A4A]">
                       {exp.role || 'Job Title'}
                     </p>
-                    <p className="font-sans text-[10px] text-gray-500 mt-0.5">
+                    <p className="font-sans text-[11px] text-gray-500 mt-0.5">
                       {exp.company || 'Company Name'}
                       {exp.company && (exp.startDate || exp.endDate) ? ' | ' : ''}
                       {exp.startDate}{exp.startDate && exp.endDate ? ' - ' : ''}{exp.current ? 'Present' : exp.endDate}
                     </p>
                     <ul className="mt-1 space-y-0.5">
                       {exp.description.split('\n').filter(Boolean).map((line, i) => (
-                        <li key={i} className="flex items-start gap-2 font-sans text-[10px] text-gray-700">
+                        <li key={i} className="flex items-start gap-2 font-sans text-[11px] text-gray-700">
                           <span className="text-gray-500 mt-0.5">-</span>
                           {line}
                         </li>
@@ -150,7 +173,7 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
                     <p className="font-sans font-bold text-[11px] text-[#1B2A4A]">
                       {edu.school || 'School Name'}
                     </p>
-                    <p className="font-sans text-[10px] text-gray-500 mt-0.5">
+                    <p className="font-sans text-[11px] text-gray-500 mt-0.5">
                       {edu.degree || ''}
                       {edu.degree && edu.graduationDate ? ' | ' : ''}
                       {edu.graduationDate || ''}
@@ -162,34 +185,55 @@ const ExecutiveBlueComponent: React.FC<ExecutiveBlueProps> = ({ data }) => {
           )}
 
           {/* Bottom Split: Skills | Languages */}
-          {(hasSkills || hasLanguages) && (
-            <div className="flex gap-6 mt-auto pt-4">
+          {(hasSkills || hasCertifications || hasProjects) && (
+            <div className="flex flex-col gap-6 mt-auto pt-4">
               {/* Skills */}
               {hasSkills && (
                 <div className="flex-1">
                   <h3 className="font-serif font-bold text-[12px] text-[#1B2A4A] uppercase tracking-wider mb-2">
                     Skills
                   </h3>
-                  <p className="font-sans text-[10px] text-gray-700 leading-relaxed">
+                  <p className="font-sans text-[11px] text-gray-700 leading-relaxed">
                     {skills.join(', ')}
                   </p>
                 </div>
               )}
 
-              {/* Languages */}
-              {hasLanguages && (
+              {/* Certifications */}
+              {hasCertifications && (
                 <div className="flex-1">
                   <h3 className="font-serif font-bold text-[12px] text-[#1B2A4A] uppercase tracking-wider mb-2">
-                    Languages
+                    Certifications
                   </h3>
                   <div className="space-y-2">
-                    {certifications.map((lang) => (
-                      <div key={lang.id}>
-                        <p className="font-sans font-bold text-[10px] text-[#1B2A4A]">
-                          {lang.name}
+                    {certifications.map((cert) => (
+                      <div key={cert.id}>
+                        <p className="font-sans font-bold text-[11px] text-[#1B2A4A]">
+                          {cert.name}
                         </p>
-                        <p className="font-sans text-[9px] text-gray-600">
-                          {lang.issuer}
+                        <p className="font-sans text-[10px] text-gray-600">
+                          {cert.issuer}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Projects */}
+              {hasProjects && (
+                <div className="flex-1">
+                  <h3 className="font-serif font-bold text-[12px] text-[#1B2A4A] uppercase tracking-wider mb-2">
+                    Projects
+                  </h3>
+                  <div className="space-y-2">
+                    {projects.map((proj) => (
+                      <div key={proj.id}>
+                        <p className="font-sans font-bold text-[11px] text-[#1B2A4A]">
+                          {proj.name}
+                        </p>
+                        <p className="font-sans text-[10px] text-gray-600">
+                          {proj.description}
                         </p>
                       </div>
                     ))}

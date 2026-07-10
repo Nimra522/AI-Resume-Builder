@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
 import { Phone, Mail, MapPin, User } from 'lucide-react';
 
@@ -6,32 +6,30 @@ interface RetroContourProps {
   data: ResumeData;
 }
 
-const SevenPetalFlower: React.FC = () => (
-  <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="18" cy="18" r="3" fill="#C8674F" />
-    {[0, 1, 2, 3, 4, 5, 6].map((i) => {
-      const angle = (i * 2 * Math.PI) / 7 - Math.PI / 2;
-      const cx = 18 + 10 * Math.cos(angle);
-      const cy = 18 + 10 * Math.sin(angle);
-      return (
-        <circle key={i} cx={cx} cy={cy} r="6.5" fill="none" stroke="#C8674F" strokeWidth="1.8" opacity="0.9" />
-      );
-    })}
-  </svg>
-);
-
 const CircleDot: React.FC = () => (
   <div className="w-[7px] h-[7px] rounded-full bg-[#3D2B1F] flex-shrink-0 mt-[5px]" />
 );
 
 const RetroContourComponent: React.FC<RetroContourProps> = ({ data }) => {
-  const { personalInfo, education, experience, skills } = data;
+  const { personalInfo, education, experience, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
-  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location;
+  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
   const hasEducation = education.length > 0;
   const hasExperience = experience.length > 0;
+  const hasProjects = projects && projects.length > 0;
+  const hasCertifications = certifications.length > 0;
 
   const leftHasContent = hasSkills || hasSummary;
 
@@ -43,13 +41,14 @@ const RetroContourComponent: React.FC<RetroContourProps> = ({ data }) => {
         <div className="flex items-center relative z-10">
           {/* Flower and Photo group */}
           <div className="flex-shrink-0 flex items-start mr-[-12px] relative">
-            {/* Flower badge top-left of photo */}
-            <div className="absolute -top-2 -left-2 z-20">
-              <SevenPetalFlower />
-            </div>
             {/* Circular Profile Photo */}
-            <div className="w-[78px] h-[78px] rounded-full bg-gray-200 overflow-hidden border-2 border-[#3D2B1F] flex items-center justify-center relative z-10">
-              <User size={30} className="text-gray-400" />
+            <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+            <div className="w-[78px] h-[78px] rounded-full bg-gray-200 overflow-hidden border-2 border-[#3D2B1F] flex items-center justify-center relative z-10 cursor-pointer" onClick={() => fileRef.current?.click()}>
+              {photoSrc ? (
+                <img src={photoSrc} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User size={28} className="text-gray-400" />
+              )}
             </div>
           </div>
 
@@ -76,6 +75,12 @@ const RetroContourComponent: React.FC<RetroContourProps> = ({ data }) => {
                   <div className="flex items-center gap-1.5">
                     <CircleDot />
                     <span className="text-[10px] text-[#3D2B1F]">{personalInfo.location}</span>
+                  </div>
+                )}
+                {personalInfo.linkedin && (
+                  <div className="flex items-center gap-1.5">
+                    <CircleDot />
+                    <span className="text-[10px] text-[#3D2B1F] break-all">{personalInfo.linkedin}</span>
                   </div>
                 )}
               </div>
@@ -160,6 +165,45 @@ const RetroContourComponent: React.FC<RetroContourProps> = ({ data }) => {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Projects */}
+          {hasProjects && (
+            <div>
+              <h3 className="font-serif italic text-sm text-[#C8674F] mb-3">
+                Mes projets
+              </h3>
+              <div className="space-y-3">
+                {projects.map((proj) => (
+                  <div key={proj.id}>
+                    <p className="font-sans font-bold text-[12px] text-[#3D2B1F] uppercase">
+                      {proj.name}
+                    </p>
+                    <p className="text-[11px] text-[#3D2B1F] mt-0.5 leading-relaxed">{proj.description}</p>
+                    {proj.technologies && proj.technologies.length > 0 && (
+                      <p className="text-[10px] text-[#3D2B1F] mt-0.5 opacity-70">{proj.technologies.join(', ')}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Certifications */}
+          {hasCertifications && (
+            <div>
+              <h3 className="font-serif italic text-sm text-[#C8674F] mb-3">
+                Certifications
+              </h3>
+              <ul className="space-y-1">
+                {certifications.map((cert) => (
+                  <li key={cert.id} className="flex items-start gap-2 text-[11px] text-[#3D2B1F]">
+                    <span className="text-[#3D2B1F] mt-[5px] text-[6px]">&#x25CF;</span>
+                    {cert.name}{cert.issuer ? <span className="opacity-70"> — {cert.issuer}</span> : ''}{cert.date ? <span className="opacity-70"> ({cert.date})</span> : ''}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 

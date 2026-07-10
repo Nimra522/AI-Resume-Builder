@@ -17,3 +17,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     </div>
   );
 };
+
+export const FullWidthLayout: React.FC<LayoutProps> = ({ children }) => {
+  return (
+    <div className="min-h-screen flex flex-col bg-base-light font-sans text-text-main">
+      <Navbar />
+      <main className="flex-grow w-full">
+        {children}
+      </main>
+      <Footer />
+    </div>
+  );
+};

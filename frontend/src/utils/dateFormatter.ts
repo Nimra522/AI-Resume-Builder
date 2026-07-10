@@ -113,3 +113,18 @@ export const formatResumeLastEdited = (lastEdited: string): string => {
     return 'Edited recently';
   }
 };
+
+/**
+ * Format date string (YYYY-MM-DD) to "D MMM, YYYY" format for resume display
+ * @param dateString - Date string to format (YYYY-MM-DD format)
+ * @returns Formatted date string like "2 Jan, 2022"
+ */
+export const formatResumeDate = (dateString: string): string => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '';
+  const day = date.getDate();
+  const month = date.toLocaleString('en-US', { month: 'short' });
+  const year = date.getFullYear();
+  return `${day} ${month}, ${year}`;
+};

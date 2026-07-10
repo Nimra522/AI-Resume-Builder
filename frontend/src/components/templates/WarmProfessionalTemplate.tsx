@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ResumeData } from '../../types';
-import { Phone, Mail, MapPin, Globe, User, Star } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, Linkedin, User, Star } from 'lucide-react';
 
 interface IsabelMercadoProps {
   data: ResumeData;
@@ -31,9 +31,19 @@ const parseSkillLevel = (skill: string): { name: string; level: number } => {
 };
 
 const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
-  const { personalInfo, education, experience, skills } = data;
+  const { personalInfo, education, experience, skills, projects, certifications } = data;
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photoSrc, setPhotoSrc] = useState<string>(personalInfo.photoUrl || '');
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { setPhotoSrc(ev.target?.result as string); };
+      reader.readAsDataURL(file);
+    }
+  }, []);
 
-  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website;
+  const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website || personalInfo.linkedin;
   const hasSkills = skills.length > 0;
   const hasSummary = personalInfo.summary;
   const hasEducation = education.length > 0;
@@ -54,14 +64,20 @@ const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
       <div className="relative z-10 px-8 pt-8 pb-6">
         <div className="flex items-start gap-6">
           {/* Profile Photo - custom shape */}
+          <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
           <div
-            className="w-24 h-28 bg-gray-200 overflow-hidden flex-shrink-0 border border-gray-300 flex items-center justify-center"
+            className="w-24 h-28 bg-gray-200 overflow-hidden flex-shrink-0 border border-gray-300 flex items-center justify-center cursor-pointer"
             style={{
               clipPath: 'polygon(0 0, 100% 0, 100% 70%, 85% 100%, 0 100%)',
               borderRadius: '0 20px 0 0',
             }}
+            onClick={() => fileRef.current?.click()}
           >
-            <User size={36} className="text-gray-400" />
+            {photoSrc ? (
+              <img src={photoSrc} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <User size={36} className="text-gray-400" />
+            )}
           </div>
           <div className="flex-1 min-w-0 pt-1">
             <h1 className="text-2xl font-bold text-[#2C2C2C] uppercase tracking-[0.12em] leading-tight">
@@ -111,6 +127,20 @@ const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
             </div>
           )}
 
+          {/* Certifications */}
+          {certifications.length > 0 && (
+            <div>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8B6F5C] mb-2.5">
+                Certifications
+              </h3>
+              <div className="space-y-1.5">
+                {certifications.map((cert) => (
+                  <p key={cert.id} className="text-[11px] text-gray-700">{cert.name}{cert.issuer ? ` — ${cert.issuer}` : ''}</p>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Contact */}
           {hasContact && (
             <div>
@@ -150,6 +180,14 @@ const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
                     <span className="break-all">{personalInfo.website}</span>
                   </div>
                 )}
+                {personalInfo.linkedin && (
+                  <div className="flex items-center gap-2.5 text-[10px] text-gray-600">
+                    <div className="w-4 flex justify-center flex-shrink-0">
+                      <Linkedin size={11} className="text-[#8B6F5C]" />
+                    </div>
+                    <span className="break-all">{personalInfo.linkedin}</span>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -175,6 +213,23 @@ const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
                     {edu.degree && (
                       <p className="text-[11px] text-gray-500 mt-0.5">{edu.degree}</p>
                     )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Projects */}
+          {projects.length > 0 && (
+            <div>
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#8B6F5C] mb-3">
+                Projects
+              </h3>
+              <div className="space-y-2">
+                {projects.map((proj) => (
+                  <div key={proj.id}>
+                    <p className="text-sm font-bold text-[#2C2C2C]">{proj.name}</p>
+                    {proj.description && <p className="text-[11px] leading-relaxed text-gray-600">{proj.description}</p>}
                   </div>
                 ))}
               </div>

@@ -18,78 +18,84 @@ export const TermsOfService: React.FC = () => {
   });
 
   return (
-    <div className="animate-fade-in pb-12">
-      {/* 1. Hero Section */}
-      <section className="relative py-16 bg-gradient-to-br from-indigo-50 to-white p-8 rounded-2xl border border-indigo-100 shadow-sm mb-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center justify-center p-3 bg-white rounded-xl text-primary mb-6 shadow-sm border border-gray-100">
-            <Scale size={32} />
+    <div className="space-y-12 pb-16 bg-gray-50">
+      {/* Hero Section */}
+      <section className="pt-24 pb-16 bg-gradient-to-r from-gray-900 to-indigo-900 border-b border-indigo-950 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-400 opacity-20 rounded-full blur-3xl transform -translate-x-1/3 translate-y-1/3"></div>
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-slate-700 mb-6">
+            <Scale size={14} className="text-indigo-400" />
+            <span className="text-xs font-semibold text-indigo-300 tracking-widest uppercase">Terms of Service</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-text-main mb-4 tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
             Terms of Service
           </h1>
-          <p className="text-xl text-text-muted mb-6">
+          <p className="text-slate-400 max-w-2xl mx-auto text-xl mb-6">
             Please read these terms carefully before using our services.
           </p>
-          <div className="inline-block px-4 py-1.5 bg-gray-50 rounded-full text-sm font-medium text-text-muted border border-gray-200">
+          <div className="inline-block px-6 py-2.5 bg-slate-800 rounded-xl border border-slate-700 text-sm font-semibold text-slate-300">
             Last updated: {currentDate}
           </div>
         </div>
       </section>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
-        {/* 3. Introduction */}
-        <section>
+        {/* Introduction */}
+        <section className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
           <TextBlock>
-            <p className="text-lg">
-              Welcome to <strong>ResumeCraft</strong>. By accessing or using our website, resume templates, and services, you agree to be bound by these Terms of Service. If you disagree with any part of the terms, then you may not access the Service.
+            <p className="text-lg leading-relaxed text-slate-700">
+              Welcome to <strong className="text-slate-900">ResumeCraft</strong>. By accessing or using our website, resume templates, and services, you agree to be bound by these Terms of Service. If you disagree with any part of the terms, then you may not access the Service.
             </p>
           </TextBlock>
         </section>
 
-        {/* 4. User Accounts */}
+        {/* User Accounts */}
         <section>
-          <div className="flex items-center gap-3 mb-4">
-            <UserCheck size={24} className="text-primary" />
+          <div className="flex items-center gap-3 mb-6">
+            <UserCheck size={24} className="text-indigo-600" />
             <SectionHeading title="User Accounts" className="mb-0" />
           </div>
-          <TextBlock>
-            <p>
-              When you create an account with us, you must provide information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms, which may result in immediate termination of your account on our Service.
-            </p>
-          </TextBlock>
-          <div className="bg-orange-50 border-l-4 border-orange-400 p-6 rounded-r-xl my-6">
-            <h4 className="flex items-center font-bold text-orange-800 mb-2">
-              <AlertTriangle size={18} className="mr-2" />
-              Security Responsibility
-            </h4>
-            <p className="text-orange-700 text-sm leading-relaxed">
-              You are responsible for safeguarding the password that you use to access the Service and for any activities or actions under your password. You agree not to disclose your password to any third party.
-            </p>
+          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+            <TextBlock>
+              <p className="text-slate-700">
+                When you create an account with us, you must provide information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms, which may result in immediate termination of your account on our Service.
+              </p>
+            </TextBlock>
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-r-xl my-6">
+              <h4 className="flex items-center font-bold text-yellow-800 mb-2">
+                <AlertTriangle size={18} className="mr-2" />
+                Security Responsibility
+              </h4>
+              <p className="text-yellow-700 text-sm leading-relaxed">
+                You are responsible for safeguarding the password that you use to access the Service and for any activities or actions under your password. You agree not to disclose your password to any third parties.
+              </p>
+            </div>
           </div>
         </section>
 
-        {/* 5. Use of Services */}
-        <section>
+        {/* Acceptable Use */}
+        <section className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
           <SectionHeading title="Acceptable Use" />
-          <TextBlock>
-            <p>
+          <TextBlock className="mt-6">
+            <p className="text-slate-700">
               You agree to use the Service only for lawful purposes and in accordance with these Terms. You agree not to use the Service:
             </p>
-            <ul className="list-disc pl-6 mt-4 space-y-2">
+            <ul className="list-disc pl-5 mt-4 space-y-2 text-slate-700">
               <li>In any way that violates any applicable national or international law or regulation.</li>
-              <li>To transmit, or procure the sending of, any advertising or promotional material, including any "junk mail", "chain letter," "spam," or any other similar solicitation.</li>
+              <li>To transmit, or procure the sending of, any advertising or promotional material, including any "junk mail", "chain letter", "spam", or any other similar solicitation.</li>
               <li>To impersonate or attempt to impersonate the Company, a Company employee, another user, or any other person or entity.</li>
               <li>To engage in any other conduct that restricts or inhibits anyone's use or enjoyment of the Service.</li>
             </ul>
           </TextBlock>
         </section>
 
-        {/* 6. Content Ownership */}
+        {/* Content Ownership */}
         <section>
           <SectionHeading title="Content Ownership" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <Card 
               variant="content"
               title="Your Content"
@@ -105,71 +111,73 @@ export const TermsOfService: React.FC = () => {
           </div>
         </section>
 
-        {/* 7. Payment & Refunds */}
-        <section>
-          <div className="flex items-center gap-3 mb-4">
-            <CreditCard size={24} className="text-primary" />
+        {/* Payment & Refunds */}
+        <section className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <CreditCard size={24} className="text-indigo-600" />
             <SectionHeading title="Payment & Refunds" className="mb-0" />
           </div>
           <TextBlock>
-            <p>
+            <p className="text-slate-700">
               Some parts of the Service are billed on a subscription basis. You will be billed in advance on a recurring and periodic basis (such as monthly or annually).
             </p>
-            <h4 className="font-bold text-text-main mt-6 mb-2">Refund Policy</h4>
-            <p>
+            <h4 className="font-bold text-slate-900 mt-6 mb-2">Refund Policy</h4>
+            <p className="text-slate-700">
               We offer a 7-day money-back guarantee for all new subscriptions. If you are not satisfied with the Service, please contact our support team within 7 days of your purchase to request a full refund.
             </p>
           </TextBlock>
         </section>
 
-        {/* 8. Disclaimers */}
-        <section className="bg-gray-50 p-8 rounded-2xl border border-gray-100">
+        {/* Disclaimer of Liability */}
+        <section className="bg-gradient-to-r from-gray-900 to-indigo-900 rounded-2xl p-8 border border-indigo-950 text-white">
            <SectionHeading title="Disclaimer of Liability" />
-           <TextBlock className="mb-0">
-             <p className="uppercase text-xs font-bold text-text-muted mb-2 tracking-wider">Please Read Carefully</p>
-             <p>
+           <TextBlock className="mb-0 mt-6">
+             <p className="uppercase text-xs font-bold text-slate-400 mb-4 tracking-wider">Please Read Carefully</p>
+             <p className="text-slate-300">
                The Service is provided on an "AS IS" and "AS AVAILABLE" basis. The Company makes no representations or warranties of any kind, express or implied, as to the operation of their services, or the information, content, or materials included therein. You expressly agree that your use of these services, their content, and any services or items obtained from us is at your sole risk.
              </p>
            </TextBlock>
         </section>
 
-        {/* 9. Termination */}
-        <section>
+        {/* Termination */}
+        <section className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
           <SectionHeading title="Termination" />
-          <TextBlock>
-            <p>
+          <TextBlock className="mt-6">
+            <p className="text-slate-700">
               We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. Upon termination, your right to use the Service will immediately cease.
             </p>
           </TextBlock>
         </section>
 
-        {/* 10. Governing Law */}
+        {/* Governing Law */}
         <section>
-          <div className="flex items-center gap-3 mb-4">
-            <Gavel size={24} className="text-primary" />
+          <div className="flex items-center gap-3 mb-6">
+            <Gavel size={24} className="text-indigo-600" />
             <SectionHeading title="Governing Law" className="mb-0" />
           </div>
-          <TextBlock>
-            <p>
-              These Terms shall be governed and construed in accordance with the laws of California, United States, without regard to its conflict of law provisions.
-            </p>
-          </TextBlock>
+          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+            <TextBlock>
+              <p className="text-slate-700">
+                These Terms shall be governed and construed in accordance with the laws of California, United States, without regard to its conflict of law provisions.
+              </p>
+            </TextBlock>
+          </div>
         </section>
 
-        {/* 11. Changes to Terms */}
-        <section>
-          <div className="flex items-center gap-3 mb-4">
-            <RefreshCw size={24} className="text-primary" />
+        {/* Changes to Terms */}
+        <section className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <RefreshCw size={24} className="text-indigo-600" />
             <SectionHeading title="Changes to Terms" className="mb-0" />
           </div>
           <TextBlock>
-            <p>
+            <p className="text-slate-700">
               We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will try to provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.
             </p>
           </TextBlock>
         </section>
 
-        {/* 12. Contact */}
+        {/* Contact */}
         <section>
           <SectionHeading title="Contact Us" />
           <ContactBox 

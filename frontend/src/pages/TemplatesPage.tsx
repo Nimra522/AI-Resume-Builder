@@ -1,36 +1,22 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useEffect } from 'react';
 import { LayoutTemplate } from 'lucide-react';
-import { TEMPLATES, INITIAL_RESUME_DATA } from '../data/templates';
+import { TEMPLATES } from '../data/templates';
 import { TemplateCard } from '../components/templates/TemplateCard';
-import { TemplateManager } from '../components/templates/TemplateManager';
-import { ResumeData } from '../types';
 import { useLocation } from '../components/layout/Navbar';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export const TemplatesPage: React.FC = () => {
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
-  
   const { search, navigate } = useLocation();
   const { isAuthenticated, user, openLoginModal, verifyTemplateAccess } = useAuth();
+
   
   // Enhanced user plan detection with fallback
   const userPlan = user?.plan || 'Free';
-  // Lowercase version for comparisons with template access
-  const userPlanLower = userPlan.toLowerCase();
-  
-  const [savedResumeData, setSavedResumeData] = useState<ResumeData>(INITIAL_RESUME_DATA);
-  
-  useEffect(() => {
-    setSelectedTemplateId(null);
-  }, [isAuthenticated]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    
-    // For new resumes, start with empty data
-    // Only load saved data when explicitly editing an existing resume
-    setSavedResumeData(INITIAL_RESUME_DATA);
 
     const params = new URLSearchParams(search);
     const idFromUrl = params.get('id');
@@ -41,125 +27,97 @@ export const TemplatesPage: React.FC = () => {
       // Check if user just logged in and had a stored template redirect
       const storedTemplateId = localStorage.getItem('post_login_redirect_template');
       
-      const needsAuth = template.requiresAuth !== false;
-      
       if (storedTemplateId === idFromUrl) {
-        // User just logged in, clear the stored ID and proceed
         localStorage.removeItem('post_login_redirect_template');
-        
-        if (!isAuthenticated && needsAuth) {
-          openLoginModal(`/templates?id=${idFromUrl}`);
-          return;
-        }
+      }
 
-        if (needsAuth) {
-          verifyTemplateAccess(idFromUrl, 'editor').then(result => {
-            if (result.success) {
-              setSelectedTemplateId(idFromUrl);
-              setIsEditorOpen(true);
-            } else if (result.status === 403) {
-              navigate('/pricing');
-            }
-          });
-        } else {
-          setSelectedTemplateId(idFromUrl);
-          setIsEditorOpen(true);
-        }
+      if (template.access === 'free') {
+        navigate(`/dashboard?template=${idFromUrl}`);
+        return;
+      }
+
+      if (!isAuthenticated) {
+        openLoginModal(`/templates?id=${idFromUrl}`);
+        return;
+      }
+
+      const userPlanLower = (user?.plan || 'free').toLowerCase();
+      let hasAccess = false;
+      if (template.access === 'pro') {
+        hasAccess = userPlanLower === 'pro' || userPlanLower === 'premium';
+      } else if (template.access === 'paid') {
+        hasAccess = userPlanLower === 'premium';
+      }
+
+      if (!hasAccess) {
+        navigate(`/pricing?templateId=${idFromUrl}`);
       } else {
-        if (!isAuthenticated && needsAuth) {
-          openLoginModal(`/templates?id=${idFromUrl}`);
-          return;
-        }
-
-        if (needsAuth) {
-          verifyTemplateAccess(idFromUrl, 'editor').then(result => {
-            if (result.success) {
-              setSelectedTemplateId(idFromUrl);
-              setIsEditorOpen(true);
-            } else if (result.status === 403) {
-              navigate('/pricing');
-            }
-          });
-        } else {
-          setSelectedTemplateId(idFromUrl);
-          setIsEditorOpen(true);
-        }
+        navigate(`/dashboard?template=${idFromUrl}`);
       }
     }
-  }, [search, isAuthenticated, userPlan, navigate, openLoginModal, verifyTemplateAccess]);
+  }, [search, isAuthenticated, userPlan, navigate, openLoginModal]);
 
-  const handleUseTemplate = async (id: string) => {
-    const template = TEMPLATES.find(t => t.id === id);
+  const handleUseTemplate = (templateId: string) => {
+    const template = TEMPLATES.find(t => t.id === templateId);
     if (!template) return;
 
-    const needsAuth = template.requiresAuth !== false;
-
-    if (!isAuthenticated && needsAuth) {
-      localStorage.setItem('post_login_redirect_template', id);
-      openLoginModal(`/templates?id=${id}`);
+    // Free templates always accessible
+    if (template.access === 'free') {
+      navigate(`/dashboard?template=${templateId}`);
       return;
     }
 
-    if (needsAuth) {
-      const accessResult = await verifyTemplateAccess(id, 'editor');
-      if (!accessResult.success) {
-        if (accessResult.status === 403) {
-          navigate('/pricing');
-        }
-        return;
-      }
+    // Check authentication first for paid templates
+    if (!isAuthenticated) {
+      openLoginModal(`/templates?id=${templateId}`);
+      return;
     }
 
-    navigate(`/dashboard?template=${id}`);
+    // Check plan access
+    const userPlanLower = (user?.plan || 'free').toLowerCase();
+    let hasAccess = false;
+    if (template.access === 'pro') {
+      hasAccess = userPlanLower === 'pro' || userPlanLower === 'premium';
+    } else if (template.access === 'paid') { // Premium templates
+      hasAccess = userPlanLower === 'premium';
+    }
+
+    if (!hasAccess) {
+      navigate(`/pricing?templateId=${templateId}`);
+      return;
+    }
+
+    // If all checks passed, open builder
+    navigate(`/dashboard?template=${templateId}`);
   };
-
-  const handleSave = (newData: ResumeData) => {
-    setSavedResumeData(newData);
-    localStorage.setItem('user_resume_data', JSON.stringify(newData));
-  };
-
-  const handleCancel = () => {
-    setIsEditorOpen(false);
-    setSelectedTemplateId(null);
-    navigate('/templates');
-  };
-
-  if (isEditorOpen && selectedTemplateId) {
-    return (
-      <TemplateManager 
-        templateId={selectedTemplateId}
-        initialData={savedResumeData}
-        onSave={handleSave}
-        onCancel={handleCancel}
-        isAuthenticated={isAuthenticated}
-      />
-    );
-  }
-
   return (
-    <div className="pb-12 animate-fade-in">
-      <section className="relative py-16 bg-gradient-to-br from-indigo-50 to-white p-8 rounded-2xl border border-indigo-100 shadow-sm mb-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center justify-center p-3 bg-white rounded-xl text-primary mb-6 shadow-sm border border-gray-100">
-            <LayoutTemplate size={32} />
+    <div className="space-y-12 pb-16 bg-gray-50">
+      <section className="pt-24 pb-16 bg-gradient-to-r from-gray-900 to-indigo-900 border-b border-indigo-950 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-400 opacity-20 rounded-full blur-3xl transform -translate-x-1/3 translate-y-1/3"></div>
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-slate-700 mb-6">
+            <LayoutTemplate size={14} className="text-indigo-400" />
+            <span className="text-xs font-semibold text-indigo-300 tracking-widest uppercase">Resume Templates</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Design Your <span className="text-primary">Future</span>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+            Design Your Future
           </h1>
-          <p className="text-xl text-text-muted max-w-2xl mx-auto">
+          <p className="text-slate-400 max-w-2xl mx-auto text-xl">
             Choose from pixel-perfect templates, optimized for ATS and recruiters.
           </p>
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
           {TEMPLATES.map(template => (
             <TemplateCard
               key={template.id}
               template={template}
               onSelect={handleUseTemplate}
-              isSelected={template.id === selectedTemplateId}
+              isSelected={false}
               isAuthenticated={isAuthenticated}
               userPlan={userPlan}
             />

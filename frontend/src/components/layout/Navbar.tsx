@@ -21,31 +21,26 @@ const RouterContext = createContext<RouterContextType>({
 });
 
 export const HashRouter: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const getPath = () => window.location.hash.slice(1).split('?')[0] || '/';
-  const getSearch = () => {
-    const parts = window.location.hash.slice(1).split('?');
-    return parts.length > 1 ? `?${parts[1]}` : '';
-  };
+  const getPath = () => window.location.pathname || '/';
+  const getSearch = () => window.location.search;
 
   const [pathname, setPathname] = useState(getPath());
   const [search, setSearch] = useState(getSearch());
 
   useEffect(() => {
-    const handleHashChange = () => {
+    const handlePopState = () => {
       setPathname(getPath());
       setSearch(getSearch());
     };
 
-    if (!window.location.hash) {
-      window.location.hash = '#/';
-    }
-
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   const navigate = (path: string) => {
-    window.location.hash = path;
+    window.history.pushState(null, '', path);
+    setPathname(getPath());
+    setSearch(getSearch());
   };
 
   return (
@@ -57,17 +52,21 @@ export const HashRouter: React.FC<{ children: React.ReactNode }> = ({ children }
 
 export const useLocation = () => useContext(RouterContext);
 
-export const Link: React.FC<{ 
-  to: string; 
-  children: React.ReactNode; 
+export const Link: React.FC<{
+  to: string;
+  children: React.ReactNode;
   className?: string;
   onClick?: () => void;
 }> = ({ to, children, className, onClick }) => {
+  const { navigate } = useLocation();
+
   return (
     <a
-      href={`#${to}`}
+      href={to}
       className={className}
       onClick={(e) => {
+        e.preventDefault();
+        navigate(to);
         if (onClick) onClick();
       }}
     >
@@ -79,14 +78,14 @@ export const Link: React.FC<{
 // --- Navbar Component ---
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Home', path: '/' },
+  { label: 'Home',      path: '/' },
   { label: 'Templates', path: '/templates' },
-  { label: 'Examples', path: '/examples' },
-  { label: 'About us', path: '/about' },
+  { label: 'Examples',  path: '/examples' },
+  { label: 'About us',  path: '/about' },
 ];
 
 const AUTH_ITEMS: NavItem[] = [
-  { label: 'Log In', path: '/login', isButton: true, variant: 'secondary' },
+  { label: 'Log In',  path: '/login',  isButton: true, variant: 'secondary' },
   { label: 'Sign Up', path: '/signup', isButton: true, variant: 'primary' },
 ];
 
@@ -98,33 +97,33 @@ export const Navbar: React.FC = () => {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 bg-base-white border-b border-gray-200 shadow-sm">
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo Section */}
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center gap-2 cursor-pointer">
+            <Link to="/" className="flex-shrink-0 flex items-center gap-2 cursor-pointer group">
               <img
                 src={LogoImage}
                 alt="ResumeCraft logo"
                 className="h-10 w-auto object-contain"
               />
-              <span className="text-2xl font-bold text-text-main tracking-tight">
-                Resume Craft
+              <span className="text-xl font-bold tracking-tight text-gray-900">
+                Resume<span className="text-primary">Craft</span>
               </span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-1">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-1.5 text-sm font-medium transition-colors duration-200 ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive(item.path)
-                    ? 'text-primary'
-                    : 'text-text-muted hover:text-primary-dark'
+                    ? 'text-primary bg-primary/8 font-semibold'
+                    : 'text-gray-600 hover:text-primary hover:bg-primary/5'
                 }`}
               >
                 {item.icon && <item.icon size={16} />}
@@ -134,10 +133,10 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Desktop Auth Buttons / Profile */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3">
             {isAuthenticated && user ? (
               <div className="flex items-center gap-4">
-                <Link to="/dashboard" className="text-sm font-medium text-text-muted hover:text-primary transition-colors">
+                <Link to="/dashboard" className="text-sm font-medium text-gray-500 hover:text-primary transition-colors">
                   Dashboard
                 </Link>
                 <div className="h-6 w-px bg-gray-200"></div>
@@ -150,8 +149,8 @@ export const Navbar: React.FC = () => {
                   to={item.path}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
                     item.variant === 'primary'
-                      ? 'bg-primary hover:bg-primary-dark text-white shadow-md hover:shadow-lg'
-                      : 'text-text-main hover:bg-gray-100'
+                      ? 'bg-primary hover:bg-primary-dark text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'
+                      : 'text-gray-700 hover:bg-gray-100 border border-gray-200'
                   }`}
                 >
                   {item.label}
@@ -164,7 +163,7 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-md text-text-muted hover:text-text-main hover:bg-gray-100 focus:outline-none"
+              className="p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:outline-none"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -174,7 +173,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-base-white border-b border-gray-200 overflow-hidden animate-fade-in">
+        <div className="md:hidden bg-white border-b border-gray-100 overflow-hidden animate-fade-in">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {NAV_ITEMS.map((item) => (
               <Link
@@ -184,7 +183,7 @@ export const Navbar: React.FC = () => {
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
                   isActive(item.path)
                     ? 'text-primary bg-primary/10'
-                    : 'text-text-muted hover:text-text-main hover:bg-gray-50'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -193,39 +192,35 @@ export const Navbar: React.FC = () => {
                 </div>
               </Link>
             ))}
-            
+
             <div className="border-t border-gray-100 my-2 pt-2">
               {isAuthenticated && user ? (
                 <>
                   <div className="px-3 py-2 flex items-center gap-3">
-                     <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100">
-                        <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
-                     </div>
-                     <div>
-                        <p className="text-sm font-bold text-text-main">{user.name}</p>
-                        <p className="text-xs text-text-muted">{user.email}</p>
-                     </div>
+                    <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100">
+                      <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">{user.name}</p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
+                    </div>
                   </div>
                   <Link
                     to="/profile"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="block px-3 py-2 rounded-md text-base font-medium text-text-muted hover:text-text-main hover:bg-gray-50"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   >
                     View Profile
                   </Link>
                   <Link
                     to="/dashboard"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="block px-3 py-2 rounded-md text-base font-medium text-text-muted hover:text-text-main hover:bg-gray-50"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   >
                     Dashboard
                   </Link>
                   <button
-                    onClick={() => {
-                      logout();
-                      setIsMobileMenuOpen(false);
-                      navigate('/login');
-                    }}
+                    onClick={() => { logout(); setIsMobileMenuOpen(false); navigate('/login'); }}
                     className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50"
                   >
                     <div className="flex items-center gap-2">
@@ -242,7 +237,7 @@ export const Navbar: React.FC = () => {
                     className={`block w-full text-center px-4 py-2 mt-2 rounded-lg text-base font-semibold ${
                       item.variant === 'primary'
                         ? 'bg-primary text-white shadow-sm'
-                        : 'bg-gray-50 text-text-main border border-gray-200'
+                        : 'bg-gray-50 text-gray-900 border border-gray-200'
                     }`}
                   >
                     {item.label}

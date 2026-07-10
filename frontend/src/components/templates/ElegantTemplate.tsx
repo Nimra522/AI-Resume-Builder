@@ -13,7 +13,7 @@ const ElegantTemplateComponent: React.FC<ElegantTemplateProps> = ({ data }) => {
       <div className="border-t-4 border-rose-300 w-16 mx-auto mb-8"></div>
       <header className="text-center mb-12">
         <h1 className="text-4xl font-serif text-gray-800 mb-3">{personalInfo.fullName || 'Your Full Name'}</h1>
-        <p className="text-rose-400 uppercase tracking-widest text-xs font-bold mb-6">{personalInfo.jobTitle || 'Your Job Title'}</p>
+        <p className="text-rose-400 uppercase tracking-widest text-base font-bold mb-6">{personalInfo.jobTitle || 'Your Job Title'}</p>
         <p className="text-sm text-gray-500 italic max-w-lg mx-auto">{personalInfo.summary || 'Your professional summary will appear here...'}</p>
       </header>
       <div className="grid grid-cols-3 gap-8">

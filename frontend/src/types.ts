@@ -86,17 +86,6 @@ export interface Certification {
   date: string;
 }
 
-export interface Language {
-  id: string;
-  name: string;
-  proficiency: string;
-}
-
-export interface AdditionalInfo {
-  id: string;
-  label: string;
-  value: string;
-}
 
 export interface ResumeData {
   personalInfo: {
@@ -108,14 +97,13 @@ export interface ResumeData {
     linkedin: string;
     jobTitle: string;
     summary: string;
+    photoUrl?: string;
   };
   experience: Experience[];
   education: Education[];
   skills: string[];
   projects: Project[];
   certifications: Certification[];
-  languages: Language[];
-  additionalInfo: AdditionalInfo[];
 }
 
 export interface Template {

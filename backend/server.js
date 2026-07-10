@@ -1,4 +1,6 @@
 require('dotenv').config();
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -12,6 +14,8 @@ const userRoutes = require('./routes/users');
 const webhookRoutes = require('./routes/webhookRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const templatesRoutes = require('./routes/templatesRoutes');
+const resumeRoutes = require('./routes/resume');
+const aiRoutes = require('./routes/ai');
 
 const app = express();
 
@@ -82,6 +86,8 @@ app.use('/webhook', webhookRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/templates', templatesRoutes);
+app.use('/api/resume', resumeRoutes);
+app.use('/api/ai', aiRoutes);
 
 
 /* =======================
@@ -99,6 +105,11 @@ app.get('*', (req, res) => {
 /* =======================
    SERVER START
 ======================= */
+// Global handler to prevent crash on unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.error('⚠️ Unhandled Rejection:', err.message);
+});
+
 app.listen(PORT, () =>
   console.log(`🚀 Server running on port ${PORT}`)
 );

@@ -19,18 +19,26 @@ export const ForgotPassword: React.FC = () => {
     setIsLoading(true);
     setError('');
 
-    // Mock API simulation
-    setTimeout(() => {
-      const users = JSON.parse(localStorage.getItem('resume_ai_users') || '[]');
-      const exists = users.some((u: any) => u.email === email);
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
 
-      if (exists) {
+      if (response.ok) {
         setIsSuccess(true);
       } else {
-        setError('No account found with this email address.');
+        const data = await response.json();
+        setError(data.message || 'Something went wrong. Please try again.');
       }
+    } catch (err) {
+      setError('Network error. Please check your connection and try again.');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   if (isSuccess) {

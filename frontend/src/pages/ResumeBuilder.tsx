@@ -5,10 +5,12 @@ import { ResumeForm } from '../components/resume/ResumeForm';
 import { LivePreview } from '../components/resume/LivePreview';
 import { INITIAL_RESUME_DATA, TEMPLATES } from '../data/templates';
 import { ResumeData, SavedResume } from '../types';
-import { Download, Eye, Palette, Save, Loader2, Sparkles } from 'lucide-react';
+import { Download, Eye, Palette, Save, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
 import { useNotifications } from '../context/NotificationContext';
 import { useAuth } from '../context/AuthContext';
+import { useLocation } from '../components/layout/Navbar';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -19,103 +21,164 @@ export const ResumeBuilder: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [resumeTitle, setResumeTitle] = useState('');
-  const [pendingTemplateId, setPendingTemplateId] = useState<string | null>(null);
+  const [titleError, setTitleError] = useState('');
+  const hasLoadedResume = useRef(false); // Add ref to track if resume is already loaded
   
+  const { search, navigate } = useLocation();
   const { addNotification } = useNotifications();
   const { user, isAuthenticated, openLoginModal, updateResumeCount, verifyTemplateAccess } = useAuth();
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Load from local storage if available on mount
+  // Load from local storage if available, and check template param
   useEffect(() => {
-    console.log('ResumeBuilder mounting, loading saved data...');
+    // If we've already loaded the resume, don't run this effect again!
+    if (hasLoadedResume.current) {
+      console.log('Resume already loaded, skipping initial load');
+      return;
+    }
+    
+    console.log('ResumeBuilder mounting/updating, loading saved data...');
     const savedData = localStorage.getItem('resume_builder_data');
     const savedTitle = localStorage.getItem('resume_builder_title');
     const savedTemplate = localStorage.getItem('resume_builder_template_id');
     
     console.log('Found saved data:', { savedData: !!savedData, savedTitle: !!savedTitle, savedTemplate: !!savedTemplate });
     
-    // Check for template parameter in URL for new template selection
-    const urlParams = new URLSearchParams(window.location.hash.split('?')[1] || '');
+    // Check for template parameter in URL
+    const urlParams = new URLSearchParams(search);
     const templateParam = urlParams.get('template');
+    const editParam = urlParams.get('edit');
     
+    // Handle template param first
     if (templateParam) {
       console.log('Template parameter found in URL:', templateParam);
-      setPendingTemplateId(templateParam);
-      const newHash = window.location.hash.split('?')[0];
-      window.location.hash = newHash;
-    }
-    
-    // Check if the saved data contains old sample values (like the original Alex Jordan data)
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        console.log('Parsed data:', parsedData.personalInfo);
-        
-        // Check if this is old sample data by looking for specific old values
-        if (parsedData.personalInfo.fullName === 'Alex Jordan' || 
-            parsedData.personalInfo.email === 'alex.jordan@example.com' ||
-            parsedData.personalInfo.summary?.includes('Creative and detail-oriented Product Designer')) {
-          // This is old sample data, clear it and use initial empty data
-          console.log('Clearing old sample data');
-          localStorage.removeItem('resume_builder_data');
-          localStorage.removeItem('resume_builder_title');
-          localStorage.removeItem('resume_builder_template_id');
-        } else {
-          // This is actual user data, load it
-          console.log('Loading actual user data');
-          // Ensure backward compatibility by adding missing countryCode field
-          const normalizedData = {
-            ...parsedData,
-            personalInfo: {
-              ...parsedData.personalInfo,
-              countryCode: parsedData.personalInfo.countryCode || '+1'
-            }
-          };
-          setResumeData(normalizedData);
-          if (savedTitle) setResumeTitle(savedTitle);
-          // Only set template from localStorage if no template parameter was provided
-          if (savedTemplate && !templateParam) setSelectedTemplateId(savedTemplate);
-        }
-      } catch (e) {
-        console.error("Failed to load resume data", e);
+      const template = TEMPLATES.find(t => t.id === templateParam);
+      const needsAuth = template ? template.requiresAuth !== false : true;
+
+      if (!isAuthenticated && needsAuth) {
+        openLoginModal(`/dashboard?template=${templateParam}`);
+        return;
       }
-    } else if (!templateParam) {
-      // If no saved data and no template parameter, use default template
-      setSelectedTemplateId('modern');
-    }
-    
-    // Cleanup function
-    return () => {
-      console.log('ResumeBuilder unmounting');
-    };
-  }, []);
 
-  useEffect(() => {
-    if (!pendingTemplateId) return;
-
-    const template = TEMPLATES.find(t => t.id === pendingTemplateId);
-    const needsAuth = template ? template.requiresAuth !== false : true;
-
-    if (!isAuthenticated && needsAuth) {
-      openLoginModal(`/dashboard?template=${pendingTemplateId}`);
-      return;
-    }
-
-    if (needsAuth) {
-      verifyTemplateAccess(pendingTemplateId, 'editor').then(result => {
-        if (result.success) {
-          setSelectedTemplateId(pendingTemplateId);
-        } else if (result.status === 403) {
-          addNotification('Upgrade your plan to use this template.', 'warning');
+      if (needsAuth) {
+        verifyTemplateAccess(templateParam, 'editor').then(result => {
+          if (result.success) {
+            hasLoadedResume.current = true;
+            setSelectedTemplateId(templateParam);
+            // Clear localStorage for new template to start fresh
+            localStorage.removeItem('resume_builder_data');
+            localStorage.removeItem('resume_builder_title');
+            setResumeData(INITIAL_RESUME_DATA);
+            setResumeTitle('');
+          } else if (result.status === 403) {
+            addNotification('Upgrade your plan to use this template.', 'warning');
+          }
+        });
+      } else {
+        hasLoadedResume.current = true;
+        setSelectedTemplateId(templateParam);
+        // Clear localStorage for new template to start fresh
+        localStorage.removeItem('resume_builder_data');
+        localStorage.removeItem('resume_builder_title');
+        setResumeData(INITIAL_RESUME_DATA);
+        setResumeTitle('');
+      }
+    } else if (editParam) {
+      console.log('Edit parameter found in URL:', editParam);
+      // Try to load from API first if authenticated
+      const loadResume = async () => {
+        if (isAuthenticated) {
+          try {
+            const response = await fetch(`/api/resume/${editParam}`, {
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('resume_ai_token')}`
+              }
+            });
+            if (response.ok) {
+              const resume = await response.json();
+              hasLoadedResume.current = true; // Mark resume as loaded
+              setResumeData(resume.data);
+              setResumeTitle(resume.title);
+              setSelectedTemplateId(resume.templateId);
+              
+              // Also update localStorage as fallback
+              localStorage.setItem('resume_builder_data', JSON.stringify(resume.data));
+              localStorage.setItem('resume_builder_title', resume.title);
+              localStorage.setItem('resume_builder_template_id', resume.templateId);
+              return;
+            }
+          } catch (err) {
+            console.error('Failed to load resume from API, falling back to localStorage', err);
+          }
         }
-      }).finally(() => {
-        setPendingTemplateId(null);
-      });
+        
+        // Fallback to localStorage if API fails or not authenticated
+        if (savedData) {
+          try {
+            const parsedData = JSON.parse(savedData);
+            console.log('Parsed data:', parsedData.personalInfo);
+            const normalizedData = {
+              ...parsedData,
+              personalInfo: {
+                ...parsedData.personalInfo,
+                countryCode: parsedData.personalInfo.countryCode || '+1'
+              }
+            };
+            hasLoadedResume.current = true;
+            setResumeData(normalizedData);
+            if (savedTitle) setResumeTitle(savedTitle);
+            if (savedTemplate) setSelectedTemplateId(savedTemplate);
+          } catch (e) {
+            console.error('Failed to load resume data', e);
+          }
+        }
+      };
+      
+      loadResume();
     } else {
-      setSelectedTemplateId(pendingTemplateId);
-      setPendingTemplateId(null);
+      // If no params, use saved data (if valid) or defaults
+      if (savedData) {
+        try {
+          const parsedData = JSON.parse(savedData);
+          console.log('Parsed data:', parsedData.personalInfo);
+          
+          // Check if this is old sample data by looking for specific old values
+          if (parsedData.personalInfo.fullName === 'Alex Jordan' || 
+              parsedData.personalInfo.email === 'alex.jordan@example.com' ||
+              parsedData.personalInfo.summary?.includes('Creative and detail-oriented Product Designer')) {
+            // This is old sample data, clear it and use initial empty data
+            console.log('Clearing old sample data');
+            localStorage.removeItem('resume_builder_data');
+            localStorage.removeItem('resume_builder_title');
+            localStorage.removeItem('resume_builder_template_id');
+            hasLoadedResume.current = true;
+          } else {
+            // This is actual user data, load it
+            console.log('Loading actual user data');
+            // Ensure backward compatibility by adding missing countryCode field
+            const normalizedData = {
+              ...parsedData,
+              personalInfo: {
+                ...parsedData.personalInfo,
+                countryCode: parsedData.personalInfo.countryCode || '+1'
+              }
+            };
+            hasLoadedResume.current = true;
+            setResumeData(normalizedData);
+            if (savedTitle) setResumeTitle(savedTitle);
+            if (savedTemplate) setSelectedTemplateId(savedTemplate);
+          }
+        } catch (e) {
+          console.error('Failed to load resume data', e);
+        }
+      } else {
+        // If no saved data, use defaults
+        hasLoadedResume.current = true;
+        if (savedTemplate) setSelectedTemplateId(savedTemplate);
+        else setSelectedTemplateId('modern');
+      }
     }
-  }, [pendingTemplateId, isAuthenticated, openLoginModal, verifyTemplateAccess, addNotification]);
+  }, [search, isAuthenticated, openLoginModal, verifyTemplateAccess, addNotification]);
 
   // Auto-save draft to local storage (for the current session)
   useEffect(() => {
@@ -140,7 +203,7 @@ export const ResumeBuilder: React.FC = () => {
         const savedResumes: SavedResume[] = JSON.parse(localStorage.getItem(storeKey) || '[]');
         
         // Find if we're editing an existing resume
-        const urlParams = new URLSearchParams(window.location.hash.split('?')[1] || '');
+        const urlParams = new URLSearchParams(window.location.search);
         const editingId = urlParams.get('edit');
         
         let existingIdx = -1;
@@ -183,72 +246,86 @@ export const ResumeBuilder: React.FC = () => {
       return;
     }
     
+    // Validate title first
+    if (!resumeTitle || !resumeTitle.trim()) {
+      setTitleError('Resume title is required');
+      return;
+    }
+    setTitleError('');
+    
     setIsSaving(true);
     
-    // Simulate API Latency
-    setTimeout(() => {
-      try {
-        const storeKey = `saved_resumes_${user?.id || 'guest'}`;
-        const savedResumes: SavedResume[] = JSON.parse(localStorage.getItem(storeKey) || '[]');
-        
-        console.log('Current saved resumes before save:', savedResumes);
-        console.log('Saving resume with title:', resumeTitle);
-        
-        // Check if we're editing an existing resume (look for matching ID in URL or state)
-        const urlParams = new URLSearchParams(window.location.hash.split('?')[1] || '');
-        const editingId = urlParams.get('edit');
-        
-        // If editing an existing resume, find it by ID
-        let existingIdx = -1;
-        if (editingId) {
-          existingIdx = savedResumes.findIndex(r => r.id === editingId);
-        }
-        
-        // Create timestamp for when this resume is saved
-        const currentTime = new Date();
-        
-        const newResume: SavedResume = {
-          id: existingIdx >= 0 ? savedResumes[existingIdx].id : `res_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          title: resumeTitle,
-          templateId: selectedTemplateId,
-          lastEdited: currentTime.toISOString(), // Store actual timestamp
-          data: resumeData
-        };
-
-        if (existingIdx >= 0) {
-          console.log('Updating existing resume at index:', existingIdx);
-          savedResumes[existingIdx] = newResume;
-        } else {
-          console.log('Adding new resume to list (always append)');
-          // ALWAYS append new resumes - never replace based on title
-          savedResumes.unshift(newResume);
-        }
-
-        console.log('Final resumes array after save:', savedResumes);
-        localStorage.setItem(storeKey, JSON.stringify(savedResumes));
-        
-        // Dispatch storage event to notify other components
-        window.dispatchEvent(new StorageEvent('storage', {
-          key: storeKey,
-          newValue: JSON.stringify(savedResumes)
-        }));
-        
-        // Also dispatch a custom event for better reliability
-        window.dispatchEvent(new CustomEvent('customStorageUpdate', {
-          detail: { key: storeKey, value: JSON.stringify(savedResumes) }
-        }));
-        
-        // Update resume count in auth context
-        updateResumeCount();
-        
-        addNotification(`"${resumeTitle}" saved successfully.`, 'success');
-      } catch (err) {
-        console.error(err);
-        addNotification("Failed to save resume. Please try again.", "error");
-      } finally {
-        setIsSaving(false);
+    try {
+      // Check if we're editing an existing resume
+      const urlParams = new URLSearchParams(search);
+      const editingId = urlParams.get('edit');
+      
+      const requestData = {
+        title: resumeTitle,
+        data: resumeData,
+        templateId: selectedTemplateId,
+        resumeId: editingId // send only if editing
+      };
+      
+      // Call backend API
+      const response = await fetch('/api/resume/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('resume_ai_token')}`
+        },
+        body: JSON.stringify(requestData)
+      });
+      
+      if (!response.ok) {
+        let errorMsg = 'Failed to save resume. Please try again.';
+        try {
+          const errorData = await response.json();
+          if (errorData.message) errorMsg = errorData.message;
+        } catch (_) {}
+        throw new Error(errorMsg);
       }
-    }, 800);
+      
+      const savedResume = await response.json();
+      
+      // Update localStorage as a fallback and for quick UX
+      const storeKey = `saved_resumes_${user?.id || 'guest'}`;
+      let savedResumes: SavedResume[] = JSON.parse(localStorage.getItem(storeKey) || '[]');
+      
+      const existingIdx = savedResumes.findIndex(r => r.id === editingId || r.id === savedResume._id);
+      
+      const newResume: SavedResume = {
+        id: savedResume._id,
+        title: savedResume.title,
+        templateId: savedResume.templateId,
+        lastEdited: new Date(savedResume.lastEdited).toISOString(),
+        data: savedResume.data
+      };
+      
+      if (existingIdx >= 0) {
+        savedResumes[existingIdx] = newResume;
+      } else {
+        savedResumes.unshift(newResume);
+      }
+      
+      localStorage.setItem(storeKey, JSON.stringify(savedResumes));
+      
+      // Update URL with actual saved resume ID if not already there
+      if (!editingId) {
+        navigate(`/dashboard?edit=${savedResume._id}`);
+      }
+      
+      // Update resume count
+      updateResumeCount();
+      
+      addNotification(`"${resumeTitle}" saved successfully.`, 'success');
+    } catch (err) {
+      console.error(err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save resume. Please try again.';
+      addNotification(errorMessage, "error");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDownloadPDF = async () => {
@@ -341,26 +418,29 @@ export const ResumeBuilder: React.FC = () => {
 
   return (
     <DashboardLayout>
-       {/* Builder Toolbar */}
-       <div className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4 shadow-sm">
-         <div className="flex items-center gap-3">
-           <div className="relative group">
-              <input 
-                type="text" 
-                value={resumeTitle}
-                onChange={(e) => setResumeTitle(e.target.value)}
-                className="text-xl font-bold text-text-main bg-transparent border-b border-dashed border-transparent hover:border-gray-300 focus:border-primary focus:outline-none px-1 transition-all"
-                placeholder="My Resume Title"
-              />
-           </div>
-           <span className="text-[10px] text-text-muted px-2 py-0.5 bg-gray-100 rounded-full font-bold uppercase tracking-widest">Draft</span>
-         </div>
-         
-         <div className="flex items-center gap-2 ml-auto">
-            <div className="hidden md:flex items-center gap-2 mr-4 border-r border-gray-200 pr-4">
-              <Palette size={18} className="text-text-muted" />
+      <div className="flex flex-col h-full overflow-hidden">
+        {/* Builder Toolbar */}
+        <div className="z-20 bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 px-4 sm:px-6 py-1.5 flex flex-wrap items-center justify-between gap-2 shadow-md flex-shrink-0">
+          <div className="flex items-start gap-3">
+            <Input 
+              label=""
+              type="text"
+              value={resumeTitle}
+              onChange={(e) => {
+                setResumeTitle(e.target.value);
+                if (titleError) setTitleError('');
+              }}
+              error={titleError}
+              placeholder="Untitled Resume"
+              className="text-base font-bold text-gray-900 shadow-sm !p-0 !w-64"
+            />
+          </div>
+          
+          <div className="flex items-center gap-2 ml-auto">
+            <div className="hidden md:flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm">
+              <Palette size={16} className="text-indigo-600" />
               <select 
-                className="text-sm border-none bg-transparent focus:ring-0 cursor-pointer text-text-main font-semibold hover:text-primary transition-colors"
+                className="text-xs border-none bg-transparent focus:ring-0 cursor-pointer text-gray-800 font-semibold outline-none"
                 value={selectedTemplateId}
                 onChange={async (e) => {
                   const nextTemplateId = e.target.value;
@@ -392,9 +472,9 @@ export const ResumeBuilder: React.FC = () => {
             <Button 
               variant="secondary" 
               size="sm" 
-              className="md:hidden"
+              className="md:hidden shadow-sm text-xs h-8"
               onClick={() => setShowMobilePreview(!showMobilePreview)}
-              icon={<Eye size={16}/>}
+              icon={<Eye size={14}/>}
             >
               {showMobilePreview ? 'Edit' : 'Preview'}
             </Button>
@@ -402,49 +482,52 @@ export const ResumeBuilder: React.FC = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              icon={isSaving ? <Loader2 className="animate-spin" size={16}/> : <Save size={16}/>}
+              icon={isSaving ? <Loader2 className="animate-spin" size={14}/> : <Save size={14}/>}
               onClick={handleSave}
               disabled={isSaving}
+              className="shadow-sm text-xs h-8"
             >
               {isSaving ? 'Saving...' : 'Save Resume'}
             </Button>
             
             <Button 
               size="sm" 
-              icon={isDownloading ? <Loader2 className="animate-spin" size={16}/> : <Download size={16}/>}
+              icon={isDownloading ? <Loader2 className="animate-spin" size={14}/> : <Download size={14}/>}
               onClick={handleDownloadPDF}
               disabled={isDownloading}
+              className="shadow-lg hover:shadow-xl transition-shadow text-xs h-8"
             >
               {isDownloading ? 'Exporting...' : 'Download PDF'}
             </Button>
-         </div>
-       </div>
+          </div>
+        </div>
 
-       {/* Main Workspace */}
-       <div className="flex h-[calc(100vh-128px)] overflow-hidden">
+        {/* Main Workspace */}
+        <div className="flex flex-1 overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100">
          {/* Left: Editor */}
          <div className={`
            w-full md:w-1/2 lg:w-5/12 xl:w-1/3 bg-white border-r border-gray-200 overflow-y-auto custom-scrollbar
            ${showMobilePreview ? 'hidden md:block' : 'block'}
          `}>
-           <div className="p-4 sm:p-6 max-w-2xl mx-auto">
-             <ResumeForm data={resumeData} onChange={setResumeData} />
+           <div className="p-5 sm:p-8 max-w-2xl mx-auto">
+             <ResumeForm data={resumeData} onChange={setResumeData} onSave={handleSave} isSaving={isSaving} />
            </div>
          </div>
 
          {/* Right: Preview */}
          <div className={`
-            flex-1 bg-gray-200 overflow-y-auto custom-scrollbar p-4 sm:p-8 flex justify-center items-start
-            ${showMobilePreview ? 'block fixed inset-0 z-40 bg-gray-200 mt-[115px] pb-32' : 'hidden md:flex'}
+            flex-1 bg-gradient-to-br from-gray-100 to-gray-200 overflow-y-auto custom-scrollbar p-5 sm:p-10 flex justify-center items-start
+            ${showMobilePreview ? 'block fixed inset-0 z-40 bg-gradient-to-br from-gray-100 to-gray-200 top-[calc(5rem+var(--toolbar-height,3.5rem))]' : 'hidden md:flex'}
          `}>
             <div 
               ref={previewRef}
-              className="bg-white shadow-2xl w-full max-w-[800px] min-h-[1100px] origin-top transition-transform duration-200 scale-100 xl:scale-100 lg:scale-[0.85] md:scale-[0.65]"
+              className="bg-white shadow-2xl rounded-sm w-full max-w-[800px] min-h-[1100px] origin-top transition-all duration-300 scale-100 xl:scale-100 lg:scale-[0.85] md:scale-[0.65] hover:shadow-3xl"
             >
                <LivePreview data={resumeData} templateId={selectedTemplateId} />
             </div>
          </div>
-       </div>
+        </div>
+      </div>
     </DashboardLayout>
   );
 };

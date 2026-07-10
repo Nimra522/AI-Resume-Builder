@@ -1,5 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../../types';
+import { formatResumeDate } from '../../utils/dateFormatter';
 
 interface ProfessionalTemplateProps {
   data: ResumeData;
@@ -35,7 +36,7 @@ const ProfessionalTemplateComponent: React.FC<ProfessionalTemplateProps> = ({ da
            <div key={exp.id} className="mb-6">
              <div className="flex justify-between font-bold text-base">
                <span>{exp.company || 'Company Name'}</span>
-               <span className="font-sans text-sm font-normal text-gray-600">{exp.startDate || 'Start Date'} - {exp.current ? 'Present' : exp.endDate || 'End Date'}</span>
+               <span className="font-sans text-sm font-normal text-gray-600">{formatResumeDate(exp.startDate) || 'Start Date'} - {exp.current ? 'Present' : formatResumeDate(exp.endDate) || 'End Date'}</span>
              </div>
              <div className="italic text-sm mb-2">{exp.role || 'Job Title'}</div>
              <p className="text-sm text-gray-700 whitespace-pre-wrap">{exp.description || 'Experience description will appear here...'}</p>
@@ -49,7 +50,7 @@ const ProfessionalTemplateComponent: React.FC<ProfessionalTemplateProps> = ({ da
              <div key={edu.id} className="mb-2">
                 <div className="font-bold text-sm">{edu.school || 'School Name'}</div>
                 <div className="text-sm italic">{edu.degree || 'Degree'}</div>
-                <div className="text-xs text-gray-500 font-sans">{edu.graduationDate || 'Graduation Date'}</div>
+                <div className="text-xs text-gray-500 font-sans">{formatResumeDate(edu.graduationDate) || 'Graduation Date'}</div>
              </div>
            ))}
         </section>
