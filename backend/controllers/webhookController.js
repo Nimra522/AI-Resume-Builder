@@ -3,6 +3,20 @@ const User = require('../models/User');
 // Initialize Stripe
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+const normalizePlanValue = (value) => {
+  if (!value || typeof value !== 'string') return 'Free';
+
+  const trimmedValue = value.trim();
+  if (!trimmedValue) return 'Free';
+
+  const lowerValue = trimmedValue.toLowerCase();
+  if (lowerValue === 'pro') return 'Pro';
+  if (lowerValue === 'premium') return 'Premium';
+  if (lowerValue === 'free') return 'Free';
+
+  return 'Free';
+};
+
 /**
  * Handle Stripe webhook events
  * POST /api/webhook
@@ -125,10 +139,13 @@ const handleCheckoutSessionCompleted = async (event) => {
   user.stripeSubscriptionId = session.subscription;
   
   // Set plan based on metadata or price detection
-  let assignedPlan = 'pro'; // Default fallback
+  let assignedPlan = 'Pro'; // Default fallback
   
-  if (plan && ['pro', 'premium'].includes(plan)) {
-    assignedPlan = plan;
+  if (plan) {
+    const normalizedPlan = normalizePlanValue(plan);
+    if (['Pro', 'Premium'].includes(normalizedPlan)) {
+      assignedPlan = normalizedPlan;
+    }
   } else if (session.subscription) {
     // Try to detect plan from subscription items
     try {
@@ -136,16 +153,16 @@ const handleCheckoutSessionCompleted = async (event) => {
       const priceId = subscription.items.data[0]?.price?.id;
       
       if (priceId === process.env.STRIPE_PREMIUM_PRICE_ID) {
-        assignedPlan = 'premium';
+        assignedPlan = 'Premium';
       } else if (priceId === process.env.STRIPE_PRO_PRICE_ID) {
-        assignedPlan = 'pro';
+        assignedPlan = 'Pro';
       }
     } catch (error) {
       console.error('Error detecting plan from subscription:', error.message);
     }
   }
 
-  user.plan = assignedPlan;
+  user.plan = normalizePlanValue(assignedPlan);
   user.subscriptionStatus = 'active';
   
   await user.save();
@@ -197,8 +214,8 @@ const handleSubscriptionUpdated = async (event) => {
   
   // If subscription is canceled, downgrade user plan
   if (subscription.status === 'canceled' || subscription.cancel_at_period_end) {
-    user.plan = 'free';
-    console.log(`⚠️  User ${user.email} downgraded to free plan due to subscription cancellation`);
+    user.plan = normalizePlanValue('free');
+    console.log(`⚠️  User ${user.email} downgraded to Free plan due to subscription cancellation`);
   }
   
   await user.save();
@@ -216,12 +233,12 @@ const handleSubscriptionDeleted = async (event) => {
     return;
   }
 
-  user.plan = 'free';
+  user.plan = normalizePlanValue('free');
   user.stripeSubscriptionId = '';
   user.subscriptionStatus = '';
   await user.save();
   
-  console.log(`✅ User ${user.email} downgraded to free plan - subscription deleted`);
+  console.log(`✅ User ${user.email} downgraded to Free plan - subscription deleted`);
 };
 
 // Handle successful invoice payment

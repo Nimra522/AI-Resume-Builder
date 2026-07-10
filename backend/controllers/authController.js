@@ -632,17 +632,17 @@ const googleCallback = async (req, res) => {
   if (!storedState || !receivedState || storedState !== receivedState) {
     console.error('Invalid or missing state parameter for Google OAuth');
     console.error('Expected:', storedState, 'Received:', receivedState);
-    return res.redirect(`${FRONTEND_URL}/#/login?error=csrf_detected`);
+    return res.redirect(`${FRONTEND_URL}/login?error=csrf_detected`);
   }
 
   // Check if state has expired (more than 10 minutes old)
   if (stateTimestamp && (Date.now() - stateTimestamp) > 10 * 60 * 1000) { // 10 minutes
     console.error('Expired state parameter for Google OAuth');
-    return res.redirect(`${FRONTEND_URL}/#/login?error=state_expired`);
+    return res.redirect(`${FRONTEND_URL}/login?error=state_expired`);
   }
 
   if (!code) {
-    return res.redirect(`${FRONTEND_URL}/#/login?error=no_code`);
+    return res.redirect(`${FRONTEND_URL}/login?error=no_code`);
   }
 
   try {
@@ -667,7 +667,7 @@ const googleCallback = async (req, res) => {
 
     if (!tokenData.id_token) {
       console.error('No ID token received from Google');
-      return res.redirect(`${FRONTEND_URL}/#/login?error=invalid_token`);
+      return res.redirect(`${FRONTEND_URL}/login?error=invalid_token`);
     }
 
     // Verify the ID token
@@ -686,21 +686,21 @@ const googleCallback = async (req, res) => {
     // Validate the token claims
     if (!emailVerified) {
       console.error('Email not verified by Google');
-      return res.redirect(`${FRONTEND_URL}/#/login?error=email_not_verified`);
+      return res.redirect(`${FRONTEND_URL}/login?error=email_not_verified`);
     }
 
     // Check if the issuer is valid
     const iss = payload['iss'];
     if (iss !== 'https://accounts.google.com' && iss !== 'accounts.google.com') {
       console.error('Invalid token issuer:', iss);
-      return res.redirect(`${FRONTEND_URL}/#/login?error=invalid_issuer`);
+      return res.redirect(`${FRONTEND_URL}/login?error=invalid_issuer`);
     }
 
     // Check if the audience matches our client ID
     const aud = payload['aud'];
     if (aud !== GOOGLE_CLIENT_ID) {
       console.error('Invalid token audience:', aud);
-      return res.redirect(`${FRONTEND_URL}/#/login?error=invalid_audience`);
+      return res.redirect(`${FRONTEND_URL}/login?error=invalid_audience`);
     }
 
     // Check if the token is expired (this is also checked internally by google-auth-library)
@@ -708,7 +708,7 @@ const googleCallback = async (req, res) => {
     const now = Math.floor(Date.now() / 1000);
     if (exp < now) {
       console.error('ID token has expired');
-      return res.redirect(`${FRONTEND_URL}/#/login?error=token_expired`);
+      return res.redirect(`${FRONTEND_URL}/login?error=token_expired`);
     }
 
     // Find or create user based on Google email
@@ -748,7 +748,7 @@ const googleCallback = async (req, res) => {
     console.log('Generated JWT token for user:', user.email);
     
     // Secure redirect to frontend with token
-    const redirectUrl = `${FRONTEND_URL}/#/auth/google/callback?token=${encodeURIComponent(token)}`;
+    const redirectUrl = `${FRONTEND_URL}/auth/google/callback?token=${encodeURIComponent(token)}`;
     console.log('Redirecting to:', redirectUrl);
     return res.redirect(redirectUrl);
   } catch (err) {
@@ -767,7 +767,7 @@ const googleCallback = async (req, res) => {
     }
     
     // Redirect to frontend with error
-    return res.redirect(`${FRONTEND_URL}/#/login?error=${errorParam}`);
+    return res.redirect(`${FRONTEND_URL}/login?error=${errorParam}`);
   }
 };
 
@@ -872,7 +872,7 @@ const forgotPassword = async (req, res) => {
     await user.save();
     
     // Construct reset URL
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/#/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
     
     console.log('Password reset requested for:', email);
     console.log('Reset URL:', resetUrl);

@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ResumeData, Experience, Education, Project, Certification } from '../../types';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { FormSection } from '../ui/FormSection';
 import { Plus, User, Briefcase, GraduationCap, Code, FolderGit2, Award, ChevronLeft, ChevronRight, CheckCircle2, Sparkles, RefreshCw, Loader2, X, Save } from 'lucide-react';
 import { LOCATION_OPTIONS, LocationOption } from '../../data/locations';
+import { useClickOutside } from '../../hooks/useClickOutside';
 
 import { useAuth } from '../../context/AuthContext';
 
@@ -118,6 +119,12 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
   // State for location suggestions
   const [showLocationSuggestions, setShowLocationSuggestions] = useState<boolean>(false);
   const [filteredLocations, setFilteredLocations] = useState<LocationOption[]>(LOCATION_OPTIONS);
+  const locationRef = useRef<HTMLDivElement>(null);
+  
+  // Close location dropdown when clicking outside
+  useClickOutside(locationRef, () => {
+    setShowLocationSuggestions(false);
+  });
   
   // State for linkedin/website field validation error
   const [linkedinError, setLinkedinError] = useState<string>('');
@@ -378,7 +385,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="block text-sm font-medium text-gray-800">Location</label>
-                <div className="relative">
+                <div className="relative" ref={locationRef}>
                   <input
                     type="text"
                     placeholder="City, Country"
@@ -386,27 +393,16 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                     onChange={(e) => {
                       const value = e.target.value;
                       updatePersonalInfo('location', value);
-                                     
+                      
                       // Filter location suggestions based on input
-                      if (value.length > 0) {
-                        const filtered = LOCATION_OPTIONS.filter(loc => 
-                          loc.name.toLowerCase().includes(value.toLowerCase())
-                        );
-                        setFilteredLocations(filtered);
-                        setShowLocationSuggestions(true);
-                      } else {
-                        setFilteredLocations(LOCATION_OPTIONS);
-                        setShowLocationSuggestions(false);
-                      }
+                      const filtered = LOCATION_OPTIONS.filter(loc => 
+                        loc.name.toLowerCase().includes(value.toLowerCase())
+                      ).slice(0,8);
+                      setFilteredLocations(filtered);
+                      setShowLocationSuggestions(true);
                     }}
                     onFocus={() => {
-                      if (data.personalInfo.location.length > 0) {
-                        setShowLocationSuggestions(true);
-                      }
-                    }}
-                    onBlur={() => {
-                      // Delay hiding suggestions to allow clicking
-                      setTimeout(() => setShowLocationSuggestions(false), 200);
+                      setShowLocationSuggestions(true);
                     }}
                     className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 shadow-sm"
                   />
@@ -416,7 +412,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                         filteredLocations.map((loc) => (
                           <div
                             key={loc.id}
-                            className="px-4 py-2 hover:bg-gray-50 cursor-pointer"
+                            className="px-4 py-2 hover:bg-indigo-50 cursor-pointer transition-colors"
                             onClick={() => {
                               updatePersonalInfo('location', loc.name);
                               setShowLocationSuggestions(false);
@@ -518,8 +514,8 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                       <Input label="Job Title" value={exp.role} onChange={e => updateItem<Experience>('experience', exp.id, 'role', e.target.value)} placeholder="e.g. Software Engineer" />
                       <Input label="Company" value={exp.company} onChange={e => updateItem<Experience>('experience', exp.id, 'company', e.target.value)} placeholder="e.g. Google" />
                       <div className="grid grid-cols-2 gap-4">
-                        <Input label="Start Date" type="text" placeholder="MM/YYYY" value={exp.startDate} onChange={e => updateItem<Experience>('experience', exp.id, 'startDate', e.target.value)} />
-                        <Input label="End Date" type="text" placeholder="MM/YYYY" disabled={exp.current} value={exp.endDate} onChange={e => updateItem<Experience>('experience', exp.id, 'endDate', e.target.value)} />
+                        <Input label="Start Date" type="date" value={exp.startDate} onChange={e => updateItem<Experience>('experience', exp.id, 'startDate', e.target.value)} />
+                        <Input label="End Date" type="date" disabled={exp.current} value={exp.endDate} onChange={e => updateItem<Experience>('experience', exp.id, 'endDate', e.target.value)} />
                       </div>
                       <div className="flex items-center gap-2">
                           <input 
@@ -610,7 +606,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                     <div className="space-y-4">
                       <Input label="School / University" value={edu.school} onChange={e => updateItem<Education>('education', edu.id, 'school', e.target.value)} placeholder="e.g. Stanford University" />
                       <Input label="Degree / Major" value={edu.degree} onChange={e => updateItem<Education>('education', edu.id, 'degree', e.target.value)} placeholder="e.g.g. B.S. Computer Science" />
-                      <Input label="Graduation Date" placeholder="YYYY" value={edu.graduationDate} onChange={e => updateItem<Education>('education', edu.id, 'graduationDate', e.target.value)} />
+                      <Input label="Graduation Date" type="date" value={edu.graduationDate} onChange={e => updateItem<Education>('education', edu.id, 'graduationDate', e.target.value)} />
                       <div className="space-y-1.5">
                         <label className="block text-sm font-medium text-gray-800">Description</label>
                         <textarea 
@@ -826,7 +822,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                   onClick={onSave}
                   disabled={isSaving}
                   icon={isSaving ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
-                  iconPosition="right"
+                  iconPosition="left"
                   className="px-3 py-1.5 shadow-sm text-xs h-8"
                 >
                   {isSaving ? 'Saving...' : 'Save Resume'}

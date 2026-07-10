@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { UserProfile, SavedResume } from '../types';
 import { useNotifications } from './NotificationContext';
 
@@ -50,15 +50,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const { addNotification, clearNotifications } = useNotifications();
 
-  useEffect(() => {
-    const savedToken = localStorage.getItem(SESSION_KEY);
-    if (savedToken) {
-      setToken(savedToken);
-      validateToken(savedToken);
-    }
-  }, []);
+  const logout = () => {
+    localStorage.removeItem(SESSION_KEY);
+    setIsAuthenticated(false);
+    setUser(null);
+    setToken(null);
+    addNotification("Logged out safely", "info");
+  };
 
-  const validateToken = async (token: string) => {
+  const validateToken = useCallback(async (token: string) => {
     try {
       const res = await fetch(`${API_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -73,6 +73,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Check for local overrides (mocking profile updates when server persistence is limited)
         const localProfileKey = `user_profile_data_${userData._id}`;
         const localProfile = JSON.parse(localStorage.getItem(localProfileKey) || '{}');
+        // Ensure safeLocalProfile never includes plan, even if old data exists
+        delete localProfile.plan;
         const { plan: _ignoredPlan, ...safeLocalProfile } = localProfile;
 
         // Format the joined date from createdAt
@@ -103,7 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               year: 'numeric'
             }) : (userData.authProvider === 'google' ? 'Using Google Sign-in' : 'Not available'),
           ...safeLocalProfile,
-          plan: normalizedPlan
+          plan: normalizedPlan // Place plan AFTER safeLocalProfile to ensure it's not overridden
         });
         setIsAuthenticated(true);
         setToken(token);
@@ -118,11 +120,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Only logout on network errors, not on invalid tokens
       // logout(); // Commented out to prevent automatic logout on network issues
     }
-  };
+  }, [logout]);
 
-  const refreshUserData = async () => {
+  const refreshUserData = useCallback(async () => {
     if (token) await validateToken(token);
-  };
+  }, [token, validateToken]);
 
   // Function to update resume count without full token validation
   const updateResumeCount = async () => {
@@ -139,6 +141,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
     });
   };
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem(SESSION_KEY);
+    if (savedToken) {
+      setToken(savedToken);
+      validateToken(savedToken);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const storedToken = localStorage.getItem(SESSION_KEY);
+      if (storedToken) {
+        refreshUserData();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [refreshUserData]);
 
   const loginWithToken = async (newToken: string) => {
     localStorage.setItem(SESSION_KEY, newToken);
@@ -390,14 +412,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       addNotification("Network error. Please try again.", "error");
       return { success: false, message: 'Network error. Please try again.' };
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem(SESSION_KEY);
-    setIsAuthenticated(false);
-    setUser(null);
-    setToken(null);
-    addNotification("Logged out safely", "info");
   };
 
   const openLoginModal = (path: string = '/dashboard') => {

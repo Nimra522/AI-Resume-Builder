@@ -6,13 +6,19 @@ import { Button } from '../components/ui/Button';
 import { ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from '../components/layout/Navbar';
+import { TEMPLATES } from '../data/templates';
 
 export const PricingPage: React.FC = () => {
   const billingCycle: 'monthly' = 'monthly';
-  const { navigate } = useLocation();
+  const { navigate, search } = useLocation();
   const { user, isAuthenticated, openLoginModal, createCheckoutSession } = useAuth();
   const normalizedPlan = (user?.plan || 'free').toLowerCase();
   const planHierarchy: Record<string, number> = { free: 0, pro: 1, premium: 2 };
+
+  const templateId = new URLSearchParams(search).get('templateId');
+const lockedTemplate = templateId
+  ? TEMPLATES.find(t => t.id === templateId)
+  : null;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -62,6 +68,16 @@ export const PricingPage: React.FC = () => {
 
   return (
     <div className="pb-16 bg-gray-50 animate-fade-in">
+
+      {lockedTemplate && (
+      <div className="text-center mb-6 p-4 bg-blue-50 border 
+        border-blue-200 rounded-xl max-w-2xl mx-auto mt-4">
+        <p className="text-blue-800 font-medium text-base">
+          🔒 Upgrade your plan to unlock{' '}
+          <strong>{lockedTemplate.name}</strong> template
+        </p>
+      </div>
+      )}
       
       {/* Hero Section */}
       <section className="text-center py-12 md:py-16 px-4 relative overflow-hidden">

@@ -3,6 +3,20 @@ const User = require('../models/User');
 // Initialize Stripe with secret key
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+const normalizePlanValue = (value) => {
+  if (!value || typeof value !== 'string') return 'Free';
+
+  const trimmedValue = value.trim();
+  if (!trimmedValue) return 'Free';
+
+  const lowerValue = trimmedValue.toLowerCase();
+  if (lowerValue === 'pro') return 'Pro';
+  if (lowerValue === 'premium') return 'Premium';
+  if (lowerValue === 'free') return 'Free';
+
+  return 'Free';
+};
+
 /**
  * Create Stripe checkout session for subscription
  * POST /api/subscription/checkout
@@ -12,16 +26,19 @@ const createCheckoutSession = async (req, res) => {
     const { plan } = req.body;
     const userId = req.user.id; // From auth middleware
 
+    // Normalize plan to the enum-safe format used by the User model
+    const normalizedPlan = normalizePlanValue(plan);
+
     // Validate plan
-    if (!plan || !['pro', 'premium'].includes(plan)) {
+    if (!normalizedPlan || !['Pro', 'Premium'].includes(normalizedPlan)) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Invalid plan. Must be "pro" or "premium"' 
+        message: 'Invalid plan. Must be "Pro" or "Premium"' 
       });
     }
 
     // Validate required environment variables
-    const priceId = plan === 'pro' 
+    const priceId = normalizedPlan === 'Pro' 
       ? process.env.STRIPE_PRO_PRICE_ID 
       : process.env.STRIPE_PREMIUM_PRICE_ID;
 
@@ -41,18 +58,35 @@ const createCheckoutSession = async (req, res) => {
       });
     }
 
+    const currentPlan = normalizePlanValue(user.plan);
+
     // Check if user already has this or higher plan
-    if ((plan === 'pro' && user.plan === 'pro') || 
-        (plan === 'pro' && user.plan === 'premium') ||
-        (plan === 'premium' && user.plan === 'premium')) {
+    if ((normalizedPlan === 'Pro' && currentPlan === 'Pro') || 
+        (normalizedPlan === 'Pro' && currentPlan === 'Premium') ||
+        (normalizedPlan === 'Premium' && currentPlan === 'Premium')) {
       return res.status(400).json({ 
         success: false, 
-        message: `You already have ${user.plan} plan or higher` 
+        message: `You already have ${currentPlan} plan or higher` 
       });
     }
 
     // Create or get Stripe customer
     let stripeCustomerId = user.stripeCustomerId;
+    
+    // Verify if existing customer ID is still valid in Stripe
+    if (stripeCustomerId) {
+      try {
+        await stripe.customers.retrieve(stripeCustomerId);
+        console.log(`✅ Found existing Stripe customer: ${stripeCustomerId}`);
+      } catch (error) {
+        if (error.type === 'StripeInvalidRequestError' && error.code === 'resource_missing') {
+          console.warn(`⚠️  Invalid Stripe customer ID ${stripeCustomerId} - will create new customer`);
+          stripeCustomerId = null;
+        } else {
+          throw error;
+        }
+      }
+    }
     
     if (!stripeCustomerId) {
       // Create new Stripe customer
@@ -68,6 +102,7 @@ const createCheckoutSession = async (req, res) => {
       // Update user with Stripe customer ID
       user.stripeCustomerId = stripeCustomerId;
       await user.save();
+      console.log(`✅ Created new Stripe customer: ${stripeCustomerId}`);
     }
 
     // Create checkout session
@@ -79,21 +114,23 @@ const createCheckoutSession = async (req, res) => {
         price: priceId,
         quantity: 1,
       }],
-      success_url: `${process.env.FRONTEND_URL}/#/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/#/pricing`,
+      success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL}/pricing`,
       metadata: {
         userId: user._id.toString(),
-        plan: plan
+        plan: normalizedPlan,
+        email: user.email
       },
       subscription_data: {
         metadata: {
           userId: user._id.toString(),
-          plan: plan
+          plan: normalizedPlan,
+          email: user.email
         }
       }
     });
 
-    console.log(`✅ Checkout session created for user ${user.email} (${plan} plan): ${session.id}`);
+    console.log(`✅ Checkout session created for user ${user.email} (${normalizedPlan} plan): ${session.id}`);
 
     res.status(200).json({
       success: true,

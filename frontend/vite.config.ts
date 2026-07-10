@@ -14,6 +14,11 @@ export default defineConfig(({ mode }) => {
             changeOrigin: true,
             secure: false,
           },
+          '/webhook': {
+            target: 'http://localhost:8080',
+            changeOrigin: true,
+            secure: false,
+          }
         },
       },
       plugins: [react()],

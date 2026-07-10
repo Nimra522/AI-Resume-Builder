@@ -37,20 +37,22 @@ const requirePlan = (requiredPlan) => {
         'premium': 2
       };
 
-      const userPlanLevel = planHierarchy[user.plan] || 0;
-      const requiredPlanLevel = planHierarchy[requiredPlan] || 0;
+      const normalizedUserPlan = (user.plan || 'free').toLowerCase();
+      const normalizedRequiredPlan = requiredPlan.toLowerCase();
+      const userPlanLevel = planHierarchy[normalizedUserPlan] || 0;
+      const requiredPlanLevel = planHierarchy[normalizedRequiredPlan] || 0;
 
       // Check if user has required plan level or higher
       if (userPlanLevel >= requiredPlanLevel) {
         // Attach user plan info to request for downstream use
-        req.userPlan = user.plan;
+        req.userPlan = normalizedUserPlan;
         req.userPlanLevel = userPlanLevel;
         next();
       } else {
         return res.status(403).json({
           success: false,
           message: `Access denied. ${requiredPlan} plan or higher required.`,
-          currentPlan: user.plan,
+          currentPlan: normalizedUserPlan,
           requiredPlan: requiredPlan
         });
       }

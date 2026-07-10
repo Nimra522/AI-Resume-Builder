@@ -1,6 +1,7 @@
 import React from 'react';
 import { ResumeData } from '../../types';
 import { MapPin, Mail, Phone, Globe } from 'lucide-react';
+import { formatResumeDate } from '../../utils/dateFormatter';
 
 interface ModernTemplateProps {
   data: ResumeData;
@@ -55,7 +56,7 @@ const ModernTemplateComponent: React.FC<ModernTemplateProps> = ({ data }) => {
             <div key={edu.id} className="mb-4 last:mb-0">
               <div className="font-bold">{edu.school}</div>
               <div className="text-sm italic text-slate-300">{edu.degree || 'Degree'}</div>
-              <div className="text-xs text-slate-400">{edu.graduationDate || 'Graduation Date'}</div>
+              <div className="text-xs text-slate-400">{formatResumeDate(edu.graduationDate) || 'Graduation Date'}</div>
             </div>
           ))}
         </div>
@@ -80,7 +81,7 @@ const ModernTemplateComponent: React.FC<ModernTemplateProps> = ({ data }) => {
                <div key={exp.id}>
                  <div className="flex justify-between items-baseline mb-1">
                    <h4 className="font-bold text-lg text-gray-800">{exp.role || 'Job Title'}</h4>
-                   <span className="text-xs text-gray-500 font-medium">{exp.startDate} - {exp.current ? 'Present' : exp.endDate}</span>
+                   <span className="text-xs text-gray-500 font-medium">{formatResumeDate(exp.startDate)} - {exp.current ? 'Present' : formatResumeDate(exp.endDate)}</span>
                  </div>
                  <div className="text-indigo-600 font-medium text-sm mb-2">{exp.company || 'Company Name'}</div>
                  <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{exp.description || 'Experience description will appear here...'}</p>

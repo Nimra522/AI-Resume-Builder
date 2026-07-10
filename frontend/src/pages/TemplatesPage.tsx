@@ -5,10 +5,12 @@ import { TEMPLATES } from '../data/templates';
 import { TemplateCard } from '../components/templates/TemplateCard';
 import { useLocation } from '../components/layout/Navbar';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export const TemplatesPage: React.FC = () => {
   const { search, navigate } = useLocation();
   const { isAuthenticated, user, openLoginModal, verifyTemplateAccess } = useAuth();
+
   
   // Enhanced user plan detection with fallback
   const userPlan = user?.plan || 'Free';
@@ -25,74 +27,69 @@ export const TemplatesPage: React.FC = () => {
       // Check if user just logged in and had a stored template redirect
       const storedTemplateId = localStorage.getItem('post_login_redirect_template');
       
-      const needsAuth = template.requiresAuth !== false;
-      
       if (storedTemplateId === idFromUrl) {
-        // User just logged in, clear the stored ID and proceed
         localStorage.removeItem('post_login_redirect_template');
-        
-        if (!isAuthenticated && needsAuth) {
-          openLoginModal(`/templates?id=${idFromUrl}`);
-          return;
-        }
+      }
 
-        if (needsAuth) {
-          verifyTemplateAccess(idFromUrl, 'editor').then(result => {
-            if (result.success) {
-              navigate(`/dashboard?template=${idFromUrl}`);
-            } else if (result.status === 403) {
-              navigate('/pricing');
-            }
-          });
-        } else {
-          navigate(`/dashboard?template=${idFromUrl}`);
-        }
+      if (template.access === 'free') {
+        navigate(`/dashboard?template=${idFromUrl}`);
+        return;
+      }
+
+      if (!isAuthenticated) {
+        openLoginModal(`/templates?id=${idFromUrl}`);
+        return;
+      }
+
+      const userPlanLower = (user?.plan || 'free').toLowerCase();
+      let hasAccess = false;
+      if (template.access === 'pro') {
+        hasAccess = userPlanLower === 'pro' || userPlanLower === 'premium';
+      } else if (template.access === 'paid') {
+        hasAccess = userPlanLower === 'premium';
+      }
+
+      if (!hasAccess) {
+        navigate(`/pricing?templateId=${idFromUrl}`);
       } else {
-        if (!isAuthenticated && needsAuth) {
-          openLoginModal(`/templates?id=${idFromUrl}`);
-          return;
-        }
-
-        if (needsAuth) {
-          verifyTemplateAccess(idFromUrl, 'editor').then(result => {
-            if (result.success) {
-              navigate(`/dashboard?template=${idFromUrl}`);
-            } else if (result.status === 403) {
-              navigate('/pricing');
-            }
-          });
-        } else {
-          navigate(`/dashboard?template=${idFromUrl}`);
-        }
+        navigate(`/dashboard?template=${idFromUrl}`);
       }
     }
-  }, [search, isAuthenticated, userPlan, navigate, openLoginModal, verifyTemplateAccess]);
+  }, [search, isAuthenticated, userPlan, navigate, openLoginModal]);
 
-  const handleUseTemplate = async (id: string) => {
-    const template = TEMPLATES.find(t => t.id === id);
+  const handleUseTemplate = (templateId: string) => {
+    const template = TEMPLATES.find(t => t.id === templateId);
     if (!template) return;
 
-    const needsAuth = template.requiresAuth !== false;
-
-    if (!isAuthenticated && needsAuth) {
-      localStorage.setItem('post_login_redirect_template', id);
-      openLoginModal(`/templates?id=${id}`);
+    // Free templates always accessible
+    if (template.access === 'free') {
+      navigate(`/dashboard?template=${templateId}`);
       return;
     }
 
-    if (needsAuth) {
-      const accessResult = await verifyTemplateAccess(id, 'editor');
-      if (!accessResult.success) {
-        if (accessResult.status === 403) {
-          navigate('/pricing');
-        }
-        return;
-      }
+    // Check authentication first for paid templates
+    if (!isAuthenticated) {
+      openLoginModal(`/templates?id=${templateId}`);
+      return;
     }
 
-    navigate(`/dashboard?template=${id}`);
-  };
+    // Check plan access
+    const userPlanLower = (user?.plan || 'free').toLowerCase();
+    let hasAccess = false;
+    if (template.access === 'pro') {
+      hasAccess = userPlanLower === 'pro' || userPlanLower === 'premium';
+    } else if (template.access === 'paid') { // Premium templates
+      hasAccess = userPlanLower === 'premium';
+    }
 
+    if (!hasAccess) {
+      navigate(`/pricing?templateId=${templateId}`);
+      return;
+    }
+
+    // If all checks passed, open builder
+    navigate(`/dashboard?template=${templateId}`);
+  };
   return (
     <div className="space-y-12 pb-16 bg-gray-50">
       <section className="pt-24 pb-16 bg-gradient-to-r from-gray-900 to-indigo-900 border-b border-indigo-950 text-white relative overflow-hidden">

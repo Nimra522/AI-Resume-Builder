@@ -31,14 +31,14 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
 
   return (
     <div
-      className={`group relative bg-white rounded-[20px] border-2 transition-all duration-250 ease-out overflow-hidden flex flex-col p-6 h-full
+      className={`group relative bg-gray-100 rounded-[20px] border-2 transition-all duration-250 ease-out overflow-hidden flex flex-col p-4 h-full
         ${isSelected
           ? 'border-[#33CFFF] ring-2 ring-[#33CFFF] ring-offset-2'
           : 'border-[#33CFFF] shadow-[0_10px_25px_rgba(0,180,255,0.12),0_0_0_1px_rgba(51,207,255,0.25),0_0_18px_rgba(51,207,255,0.18)] hover:shadow-[0_16px_40px_rgba(0,180,255,0.2),0_0_0_2px_rgba(51,207,255,0.4),0_0_28px_rgba(51,207,255,0.25)] hover:-translate-y-[6px]'
         }`}
     >
       {/* Thumbnail Container */}
-      <div className="relative w-full rounded-[14px] bg-gray-100 overflow-hidden flex items-center justify-center aspect-[4/5] cursor-pointer" onClick={handleSelect}>
+      <div className="relative w-full rounded-[14px] bg-gray-100 overflow-hidden flex items-center justify-center aspect-[3/4] cursor-pointer" onClick={handleSelect}>
         <img
           src={template.thumbnailUrl}
           alt={template.name}
@@ -86,18 +86,18 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
       </div>
 
       {/* Spacer */}
-      <div className="h-6" />
+      <div className="h-4" />
 
       {/* Text Section */}
-      <div className="flex flex-col">
-        <h3 className="font-bold text-[34px] text-[#374151] leading-none">
+      <div className="flex flex-col flex-1">
+        <h3 className="font-bold text-lg text-[#374151] leading-tight truncate">
           {template.name}
         </h3>
-        <p className="text-[18px] font-medium text-[#6B7280] mt-2">
+        <p className="text-xs font-medium text-[#6B7280] mt-1 truncate">
           Resume Template
         </p>
 
-        <div className="mt-4">
+        <div className="mt-3 mt-auto">
           <Button
             variant={isSelected ? "primary" : "outline"}
             fullWidth
