@@ -86,6 +86,14 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
 
   // Step navigation functions
   const goToNextStep = () => {
+    if (currentStep === 1) {
+      const fullNameError = validateFullName(data.personalInfo.fullName.trim());
+      setNameError(fullNameError);
+      if (fullNameError) {
+        return;
+      }
+    }
+
     if (currentStep < steps.length) {
       setCurrentStep(prev => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -100,6 +108,14 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
   };
 
   const goToStep = (step: number) => {
+    if (currentStep === 1 && step > currentStep) {
+      const fullNameError = validateFullName(data.personalInfo.fullName.trim());
+      setNameError(fullNameError);
+      if (fullNameError) {
+        return;
+      }
+    }
+
     setCurrentStep(step);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -113,9 +129,13 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
 
   // State for name field validation error
   const [nameError, setNameError] = useState<string>('');
+  const [jobTitleError, setJobTitleError] = useState<string>('');
   
   // State for phone field validation error
   const [phoneError, setPhoneError] = useState<string>('');
+  const [locationError, setLocationError] = useState<string>('');
+  const [linkedinError, setLinkedinError] = useState<string>('');
+  const [summaryError, setSummaryError] = useState<string>('');
   
   // State for location suggestions
   const [showLocationSuggestions, setShowLocationSuggestions] = useState<boolean>(false);
@@ -127,86 +147,133 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
     setShowLocationSuggestions(false);
   });
   
-  // State for linkedin/website field validation error
-  const [linkedinError, setLinkedinError] = useState<string>('');
+  const validateFullName = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return 'Full name is required.';
+    if (trimmedValue.length < 2) return 'Full name must be at least 2 characters.';
+    if (trimmedValue.length > 100) return 'Full name must be at most 100 characters.';
+    if (!/^[\p{L}\s.'-]+$/u.test(trimmedValue)) {
+      return 'Use letters, spaces, hyphens, apostrophes, or periods only.';
+    }
+    return '';
+  };
+
+  const validateJobTitle = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return '';
+    if (trimmedValue.length > 100) return 'Job title must be at most 100 characters.';
+    if (!/^[A-Za-z0-9 ,./#+&()-]+$/.test(trimmedValue)) {
+      return 'Use letters, numbers, spaces, hyphens, slashes, dots, plus, hash, commas, parentheses, or ampersands.';
+    }
+    return '';
+  };
+
+  const validateEmail = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return '';
+    if (trimmedValue.length > 254) return 'Email must be at most 254 characters.';
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedValue)) {
+      return 'Please enter a valid email address.';
+    }
+    return '';
+  };
+
+  const validatePhone = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return '';
+    if (trimmedValue.length > 30) return 'Phone number must be at most 30 characters.';
+    if (!/^[0-9 +().-]+$/.test(trimmedValue)) {
+      return 'Use numbers, spaces, plus, hyphens, or parentheses only.';
+    }
+    return '';
+  };
+
+  const validateLocation = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return '';
+    if (trimmedValue.length > 100) return 'Location must be at most 100 characters.';
+    return '';
+  };
+
+  const validateLinkedin = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return '';
+    if (trimmedValue.length > 255) return 'Link must be at most 255 characters.';
+
+    let urlToTest = trimmedValue;
+    if (!/^https?:\/\//i.test(trimmedValue) && !trimmedValue.startsWith('www.')) {
+      urlToTest = `https://${trimmedValue}`;
+    }
+
+    try {
+      const url = new URL(urlToTest);
+      if (!url.hostname.includes('.')) {
+        throw new Error('Invalid hostname');
+      }
+      return '';
+    } catch {
+      return 'Please enter a valid website or profile URL.';
+    }
+  };
+
+  const validateSummary = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return '';
+    if (trimmedValue.length > 1000) return 'Professional summary must be at most 1000 characters.';
+    return '';
+  };
 
   const updatePersonalInfo = (field: string, value: string) => {
-    // Apply validation to the Name field
+    const trimmedValue = value.trim();
+    const normalizedValue = field === 'summary' ? value.trim() : trimmedValue;
+
     if (field === 'fullName') {
-      // Allow only alphabets and spaces
-      const nameRegex = /^[A-Za-z ]*$/;
-      if (!nameRegex.test(value)) {
-        setNameError('Only valid names are allowed');
-        return; // Don't update if invalid
-      } else {
-        setNameError(''); // Clear error if valid
-      }
+      setNameError(value ? validateFullName(normalizedValue) : '');
+    } else if (field === 'jobTitle') {
+      setJobTitleError(validateJobTitle(normalizedValue));
+    } else if (field === 'email') {
+      setEmailError(validateEmail(normalizedValue));
+    } else if (field === 'phone') {
+      setPhoneError(validatePhone(normalizedValue));
+    } else if (field === 'location') {
+      setLocationError(validateLocation(normalizedValue));
+    } else if (field === 'linkedin') {
+      setLinkedinError(validateLinkedin(normalizedValue));
+    } else if (field === 'summary') {
+      setSummaryError(validateSummary(normalizedValue));
     }
-    
-    // Apply validation to the LinkedIn/Website field
-    if (field === 'linkedin') {
-      // Allow empty values (optional field)
-      if (!value) {
-        setLinkedinError('');
-      } else {
-        // Validate the URL as the user types, but be smart about it
-        // For a valid URL, we minimally need a domain with a dot (e.g. "example.com")
-        const hasDomainPattern = value.includes('.');
-        
-        if (hasDomainPattern) {
-          try {
-            // Add protocol if missing for validation purposes
-            let urlToTest = value;
-            if (!value.startsWith('http://') && !value.startsWith('https://')) {
-              urlToTest = 'https://' + value;
-            }
-            new URL(urlToTest);
-            setLinkedinError(''); // Clear error if valid
-          } catch {
-            setLinkedinError('Only valid links are allowed (e.g., https://example.com)');
-          }
-        } else {
-          // If no dot present, likely still typing, don't show error
-          setLinkedinError('');
-        }
-      }
-    }
-    
-    // No validation for other fields - accept all input
-    
+
     onChange({
       ...data,
-      personalInfo: { ...data.personalInfo, [field]: value }
+      personalInfo: { ...data.personalInfo, [field]: normalizedValue }
     });
+  };
+
+  const handleFullNameBlur = (value: string) => {
+    setNameError(validateFullName(value.trim()));
   };
 
   // Handle phone validation on blur
   const handlePhoneBlur = (value: string) => {
-    // Allow only numeric digits
-    const phoneRegex = /^[0-9]*$/;
-    if (value && !phoneRegex.test(value)) {
-      setPhoneError('Only valid phone numbers are allowed');
-      return;
-    }
-    
-    // Check length constraints (min 7, max 15 digits)
-    if (value && (value.length < 7 || value.length > 15)) {
-      setPhoneError('Phone number must be between 7 and 15 digits');
-      return;
-    }
-    
-    setPhoneError(''); // Clear error if valid
+    setPhoneError(validatePhone(value.trim()));
   };
   
   // Handle email validation on blur
   const handleEmailBlur = (value: string) => {
-    // Allow only valid email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (value && !emailRegex.test(value)) {
-      setEmailError('Only valid emails are allowed (e.g. name@example.com)');
-    } else {
-      setEmailError(''); // Clear error if valid or empty
-    }
+    setEmailError(validateEmail(value.trim()));
+  };
+
+  const handleLinkedinBlur = (value: string) => {
+    setLinkedinError(validateLinkedin(value.trim()));
+  };
+
+  const handleLocationBlur = (value: string) => {
+    setLocationError(validateLocation(value.trim()));
+  };
+
+  const handleSummaryBlur = (value: string) => {
+    setSummaryError(validateSummary(value.trim()));
   };
 
 // Generic handler for array updates (Experience, Education, Projects, Certs)
@@ -355,14 +422,20 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                   label="Full Name" 
                   value={data.personalInfo.fullName} 
                   onChange={e => updatePersonalInfo('fullName', e.target.value)} 
+                  onBlur={(e) => handleFullNameBlur(e.target.value)}
                   placeholder="e.g. John Doe" 
                   error={nameError}
+                  required
+                  maxLength={100}
                 />
                 <Input 
                   label="Job Title"
                   value={data.personalInfo.jobTitle} 
                   onChange={e => updatePersonalInfo('jobTitle', e.target.value)} 
+                  onBlur={(e) => setJobTitleError(validateJobTitle(e.target.value.trim()))}
                   placeholder="e.g. Software Engineer"
+                  error={jobTitleError}
+                  maxLength={100}
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -373,6 +446,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                   onBlur={(e) => handleEmailBlur(e.target.value)}
                   placeholder="john@example.com"
                   error={emailError}
+                  maxLength={254}
                 />
                 <Input 
                   label="Phone"
@@ -381,6 +455,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                   onBlur={(e) => handlePhoneBlur(e.target.value)}
                   placeholder="Enter phone number"
                   error={phoneError}
+                  maxLength={30}
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -402,9 +477,11 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                       setFilteredLocations(filtered);
                       setShowLocationSuggestions(true);
                     }}
+                    onBlur={(e) => handleLocationBlur(e.target.value)}
                     onFocus={() => {
                       setShowLocationSuggestions(true);
                     }}
+                    maxLength={100}
                     className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 shadow-sm"
                   />
                   {showLocationSuggestions && (
@@ -433,8 +510,10 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                   label="LinkedIn / Website"
                   value={data.personalInfo.linkedin} 
                   onChange={e => updatePersonalInfo('linkedin', e.target.value)} 
+                  onBlur={(e) => handleLinkedinBlur(e.target.value)}
                   placeholder="linkedin.com/in/john"
                   error={linkedinError}
+                  maxLength={255}
                 />
               </div>
               <div className="space-y-1.5">
@@ -444,8 +523,13 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                     rows={4}
                     value={data.personalInfo.summary}
                     onChange={e => updatePersonalInfo('summary', e.target.value)}
+                    onBlur={(e) => handleSummaryBlur(e.target.value)}
                     placeholder="Briefly describe your professional background and goals..."
+                    maxLength={1000}
                   />
+                  {summaryError && (
+                    <p className="text-sm text-red-500">{summaryError}</p>
+                  )}
                   <div className="flex gap-2 mt-2">
                     <Button
                       variant="outline"
