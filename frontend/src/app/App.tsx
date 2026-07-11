@@ -26,7 +26,7 @@ import { DashboardOverview } from '../pages/DashboardOverview';
 import { HelpSupportPage } from '../pages/HelpSupportPage';
 import { PaymentSuccess } from '../pages/PaymentSuccess';
 import { PaymentCancel } from '../pages/PaymentCancel';
-import { HashRouter, useLocation, Link } from '../components/layout/Navbar';
+import { BrowserRouter, useLocation, Link } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
 import { LoginModal } from '../components/ui/LoginModal';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
@@ -122,12 +122,12 @@ const AppRoutes: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <AuthProvider>
         <AppRoutes />
         <LoginModal />
       </AuthProvider>
-    </HashRouter>
+    </BrowserRouter>
   );
 };
 

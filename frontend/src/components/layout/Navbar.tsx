@@ -1,78 +1,23 @@
 
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState } from 'react';
+import { Link as RouterLink, useLocation as useRouterLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, LogOut } from 'lucide-react';
 import { NavItem } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { UserMenu } from './UserMenu';
 import LogoImage from '../../assets/Logo.png';
 
-// --- Simple Hash Router Implementation ---
+export const Link = RouterLink;
 
-interface RouterContextType {
-  pathname: string;
-  search: string;
-  navigate: (path: string) => void;
-}
+export const useLocation = () => {
+  const location = useRouterLocation();
+  const navigate = useNavigate();
 
-const RouterContext = createContext<RouterContextType>({
-  pathname: '/',
-  search: '',
-  navigate: () => {},
-});
-
-export const HashRouter: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const getPath = () => window.location.pathname || '/';
-  const getSearch = () => window.location.search;
-
-  const [pathname, setPathname] = useState(getPath());
-  const [search, setSearch] = useState(getSearch());
-
-  useEffect(() => {
-    const handlePopState = () => {
-      setPathname(getPath());
-      setSearch(getSearch());
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  const navigate = (path: string) => {
-    window.history.pushState(null, '', path);
-    setPathname(getPath());
-    setSearch(getSearch());
+  return {
+    pathname: location.pathname,
+    search: location.search,
+    navigate,
   };
-
-  return (
-    <RouterContext.Provider value={{ pathname, search, navigate }}>
-      {children}
-    </RouterContext.Provider>
-  );
-};
-
-export const useLocation = () => useContext(RouterContext);
-
-export const Link: React.FC<{
-  to: string;
-  children: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-}> = ({ to, children, className, onClick }) => {
-  const { navigate } = useLocation();
-
-  return (
-    <a
-      href={to}
-      className={className}
-      onClick={(e) => {
-        e.preventDefault();
-        navigate(to);
-        if (onClick) onClick();
-      }}
-    >
-      {children}
-    </a>
-  );
 };
 
 // --- Navbar Component ---
@@ -91,9 +36,11 @@ const AUTH_ITEMS: NavItem[] = [
 
 export const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { pathname, navigate } = useLocation();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
 
+  const pathname = location.pathname;
   const isActive = (path: string) => pathname === path;
 
   return (
