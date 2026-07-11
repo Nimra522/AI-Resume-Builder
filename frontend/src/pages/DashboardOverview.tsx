@@ -24,6 +24,7 @@ import {
   Settings
 } from 'lucide-react';
 import { DeleteConfirmModal } from '../components/ui/DeleteConfirmModal';
+import { apiUrl } from '../utils/api';
 
 export const DashboardOverview: React.FC = () => {
   const { user, isAuthenticated, updateResumeCount, openLoginModal, verifyTemplateAccess } = useAuth();
@@ -39,7 +40,7 @@ export const DashboardOverview: React.FC = () => {
     const loadResumes = async () => {
       if (isAuthenticated) {
         try {
-          const response = await fetch('/api/resume/all', {
+          const response = await fetch(apiUrl('/resume/all'), {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('resume_ai_token')}`
             }
@@ -137,7 +138,7 @@ export const DashboardOverview: React.FC = () => {
     try {
       // Call delete API first if authenticated
       if (isAuthenticated) {
-        const response = await fetch(`/api/resume/${deleteId}`, {
+        const response = await fetch(apiUrl(`/resume/${deleteId}`), {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('resume_ai_token')}`,

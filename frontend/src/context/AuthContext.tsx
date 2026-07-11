@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { UserProfile, SavedResume } from '../types';
 import { useNotifications } from './NotificationContext';
+import { apiUrl } from '../utils/api';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -39,7 +40,6 @@ export const useAuth = () => {
 };
 
 const SESSION_KEY = 'resume_ai_token';
-const API_URL = import.meta.env.VITE_API_URL;
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const validateToken = useCallback(async (token: string) => {
     try {
-      const res = await fetch(`${API_URL}/auth/me`, {
+      const res = await fetch(apiUrl('/auth/me'), {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -171,7 +171,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signup = async (name: string, email: string, password: string) => {
     try {
-      const res = await fetch(`${API_URL}/auth/signup`, {
+      const res = await fetch(apiUrl('/auth/signup'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fullName: name, email, password })
@@ -200,7 +200,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string, twoFactorToken?: string) => {
     try {
-      const res = await fetch(`${API_URL}/api/auth/login`, {
+      const res = await fetch(apiUrl('/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, twoFactorOTP: twoFactorToken }) // Changed parameter name to match backend
@@ -238,7 +238,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       const token = localStorage.getItem(SESSION_KEY);
-      const res = await fetch(`${API_URL}/auth/profile`, {
+      const res = await fetch(apiUrl('/auth/profile'), {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -305,7 +305,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       const token = localStorage.getItem(SESSION_KEY);
-      const res = await fetch(`${API_URL}/auth/password`, {
+      const res = await fetch(apiUrl('/auth/password'), {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -335,7 +335,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       const token = localStorage.getItem(SESSION_KEY);
-      const res = await fetch(`${API_URL}/users/preferences`, {
+      const res = await fetch(apiUrl('/users/preferences'), {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -378,7 +378,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       const token = localStorage.getItem(SESSION_KEY);
-      const res = await fetch(`${API_URL}/auth/account`, {
+      const res = await fetch(apiUrl('/auth/account'), {
         method: 'DELETE',
         headers: { 
           'Content-Type': 'application/json',
@@ -436,7 +436,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       const token = localStorage.getItem(SESSION_KEY);
-      const res = await fetch(`${API_URL}/auth/2fa/setup`, {
+      const res = await fetch(apiUrl('/auth/2fa/setup'), {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -467,7 +467,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       const authToken = localStorage.getItem(SESSION_KEY);
-      const res = await fetch(`${API_URL}/auth/2fa/verify`, {
+      const res = await fetch(apiUrl('/auth/2fa/verify'), {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -497,7 +497,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       const authToken = localStorage.getItem(SESSION_KEY);
-      const res = await fetch(`${API_URL}/auth/2fa/disable`, {
+      const res = await fetch(apiUrl('/auth/2fa/disable'), {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -527,7 +527,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       const authToken = localStorage.getItem(SESSION_KEY);
-      const res = await fetch(`${API_URL}/auth/2fa/resend`, {
+      const res = await fetch(apiUrl('/auth/2fa/resend'), {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -557,7 +557,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       const token = localStorage.getItem(SESSION_KEY);
-      const res = await fetch(`${API_URL}/subscription/checkout`, {
+      const res = await fetch(apiUrl('/subscription/checkout'), {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -584,7 +584,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       const token = localStorage.getItem(SESSION_KEY);
-      const res = await fetch(`${API_URL}/templates/${action}`, {
+      const res = await fetch(apiUrl(`/templates/${action}`), {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

@@ -14,6 +14,7 @@ import { useNotifications } from '../context/NotificationContext';
 import { LivePreview } from '../components/resume/LivePreview';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { apiUrl } from '../utils/api';
 
 export const MyResumesPage: React.FC = () => {
   const [resumes, setResumes] = useState<SavedResume[]>([]);
@@ -141,7 +142,7 @@ export const MyResumesPage: React.FC = () => {
       let apiErrorOccurred = false;
       
       try {
-        const response = await fetch(`/api/resumes/${deleteId}`, {
+        const response = await fetch(apiUrl(`/resume/${deleteId}`), {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,

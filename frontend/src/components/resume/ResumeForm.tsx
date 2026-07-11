@@ -8,6 +8,7 @@ import { LOCATION_OPTIONS, LocationOption } from '../../data/locations';
 import { useClickOutside } from '../../hooks/useClickOutside';
 
 import { useAuth } from '../../context/AuthContext';
+import { apiUrl } from '../../utils/api';
 
 interface ResumeFormProps {
   data: ResumeData;
@@ -60,7 +61,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
   // Helper to make API calls
   const callAI = async (endpoint: string, payload: any) => {
     try {
-      const response = await fetch(`/api/ai${endpoint}`, {
+      const response = await fetch(apiUrl(`/ai${endpoint}`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

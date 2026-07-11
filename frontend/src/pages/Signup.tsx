@@ -7,6 +7,7 @@ import { Button } from '../components/ui/Button';
 import { Link, useLocation } from '../components/layout/Navbar';
 import { SuccessMessage } from '../components/ui/SuccessMessage';
 import { useAuth } from '../context/AuthContext';
+import { googleAuthUrl } from '../utils/api';
 
 export const Signup: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -98,7 +99,7 @@ export const Signup: React.FC = () => {
 
   const handleGoogleSignup = () => {
     // Real redirection to backend OAuth endpoint
-    window.location.href = 'http://localhost:8080/api/auth/google';
+    window.location.href = googleAuthUrl();
   };
 
   const GoogleIcon = () => (

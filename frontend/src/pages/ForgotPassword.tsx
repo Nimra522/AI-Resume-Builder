@@ -6,6 +6,7 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { Link, useLocation } from '../components/layout/Navbar';
 import { SuccessMessage } from '../components/ui/SuccessMessage';
+import { apiUrl } from '../utils/api';
 
 export const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -20,7 +21,7 @@ export const ForgotPassword: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
+      const response = await fetch(apiUrl('/auth/forgot-password'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

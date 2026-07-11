@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Send, MessageSquare, X, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useAuth } from '../../context/AuthContext';
+import { apiUrl } from '../../utils/api';
 
 export const FloatingChatButton: React.FC = () => {
   const { token } = useAuth();
@@ -62,7 +63,7 @@ export const FloatingChatButton: React.FC = () => {
     setIsTyping(true);
 
     try {
-      const res = await fetch('/api/ai/chat', {
+      const res = await fetch(apiUrl('/ai/chat'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

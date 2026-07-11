@@ -5,6 +5,7 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { Link, useLocation } from '../components/layout/Navbar';
 import { SuccessMessage } from '../components/ui/SuccessMessage';
+import { apiUrl } from '../utils/api';
 
 export const ResetPassword: React.FC = () => {
   const { pathname, navigate } = useLocation();
@@ -34,7 +35,7 @@ export const ResetPassword: React.FC = () => {
     }
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
+      const response = await fetch(apiUrl('/auth/reset-password'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

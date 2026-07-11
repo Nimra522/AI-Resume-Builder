@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { CheckCircle, ArrowRight, Loader } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useLocation } from '../components/layout/Navbar';
+import { apiUrl } from '../utils/api';
 
 
 export const PaymentSuccess: React.FC = () => {
@@ -25,9 +26,7 @@ export const PaymentSuccess: React.FC = () => {
           const token = localStorage.getItem('resume_ai_token');
           if (!token) return 'Free';
           
-          // Use the same API URL pattern as AuthContext
-          const apiUrl = process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:8080/api';
-          const response = await fetch(`${apiUrl}/auth/me`, {
+          const response = await fetch(apiUrl('/auth/me'), {
             headers: { 
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'

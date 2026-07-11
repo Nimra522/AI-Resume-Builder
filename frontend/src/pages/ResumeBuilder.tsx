@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLocation } from '../components/layout/Navbar';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { apiUrl } from '../utils/api';
 
 export const ResumeBuilder: React.FC = () => {
   const [resumeData, setResumeData] = useState<ResumeData>(INITIAL_RESUME_DATA);
@@ -89,7 +90,7 @@ export const ResumeBuilder: React.FC = () => {
       const loadResume = async () => {
         if (isAuthenticated) {
           try {
-            const response = await fetch(`/api/resume/${editParam}`, {
+            const response = await fetch(apiUrl(`/resume/${editParam}`), {
               headers: {
                 'Authorization': `Bearer ${localStorage.getItem('resume_ai_token')}`
               }
@@ -268,7 +269,7 @@ export const ResumeBuilder: React.FC = () => {
       };
       
       // Call backend API
-      const response = await fetch('/api/resume/save', {
+      const response = await fetch(apiUrl('/resume/save'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

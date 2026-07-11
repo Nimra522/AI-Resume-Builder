@@ -5,6 +5,7 @@ import { useLocation } from '../layout/Navbar';
 import { X, Mail, Lock, User, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Button } from './Button';
 import { Input } from './Input';
+import { googleAuthUrl } from '../../utils/api';
 
 export const LoginModal: React.FC = () => {
   const { isLoginModalOpen, closeLoginModal, login, signup, loginRedirectPath } = useAuth();
@@ -49,7 +50,7 @@ export const LoginModal: React.FC = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:8080/api/auth/google';
+    window.location.href = googleAuthUrl();
   };
 
   const GoogleIcon = () => (
