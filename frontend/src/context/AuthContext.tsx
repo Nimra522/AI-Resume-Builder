@@ -39,7 +39,7 @@ export const useAuth = () => {
 };
 
 const SESSION_KEY = 'resume_ai_token';
-const API_URL = '/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
