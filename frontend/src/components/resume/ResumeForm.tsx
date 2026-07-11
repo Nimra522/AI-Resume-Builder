@@ -46,6 +46,27 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
     endDate?: string;
   }>>({});
 
+  const [educationErrors, setEducationErrors] = useState<Record<string, {
+    school?: string;
+    degree?: string;
+    graduationDate?: string;
+    description?: string;
+  }>>({});
+
+  const [projectErrors, setProjectErrors] = useState<Record<string, {
+    name?: string;
+    link?: string;
+    description?: string;
+  }>>({});
+
+  const [certificationErrors, setCertificationErrors] = useState<Record<string, {
+    name?: string;
+    issuer?: string;
+    date?: string;
+  }>>({});
+
+  const [saveError, setSaveError] = useState<string>('');
+
   // AI Loading states
   const [aiLoading, setAiLoading] = useState<{
     summary: boolean;
@@ -190,6 +211,80 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
     });
   };
 
+  // --- Education Update Handler ---
+  const updateEducationItem = (id: string, field: keyof Education, value: string) => {
+    const normalizedValue = typeof value === 'string' ? value.trim() : value;
+    const updatedEducation = data.education.map(item =>
+      item.id === id ? { ...item, [field]: normalizedValue } : item
+    );
+    onChange({ ...data, education: updatedEducation });
+
+    const currentItem = updatedEducation.find(item => item.id === id);
+    if (!currentItem) return;
+
+    setEducationErrors(prev => {
+      const nextErrors = { ...(prev[id] || {}) };
+      if (field === 'school') {
+        nextErrors.school = validateEducationSchool(currentItem.school);
+      } else if (field === 'degree') {
+        nextErrors.degree = validateEducationDegree(currentItem.degree);
+      } else if (field === 'graduationDate') {
+        nextErrors.graduationDate = validateEducationGraduationDate(currentItem.graduationDate);
+      } else if (field === 'description') {
+        nextErrors.description = validateEducationDescription(currentItem.description);
+      }
+      return { ...prev, [id]: nextErrors };
+    });
+  };
+
+  // --- Project Update Handler ---
+  const updateProjectItem = (id: string, field: keyof Project, value: string) => {
+    const normalizedValue = typeof value === 'string' ? value.trim() : value;
+    const updatedProjects = data.projects.map(item =>
+      item.id === id ? { ...item, [field]: normalizedValue } : item
+    );
+    onChange({ ...data, projects: updatedProjects });
+
+    const currentItem = updatedProjects.find(item => item.id === id);
+    if (!currentItem) return;
+
+    setProjectErrors(prev => {
+      const nextErrors = { ...(prev[id] || {}) };
+      if (field === 'name') {
+        nextErrors.name = validateProjectName(currentItem.name);
+      } else if (field === 'link') {
+        nextErrors.link = validateProjectLink(currentItem.link || '');
+      } else if (field === 'description') {
+        nextErrors.description = validateProjectDescription(currentItem.description);
+      }
+      return { ...prev, [id]: nextErrors };
+    });
+  };
+
+  // --- Certification Update Handler ---
+  const updateCertificationItem = (id: string, field: keyof Certification, value: string) => {
+    const normalizedValue = typeof value === 'string' ? value.trim() : value;
+    const updatedCertifications = data.certifications.map(item =>
+      item.id === id ? { ...item, [field]: normalizedValue } : item
+    );
+    onChange({ ...data, certifications: updatedCertifications });
+
+    const currentItem = updatedCertifications.find(item => item.id === id);
+    if (!currentItem) return;
+
+    setCertificationErrors(prev => {
+      const nextErrors = { ...(prev[id] || {}) };
+      if (field === 'name') {
+        nextErrors.name = validateCertificationName(currentItem.name);
+      } else if (field === 'issuer') {
+        nextErrors.issuer = validateCertificationIssuer(currentItem.issuer);
+      } else if (field === 'date') {
+        nextErrors.date = validateCertificationDate(currentItem.date);
+      }
+      return { ...prev, [id]: nextErrors };
+    });
+  };
+
   // Step navigation functions
   const goToNextStep = () => {
     if (currentStep === 1) {
@@ -330,6 +425,280 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
     return '';
   };
 
+  // --- Education Validation ---
+  const validateEducationSchool = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return 'School / University is required.';
+    if (trimmedValue.length > 100) return 'School name must be at most 100 characters.';
+    return '';
+  };
+
+  const validateEducationDegree = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return 'Degree / Major is required.';
+    if (trimmedValue.length > 100) return 'Degree must be at most 100 characters.';
+    return '';
+  };
+
+  const validateEducationGraduationDate = (value: string) => {
+    if (!value) return '';
+    const date = new Date(value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (isNaN(date.getTime())) return 'Invalid date format.';
+    if (date > today) return 'Graduation date cannot be in the future.';
+    return '';
+  };
+
+  const validateEducationDescription = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return '';
+    if (trimmedValue.length > 500) return 'Description must be at most 500 characters.';
+    return '';
+  };
+
+  // --- Projects Validation ---
+  const validateProjectName = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return 'Project name is required.';
+    if (trimmedValue.length > 100) return 'Project name must be at most 100 characters.';
+    return '';
+  };
+
+  const validateProjectLink = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return '';
+    if (trimmedValue.length > 255) return 'Link must be at most 255 characters.';
+    let urlToTest = trimmedValue;
+    if (!/^https?:\/\//i.test(trimmedValue) && !trimmedValue.startsWith('www.')) {
+      urlToTest = `https://${trimmedValue}`;
+    }
+    try {
+      new URL(urlToTest);
+      return '';
+    } catch {
+      return 'Please enter a valid URL.';
+    }
+  };
+
+  const validateProjectDescription = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return '';
+    if (trimmedValue.length > 500) return 'Description must be at most 500 characters.';
+    return '';
+  };
+
+  // --- Certifications Validation ---
+  const validateCertificationName = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return 'Certification name is required.';
+    if (trimmedValue.length > 100) return 'Certification name must be at most 100 characters.';
+    return '';
+  };
+
+  const validateCertificationIssuer = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return 'Issuing organization is required.';
+    if (trimmedValue.length > 100) return 'Issuer name must be at most 100 characters.';
+    return '';
+  };
+
+  const validateCertificationDate = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return '';
+    // Check if it's a valid year (4 digits)
+    if (!/^\d{4}$/.test(trimmedValue)) {
+      return 'Please enter a valid year (e.g. 2023).';
+    }
+    const year = parseInt(trimmedValue);
+    const currentYear = new Date().getFullYear();
+    if (year > currentYear) return 'Year cannot be in the future.';
+    return '';
+  };
+
+  // --- Centralized Save Validation ---
+  interface ValidationErrors {
+    personalInfo: {
+      fullName?: string;
+      email?: string;
+      jobTitle?: string;
+      phone?: string;
+      location?: string;
+      linkedin?: string;
+      summary?: string;
+    };
+    experience: Record<string, any>;
+    education: Record<string, any>;
+    projects: Record<string, any>;
+    certifications: Record<string, any>;
+  }
+
+  const validateResumeBeforeSave = (): { isValid: boolean; errors: ValidationErrors } => {
+    const errors: ValidationErrors = {
+      personalInfo: {},
+      experience: {},
+      education: {},
+      projects: {},
+      certifications: {},
+    };
+    let isValid = true;
+
+    // Validate Personal Info
+    const nameErr = validateFullName(data.personalInfo.fullName);
+    if (nameErr) {
+      errors.personalInfo.fullName = nameErr;
+      isValid = false;
+    }
+    const emailErr = validateEmail(data.personalInfo.email);
+    if (emailErr) {
+      errors.personalInfo.email = emailErr;
+      isValid = false;
+    }
+    const jobTitleErr = validateJobTitle(data.personalInfo.jobTitle);
+    if (jobTitleErr) {
+      errors.personalInfo.jobTitle = jobTitleErr;
+      isValid = false;
+    }
+    const phoneErr = validatePhone(data.personalInfo.phone);
+    if (phoneErr) {
+      errors.personalInfo.phone = phoneErr;
+      isValid = false;
+    }
+    const locationErr = validateLocation(data.personalInfo.location);
+    if (locationErr) {
+      errors.personalInfo.location = locationErr;
+      isValid = false;
+    }
+    const linkedinErr = validateLinkedin(data.personalInfo.linkedin);
+    if (linkedinErr) {
+      errors.personalInfo.linkedin = linkedinErr;
+      isValid = false;
+    }
+    const summaryErr = validateSummary(data.personalInfo.summary);
+    if (summaryErr) {
+      errors.personalInfo.summary = summaryErr;
+      isValid = false;
+    }
+
+    // Validate Experience
+    data.experience.forEach(exp => {
+      const roleErr = validateExperienceRole(exp.role);
+      const companyErr = validateExperienceCompany(exp.company);
+      const descErr = validateExperienceDescription(exp.description);
+      const dateErrs = validateExperienceDateRange(exp.startDate, exp.current ? '' : exp.endDate, exp.current);
+      
+      const expErrors: any = {};
+      if (roleErr) {
+        expErrors.role = roleErr;
+        isValid = false;
+      }
+      if (companyErr) {
+        expErrors.company = companyErr;
+        isValid = false;
+      }
+      if (!exp.startDate) {
+        expErrors.startDate = 'Start date is required.';
+        isValid = false;
+      } else if (dateErrs.startDate) {
+        expErrors.startDate = dateErrs.startDate;
+        isValid = false;
+      }
+      if (!exp.current && !exp.endDate) {
+        expErrors.endDate = 'End date is required if not currently working.';
+        isValid = false;
+      } else if (dateErrs.endDate) {
+        expErrors.endDate = dateErrs.endDate;
+        isValid = false;
+      }
+      if (descErr) {
+        expErrors.description = descErr;
+        isValid = false;
+      }
+      if (Object.keys(expErrors).length > 0) {
+        errors.experience[exp.id] = expErrors;
+      }
+    });
+
+    // Validate Education
+    data.education.forEach(edu => {
+      const schoolErr = validateEducationSchool(edu.school);
+      const degreeErr = validateEducationDegree(edu.degree);
+      const dateErr = validateEducationGraduationDate(edu.graduationDate);
+      const descErr = validateEducationDescription(edu.description);
+
+      const eduErrors: any = {};
+      if (schoolErr) {
+        eduErrors.school = schoolErr;
+        isValid = false;
+      }
+      if (degreeErr) {
+        eduErrors.degree = degreeErr;
+        isValid = false;
+      }
+      if (dateErr) {
+        eduErrors.graduationDate = dateErr;
+        isValid = false;
+      }
+      if (descErr) {
+        eduErrors.description = descErr;
+        isValid = false;
+      }
+      if (Object.keys(eduErrors).length > 0) {
+        errors.education[edu.id] = eduErrors;
+      }
+    });
+
+    // Validate Projects
+    data.projects.forEach(proj => {
+      const nameErr = validateProjectName(proj.name);
+      const linkErr = validateProjectLink(proj.link || '');
+      const descErr = validateProjectDescription(proj.description);
+
+      const projErrors: any = {};
+      if (nameErr) {
+        projErrors.name = nameErr;
+        isValid = false;
+      }
+      if (linkErr) {
+        projErrors.link = linkErr;
+        isValid = false;
+      }
+      if (descErr) {
+        projErrors.description = descErr;
+        isValid = false;
+      }
+      if (Object.keys(projErrors).length > 0) {
+        errors.projects[proj.id] = projErrors;
+      }
+    });
+
+    // Validate Certifications
+    data.certifications.forEach(cert => {
+      const nameErr = validateCertificationName(cert.name);
+      const issuerErr = validateCertificationIssuer(cert.issuer);
+      const dateErr = validateCertificationDate(cert.date);
+
+      const certErrors: any = {};
+      if (nameErr) {
+        certErrors.name = nameErr;
+        isValid = false;
+      }
+      if (issuerErr) {
+        certErrors.issuer = issuerErr;
+        isValid = false;
+      }
+      if (dateErr) {
+        certErrors.date = dateErr;
+        isValid = false;
+      }
+      if (Object.keys(certErrors).length > 0) {
+        errors.certifications[cert.id] = certErrors;
+      }
+    });
+
+    return { isValid, errors };
+  };
+
   const updatePersonalInfo = (field: string, value: string) => {
     const trimmedValue = value.trim();
     const normalizedValue = field === 'summary' ? value.trim() : trimmedValue;
@@ -428,7 +797,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
 
   // Skills
   const handleSkillsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const skillsArray = e.target.value.split(',').map(s => s.trim());
+    const skillsArray = e.target.value.split(',').map(s => s.trim()).filter(s => s !== '');
     onChange({ ...data, skills: skillsArray });
   };
 
@@ -841,18 +1210,66 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                     onRemove={() => removeItem('education', edu.id)}
                   >
                     <div className="space-y-4">
-                      <Input label="School / University" value={edu.school} onChange={e => updateItem<Education>('education', edu.id, 'school', e.target.value)} placeholder="e.g. Stanford University" />
-                      <Input label="Degree / Major" value={edu.degree} onChange={e => updateItem<Education>('education', edu.id, 'degree', e.target.value)} placeholder="e.g.g. B.S. Computer Science" />
-                      <Input label="Graduation Date" type="date" value={edu.graduationDate} onChange={e => updateItem<Education>('education', edu.id, 'graduationDate', e.target.value)} />
+                      <Input 
+                        label="School / University" 
+                        value={edu.school} 
+                        onChange={e => updateEducationItem(edu.id, 'school', e.target.value)} 
+                        onBlur={() => {
+                          setEducationErrors(prev => ({
+                            ...prev,
+                            [edu.id]: { ...prev[edu.id], school: validateEducationSchool(edu.school) }
+                          }));
+                        }}
+                        placeholder="e.g. Stanford University" 
+                        error={educationErrors[edu.id]?.school}
+                        maxLength={100}
+                      />
+                      <Input 
+                        label="Degree / Major" 
+                        value={edu.degree} 
+                        onChange={e => updateEducationItem(edu.id, 'degree', e.target.value)} 
+                        onBlur={() => {
+                          setEducationErrors(prev => ({
+                            ...prev,
+                            [edu.id]: { ...prev[edu.id], degree: validateEducationDegree(edu.degree) }
+                          }));
+                        }}
+                        placeholder="e.g. B.S. Computer Science" 
+                        error={educationErrors[edu.id]?.degree}
+                        maxLength={100}
+                      />
+                      <Input 
+                        label="Graduation Date" 
+                        type="date" 
+                        value={edu.graduationDate} 
+                        onChange={e => updateEducationItem(edu.id, 'graduationDate', e.target.value)} 
+                        onBlur={() => {
+                          setEducationErrors(prev => ({
+                            ...prev,
+                            [edu.id]: { ...prev[edu.id], graduationDate: validateEducationGraduationDate(edu.graduationDate) }
+                          }));
+                        }}
+                        error={educationErrors[edu.id]?.graduationDate}
+                      />
                       <div className="space-y-1.5">
                         <label className="block text-sm font-medium text-gray-800">Description</label>
                         <textarea 
                           className="w-full rounded-lg border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
                           rows={2}
                           value={edu.description}
-                          onChange={e => updateItem<Education>('education', edu.id, 'description', e.target.value)}
+                          onChange={e => updateEducationItem(edu.id, 'description', e.target.value)}
+                          onBlur={() => {
+                            setEducationErrors(prev => ({
+                              ...prev,
+                              [edu.id]: { ...prev[edu.id], description: validateEducationDescription(edu.description) }
+                            }));
+                          }}
                           placeholder="Academic achievements, honors, relevant coursework..."
+                          maxLength={500}
                         />
+                        {educationErrors[edu.id]?.description && (
+                          <p className="text-sm text-red-500">{educationErrors[edu.id].description}</p>
+                        )}
                         <div className="flex gap-2 mt-2">
                           <Button
                             variant="outline"
@@ -955,17 +1372,53 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                     onRemove={() => removeItem('projects', proj.id)}
                   >
                     <div className="space-y-4">
-                      <Input label="Project Name" value={proj.name} onChange={e => updateItem<Project>('projects', proj.id, 'name', e.target.value)} placeholder="e.g. E-commerce Platform" />
-                      <Input label="Link (Optional)" placeholder="github.com/project" value={proj.link} onChange={e => updateItem<Project>('projects', proj.id, 'link', e.target.value)} />
+                      <Input 
+                        label="Project Name" 
+                        value={proj.name} 
+                        onChange={e => updateProjectItem(proj.id, 'name', e.target.value)} 
+                        onBlur={() => {
+                          setProjectErrors(prev => ({
+                            ...prev,
+                            [proj.id]: { ...prev[proj.id], name: validateProjectName(proj.name) }
+                          }));
+                        }}
+                        placeholder="e.g. E-commerce Platform" 
+                        error={projectErrors[proj.id]?.name}
+                        maxLength={100}
+                      />
+                      <Input 
+                        label="Link (Optional)" 
+                        placeholder="github.com/project" 
+                        value={proj.link} 
+                        onChange={e => updateProjectItem(proj.id, 'link', e.target.value)} 
+                        onBlur={() => {
+                          setProjectErrors(prev => ({
+                            ...prev,
+                            [proj.id]: { ...prev[proj.id], link: validateProjectLink(proj.link || '') }
+                          }));
+                        }}
+                        error={projectErrors[proj.id]?.link}
+                        maxLength={255}
+                      />
                       <div className="space-y-1.5">
                         <label className="block text-sm font-medium text-gray-800">Description</label>
                         <textarea 
                           className="w-full rounded-lg border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
                           rows={2}
                           value={proj.description}
-                          onChange={e => updateItem<Project>('projects', proj.id, 'description', e.target.value)}
+                          onChange={e => updateProjectItem(proj.id, 'description', e.target.value)}
+                          onBlur={() => {
+                            setProjectErrors(prev => ({
+                              ...prev,
+                              [proj.id]: { ...prev[proj.id], description: validateProjectDescription(proj.description) }
+                            }));
+                          }}
                           placeholder="Describe your role and achievements in this project..."
+                          maxLength={500}
                         />
+                        {projectErrors[proj.id]?.description && (
+                          <p className="text-sm text-red-500">{projectErrors[proj.id].description}</p>
+                        )}
                         <div className="flex gap-2 mt-2">
                           <Button
                             variant="outline"
@@ -1024,9 +1477,47 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                     onRemove={() => removeItem('certifications', cert.id)}
                   >
                     <div className="space-y-4">
-                      <Input label="Certification Name" value={cert.name} onChange={e => updateItem<Certification>('certifications', cert.id, 'name', e.target.value)} placeholder="e.g. AWS Certified Solutions Architect" />
-                      <Input label="Issuing Organization" value={cert.issuer} onChange={e => updateItem<Certification>('certifications', cert.id, 'issuer', e.target.value)} placeholder="e.g. Amazon Web Services" />
-                      <Input label="Date" placeholder="YYYY" value={cert.date} onChange={e => updateItem<Certification>('certifications', cert.id, 'date', e.target.value)} />
+                      <Input 
+                        label="Certification Name" 
+                        value={cert.name} 
+                        onChange={e => updateCertificationItem(cert.id, 'name', e.target.value)} 
+                        onBlur={() => {
+                          setCertificationErrors(prev => ({
+                            ...prev,
+                            [cert.id]: { ...prev[cert.id], name: validateCertificationName(cert.name) }
+                          }));
+                        }}
+                        placeholder="e.g. AWS Certified Solutions Architect" 
+                        error={certificationErrors[cert.id]?.name}
+                        maxLength={100}
+                      />
+                      <Input 
+                        label="Issuing Organization" 
+                        value={cert.issuer} 
+                        onChange={e => updateCertificationItem(cert.id, 'issuer', e.target.value)} 
+                        onBlur={() => {
+                          setCertificationErrors(prev => ({
+                            ...prev,
+                            [cert.id]: { ...prev[cert.id], issuer: validateCertificationIssuer(cert.issuer) }
+                          }));
+                        }}
+                        placeholder="e.g. Amazon Web Services" 
+                        error={certificationErrors[cert.id]?.issuer}
+                        maxLength={100}
+                      />
+                      <Input 
+                        label="Date" 
+                        placeholder="YYYY" 
+                        value={cert.date} 
+                        onChange={e => updateCertificationItem(cert.id, 'date', e.target.value)} 
+                        onBlur={() => {
+                          setCertificationErrors(prev => ({
+                            ...prev,
+                            [cert.id]: { ...prev[cert.id], date: validateCertificationDate(cert.date) }
+                          }));
+                        }}
+                        error={certificationErrors[cert.id]?.date}
+                      />
                     </div>
                   </FormSection>
                 ))
@@ -1052,11 +1543,48 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                 <CheckCircle2 size={18} className="text-indigo-600" />
                 <span>All sections completed!</span>
               </div>
+              {saveError && (
+                <div className="text-red-500 text-sm flex items-center gap-1 w-full">
+                  <span>{saveError}</span>
+                </div>
+              )}
               {onSave && (
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={onSave}
+                  onClick={() => {
+                    setSaveError('');
+                    // Clean skills before saving
+                    const cleanedSkills = data.skills.filter(s => s.trim() !== '');
+                    if (cleanedSkills.length !== data.skills.length) {
+                      onChange({ ...data, skills: cleanedSkills });
+                    }
+
+                    const { isValid, errors } = validateResumeBeforeSave();
+                    
+                    if (!isValid) {
+                      setSaveError('Please fix the highlighted errors before saving your resume.');
+                      // Update all error states
+                      if (errors.personalInfo.fullName) setNameError(errors.personalInfo.fullName);
+                      if (errors.personalInfo.email) setEmailError(errors.personalInfo.email);
+                      if (errors.personalInfo.jobTitle) setJobTitleError(errors.personalInfo.jobTitle);
+                      if (errors.personalInfo.phone) setPhoneError(errors.personalInfo.phone);
+                      if (errors.personalInfo.location) setLocationError(errors.personalInfo.location);
+                      if (errors.personalInfo.linkedin) setLinkedinError(errors.personalInfo.linkedin);
+                      if (errors.personalInfo.summary) setSummaryError(errors.personalInfo.summary);
+                      
+                      setExperienceErrors(errors.experience);
+                      setEducationErrors(errors.education);
+                      setProjectErrors(errors.projects);
+                      setCertificationErrors(errors.certifications);
+                      
+                      // Scroll to first invalid section
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      return;
+                    }
+
+                    onSave();
+                  }}
                   disabled={isSaving}
                   icon={isSaving ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
                   iconPosition="left"
