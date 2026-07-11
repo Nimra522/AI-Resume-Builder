@@ -451,8 +451,9 @@ const deleteAccount = async (req, res) => {
 // 7. Authentication controllers (no token required)
 const login = async (req, res) => {
   const { email, password, twoFactorOTP } = req.body;
+  const normalizedEmail = (email || '').trim().toLowerCase();
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: normalizedEmail });
   if (!user || user.authProvider !== 'email')
     return res.status(400).json({ message: 'Invalid credentials' });
 
@@ -527,6 +528,7 @@ const login = async (req, res) => {
 
 const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
+  const normalizedEmail = (email || '').trim().toLowerCase();
 
   // Server-side validation for name
   // Validate name format: only letters and spaces, no numbers or special characters
@@ -543,7 +545,7 @@ const signup = async (req, res) => {
     return res.status(400).json({ message: 'Name must be between 2 and 50 characters' });
   }
 
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ email: normalizedEmail });
   if (existingUser)
     return res.status(400).json({ message: 'User already exists' });
 
@@ -551,7 +553,7 @@ const signup = async (req, res) => {
 
   const user = new User({
     fullName,
-    email,
+    email: normalizedEmail,
     passwordHash,
     authProvider: 'email',
   });
@@ -678,7 +680,7 @@ const googleCallback = async (req, res) => {
 
     const payload = ticket.getPayload();
     const googleUserId = payload['sub'];
-    const email = payload['email'];
+    const email = (payload['email'] || '').trim().toLowerCase();
     const emailVerified = payload['email_verified'];
 
     console.log('Google user data:', { email, emailVerified, name: payload['name'] });

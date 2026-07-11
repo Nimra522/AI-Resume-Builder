@@ -71,10 +71,27 @@ app.use(generalLimiter);
    MONGODB CONNECTION
 ======================= */
 const MONGO_URI = process.env.MONGO_URI;
+const resolveMongoDbName = () => {
+  if (!MONGO_URI) return process.env.MONGO_DB_NAME || 'resumeBuilder';
+
+  try {
+    const parsed = new URL(MONGO_URI);
+    const pathname = parsed.pathname.replace(/^\/+/, '');
+    if (pathname && pathname !== '/') {
+      return pathname.split('/')[0];
+    }
+  } catch (error) {
+    console.warn('⚠️ Could not parse MONGO_URI for database name, using fallback.', error.message);
+  }
+
+  return process.env.MONGO_DB_NAME || 'resumeBuilder';
+};
+
+const MONGO_DB_NAME = resolveMongoDbName();
 
 mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log('✅ MongoDB Connected'))
+  .connect(MONGO_URI, { dbName: MONGO_DB_NAME })
+  .then(() => console.log(`✅ MongoDB Connected to database: ${MONGO_DB_NAME}`))
   .catch((err) => console.error('❌ MongoDB Error:', err));
 
 /* =======================
