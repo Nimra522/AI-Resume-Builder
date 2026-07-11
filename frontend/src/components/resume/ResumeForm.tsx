@@ -38,6 +38,14 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
     personal: true,
   });
 
+  const [experienceErrors, setExperienceErrors] = useState<Record<string, {
+    role?: string;
+    company?: string;
+    description?: string;
+    startDate?: string;
+    endDate?: string;
+  }>>({});
+
   // AI Loading states
   const [aiLoading, setAiLoading] = useState<{
     summary: boolean;
@@ -82,6 +90,104 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
 
   const toggleSection = (id: string) => {
     setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const validateExperienceRole = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return '';
+    if (trimmedValue.length > 100) return 'Job title must be at most 100 characters.';
+    if (!/^[A-Za-z0-9 ,./#+&()-]+$/.test(trimmedValue)) {
+      return 'Use letters, numbers, spaces, hyphens, slashes, dots, plus, hash, commas, parentheses, or ampersands.';
+    }
+    return '';
+  };
+
+  const validateExperienceCompany = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return '';
+    if (trimmedValue.length > 100) return 'Company name must be at most 100 characters.';
+    if (!/^[A-Za-z0-9 .,&'()/-]+$/.test(trimmedValue)) {
+      return 'Company name contains unsupported characters.';
+    }
+    return '';
+  };
+
+  const validateExperienceDescription = (value: string) => {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+      if (value.length > 0) return 'Description cannot be empty spaces only.';
+      return '';
+    }
+    if (trimmedValue.length > 500) return 'Description must be at most 500 characters.';
+    return '';
+  };
+
+  const validateExperienceDateRange = (startDate: string, endDate: string, current: boolean) => {
+    const errors = { startDate: '', endDate: '' };
+    if (!startDate) return errors;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const start = new Date(`${startDate}T00:00:00`);
+
+    if (start > today) {
+      errors.startDate = 'Start date cannot be in the future.';
+    }
+
+    if (current || !endDate) {
+      return errors;
+    }
+
+    const end = new Date(`${endDate}T00:00:00`);
+    if (end < start) {
+      errors.endDate = 'End date cannot be before start date.';
+    }
+
+    return errors;
+  };
+
+  const updateExperienceItem = (id: string, field: keyof Experience, value: string | boolean) => {
+    const normalizedValue = field === 'role' || field === 'company'
+      ? (typeof value === 'string' ? value.trim() : value)
+      : field === 'description'
+        ? (typeof value === 'string' && value.trim() === '' ? '' : value)
+        : value;
+
+    const updatedExperience = data.experience.map(item => {
+      if (item.id !== id) return item;
+
+      if (field === 'current' && typeof normalizedValue === 'boolean' && normalizedValue) {
+        return { ...item, current: normalizedValue, endDate: '' };
+      }
+
+      return { ...item, [field]: normalizedValue };
+    });
+
+    onChange({ ...data, experience: updatedExperience });
+
+    const currentItem = updatedExperience.find(item => item.id === id);
+    if (!currentItem) return;
+
+    setExperienceErrors(prev => {
+      const nextErrors = { ...(prev[id] || {}) };
+      if (field === 'role') {
+        nextErrors.role = validateExperienceRole(currentItem.role);
+      } else if (field === 'company') {
+        nextErrors.company = validateExperienceCompany(currentItem.company);
+      } else if (field === 'description') {
+        nextErrors.description = validateExperienceDescription(currentItem.description);
+      } else if (field === 'startDate' || field === 'endDate' || field === 'current') {
+        const dateErrors = validateExperienceDateRange(
+          currentItem.startDate,
+          currentItem.current ? '' : currentItem.endDate,
+          currentItem.current
+        );
+        nextErrors.startDate = dateErrors.startDate;
+        nextErrors.endDate = dateErrors.endDate;
+      }
+
+      return { ...prev, [id]: nextErrors };
+    });
   };
 
   // Step navigation functions
@@ -301,10 +407,18 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
   };
 
   const addItem = (section: keyof ResumeData, newItem: any) => {
-    // @ts-ignore
-    onChange({ ...data, [section]: [newItem, ...data[section]] });
-    // Open the new item immediately
+    const nextItems = [newItem, ...(data[section] as unknown as any[])];
+    onChange({ ...data, [section]: nextItems });
     setOpenSections(prev => ({ ...prev, [newItem.id]: true }));
+
+    if (section === 'experience') {
+      window.setTimeout(() => {
+        document.getElementById(`experience-section-${newItem.id}`)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 120);
+    }
   };
 
   const removeItem = (section: keyof ResumeData, id: string) => {
@@ -587,63 +701,101 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                 </div>
               ) : (
                 data.experience.map((exp) => (
-                  <FormSection
-                    key={exp.id}
-                    title={exp.company || 'Add Company'}
-                    subtitle={exp.role}
-                    isOpen={!!openSections[exp.id]}
-                    onToggle={() => toggleSection(exp.id)}
-                    onRemove={() => removeItem('experience', exp.id)}
-                  >
-                    <div className="space-y-4">
-                      <Input label="Job Title" value={exp.role} onChange={e => updateItem<Experience>('experience', exp.id, 'role', e.target.value)} placeholder="e.g. Software Engineer" />
-                      <Input label="Company" value={exp.company} onChange={e => updateItem<Experience>('experience', exp.id, 'company', e.target.value)} placeholder="e.g. Google" />
-                      <div className="grid grid-cols-2 gap-4">
-                        <Input label="Start Date" type="date" value={exp.startDate} onChange={e => updateItem<Experience>('experience', exp.id, 'startDate', e.target.value)} />
-                        <Input label="End Date" type="date" disabled={exp.current} value={exp.endDate} onChange={e => updateItem<Experience>('experience', exp.id, 'endDate', e.target.value)} />
-                      </div>
-                      <div className="flex items-center gap-2">
-                          <input 
-                          type="checkbox" 
-                          id={`current-${exp.id}`}
-                          checked={exp.current}
-                          onChange={e => updateBooleanItem<Experience>('experience', exp.id, 'current', e.target.checked)}
-                          className="rounded text-indigo-600 focus:ring-indigo-600 w-4 h-4"
-                          />
-                          <label htmlFor={`current-${exp.id}`} className="text-sm text-gray-800">I currently work here</label>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="block text-sm font-medium text-gray-800">Description</label>
-                        <textarea 
-                          className="w-full rounded-lg border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
-                          rows={4}
-                          value={exp.description}
-                          onChange={e => updateItem<Experience>('experience', exp.id, 'description', e.target.value)}
-                          placeholder="• Achieved X by doing Y..."
+                  <div key={exp.id} id={`experience-section-${exp.id}`}>
+                    <FormSection
+                      title={exp.company || 'Add Company'}
+                      subtitle={exp.role}
+                      isOpen={!!openSections[exp.id]}
+                      onToggle={() => toggleSection(exp.id)}
+                      onRemove={() => {
+                        if (window.confirm('Are you sure you want to remove this experience?')) {
+                          removeItem('experience', exp.id);
+                        }
+                      }}
+                    >
+                      <div className="space-y-4">
+                        <Input
+                          label="Job Title"
+                          value={exp.role}
+                          error={experienceErrors[exp.id]?.role || ''}
+                          onChange={e => updateExperienceItem(exp.id, 'role', e.target.value)}
+                          placeholder="e.g. Software Engineer"
                         />
-                        <div className="flex gap-2 mt-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => generateExperienceDescription(exp.id, exp.role, exp.company)}
-                            disabled={!exp.role || !exp.company || aiLoading.experiences[exp.id]}
-                            icon={aiLoading.experiences[exp.id] ? <Loader2 className="animate-spin" size={16} /> : <Sparkles size={16} />}
-                          >
-                            {aiLoading.experiences[exp.id] ? 'Generating...' : 'Generate Description'}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => improveText('experience', exp.description, exp.id)}
-                            disabled={!exp.description}
-                          >
-                            Improve with AI
-                          </Button>
+                        <Input
+                          label="Company"
+                          value={exp.company}
+                          error={experienceErrors[exp.id]?.company || ''}
+                          onChange={e => updateExperienceItem(exp.id, 'company', e.target.value)}
+                          placeholder="e.g. Google"
+                        />
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                          <Input
+                            label="Start Date"
+                            type="date"
+                            value={exp.startDate}
+                            error={experienceErrors[exp.id]?.startDate || ''}
+                            onChange={e => updateExperienceItem(exp.id, 'startDate', e.target.value)}
+                          />
+                          <Input
+                            label="End Date"
+                            type="date"
+                            disabled={exp.current}
+                            value={exp.endDate}
+                            error={experienceErrors[exp.id]?.endDate || ''}
+                            onChange={e => updateExperienceItem(exp.id, 'endDate', e.target.value)}
+                          />
                         </div>
+                        <div className="flex items-center gap-2">
+                            <input 
+                            type="checkbox" 
+                            id={`current-${exp.id}`}
+                            checked={exp.current}
+                            onChange={e => updateExperienceItem(exp.id, 'current', e.target.checked)}
+                            className="rounded text-indigo-600 focus:ring-indigo-600 w-4 h-4"
+                            />
+                            <label htmlFor={`current-${exp.id}`} className="text-sm text-gray-800">I currently work here</label>
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="block text-sm font-medium text-gray-800">Description</label>
+                          <textarea 
+                            className="w-full rounded-lg border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                            rows={4}
+                            value={exp.description}
+                            maxLength={500}
+                            onChange={e => updateExperienceItem(exp.id, 'description', e.target.value)}
+                            placeholder="• Developed responsive web applications using React
+• Improved application performance by 30%"
+                          />
+                          <div className="flex items-center justify-between gap-2 text-sm">
+                            <span className="text-red-500">{experienceErrors[exp.id]?.description || ''}</span>
+                            <span className={`${exp.description.length > 500 ? 'text-red-500' : 'text-gray-500'}`}>
+                              {exp.description.length}/500
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => generateExperienceDescription(exp.id, exp.role, exp.company)}
+                              disabled={!exp.role.trim() || !exp.company.trim() || aiLoading.experiences[exp.id]}
+                              icon={aiLoading.experiences[exp.id] ? <Loader2 className="animate-spin" size={16} /> : <Sparkles size={16} />}
+                            >
+                              {aiLoading.experiences[exp.id] ? 'Generating...' : 'Generate Description'}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => improveText('experience', exp.description, exp.id)}
+                              disabled={!exp.role.trim() || !exp.company.trim() || !exp.description.trim()}
+                            >
+                              Improve with AI
+                            </Button>
+                          </div>
 
+                        </div>
                       </div>
-                    </div>
-                  </FormSection>
+                    </FormSection>
+                  </div>
                 ))
               )}
             </div>
