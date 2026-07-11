@@ -6,7 +6,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const session = require('express-session');
 const MongoStore = require('connect-mongo').default;
-const path = require('path');
 const { generalLimiter, authLimiter, passwordResetLimiter } = require('./middleware/rateLimiter');
 
 const authRoutes = require('./routes/auth');
@@ -18,6 +17,7 @@ const resumeRoutes = require('./routes/resume');
 const aiRoutes = require('./routes/ai');
 
 const app = express();
+app.set('trust proxy', 1);
 
 /* =======================
    BASIC CONFIG
@@ -47,7 +47,13 @@ app.use(session({
 }));
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:8080', 'http://localhost:3001', 'http://localhost:3000'],
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:8080',
+    'http://localhost:3001',
+    'http://localhost:3000',
+    'https://resumecraft-taupe.vercel.app'
+  ],
   credentials: true
 }));
 // Avoid JSON parsing for Stripe webhook to preserve raw body
@@ -91,15 +97,13 @@ app.use('/api/ai', aiRoutes);
 
 
 /* =======================
-   SERVE STATIC FILES
+   API HEALTH CHECK
 ======================= */
-// Serve static files from the frontend build directory
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-// Catch-all route to serve the frontend for all non-API routes
-// This must come AFTER API routes to avoid interfering with API requests
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Resume Builder API is running'
+  });
 });
 
 /* =======================
