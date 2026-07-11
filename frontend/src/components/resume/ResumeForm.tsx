@@ -9,6 +9,7 @@ import { useClickOutside } from '../../hooks/useClickOutside';
 
 import { useAuth } from '../../context/AuthContext';
 import { apiUrl } from '../../utils/api';
+import * as resumeValidation from '../../utils/resumeValidation';
 
 interface ResumeFormProps {
   data: ResumeData;
@@ -113,60 +114,6 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
     setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const validateExperienceRole = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return '';
-    if (trimmedValue.length > 100) return 'Job title must be at most 100 characters.';
-    if (!/^[A-Za-z0-9 ,./#+&()-]+$/.test(trimmedValue)) {
-      return 'Use letters, numbers, spaces, hyphens, slashes, dots, plus, hash, commas, parentheses, or ampersands.';
-    }
-    return '';
-  };
-
-  const validateExperienceCompany = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return '';
-    if (trimmedValue.length > 100) return 'Company name must be at most 100 characters.';
-    if (!/^[A-Za-z0-9 .,&'()/-]+$/.test(trimmedValue)) {
-      return 'Company name contains unsupported characters.';
-    }
-    return '';
-  };
-
-  const validateExperienceDescription = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) {
-      if (value.length > 0) return 'Description cannot be empty spaces only.';
-      return '';
-    }
-    if (trimmedValue.length > 500) return 'Description must be at most 500 characters.';
-    return '';
-  };
-
-  const validateExperienceDateRange = (startDate: string, endDate: string, current: boolean) => {
-    const errors = { startDate: '', endDate: '' };
-    if (!startDate) return errors;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const start = new Date(`${startDate}T00:00:00`);
-
-    if (start > today) {
-      errors.startDate = 'Start date cannot be in the future.';
-    }
-
-    if (current || !endDate) {
-      return errors;
-    }
-
-    const end = new Date(`${endDate}T00:00:00`);
-    if (end < start) {
-      errors.endDate = 'End date cannot be before start date.';
-    }
-
-    return errors;
-  };
-
   const updateExperienceItem = (id: string, field: keyof Experience, value: string | boolean) => {
     const normalizedValue = field === 'role' || field === 'company'
       ? (typeof value === 'string' ? value.trim() : value)
@@ -192,13 +139,13 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
     setExperienceErrors(prev => {
       const nextErrors = { ...(prev[id] || {}) };
       if (field === 'role') {
-        nextErrors.role = validateExperienceRole(currentItem.role);
+        nextErrors.role = resumeValidation.validateExperienceRole(currentItem.role);
       } else if (field === 'company') {
-        nextErrors.company = validateExperienceCompany(currentItem.company);
+        nextErrors.company = resumeValidation.validateExperienceCompany(currentItem.company);
       } else if (field === 'description') {
-        nextErrors.description = validateExperienceDescription(currentItem.description);
+        nextErrors.description = resumeValidation.validateExperienceDescription(currentItem.description);
       } else if (field === 'startDate' || field === 'endDate' || field === 'current') {
-        const dateErrors = validateExperienceDateRange(
+        const dateErrors = resumeValidation.validateExperienceDateRange(
           currentItem.startDate,
           currentItem.current ? '' : currentItem.endDate,
           currentItem.current
@@ -225,13 +172,13 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
     setEducationErrors(prev => {
       const nextErrors = { ...(prev[id] || {}) };
       if (field === 'school') {
-        nextErrors.school = validateEducationSchool(currentItem.school);
+        nextErrors.school = resumeValidation.validateEducationSchool(currentItem.school);
       } else if (field === 'degree') {
-        nextErrors.degree = validateEducationDegree(currentItem.degree);
+        nextErrors.degree = resumeValidation.validateEducationDegree(currentItem.degree);
       } else if (field === 'graduationDate') {
-        nextErrors.graduationDate = validateEducationGraduationDate(currentItem.graduationDate);
+        nextErrors.graduationDate = resumeValidation.validateEducationGraduationDate(currentItem.graduationDate);
       } else if (field === 'description') {
-        nextErrors.description = validateEducationDescription(currentItem.description);
+        nextErrors.description = resumeValidation.validateEducationDescription(currentItem.description);
       }
       return { ...prev, [id]: nextErrors };
     });
@@ -251,11 +198,11 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
     setProjectErrors(prev => {
       const nextErrors = { ...(prev[id] || {}) };
       if (field === 'name') {
-        nextErrors.name = validateProjectName(currentItem.name);
+        nextErrors.name = resumeValidation.validateProjectName(currentItem.name);
       } else if (field === 'link') {
-        nextErrors.link = validateProjectLink(currentItem.link || '');
+        nextErrors.link = resumeValidation.validateProjectLink(currentItem.link || '');
       } else if (field === 'description') {
-        nextErrors.description = validateProjectDescription(currentItem.description);
+        nextErrors.description = resumeValidation.validateProjectDescription(currentItem.description);
       }
       return { ...prev, [id]: nextErrors };
     });
@@ -275,11 +222,11 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
     setCertificationErrors(prev => {
       const nextErrors = { ...(prev[id] || {}) };
       if (field === 'name') {
-        nextErrors.name = validateCertificationName(currentItem.name);
+        nextErrors.name = resumeValidation.validateCertificationName(currentItem.name);
       } else if (field === 'issuer') {
-        nextErrors.issuer = validateCertificationIssuer(currentItem.issuer);
+        nextErrors.issuer = resumeValidation.validateCertificationIssuer(currentItem.issuer);
       } else if (field === 'date') {
-        nextErrors.date = validateCertificationDate(currentItem.date);
+        nextErrors.date = resumeValidation.validateCertificationDate(currentItem.date);
       }
       return { ...prev, [id]: nextErrors };
     });
@@ -288,7 +235,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
   // Step navigation functions
   const goToNextStep = () => {
     if (currentStep === 1) {
-      const fullNameError = validateFullName(data.personalInfo.fullName.trim());
+      const fullNameError = resumeValidation.validateFullName(data.personalInfo.fullName.trim());
       setNameError(fullNameError);
       if (fullNameError) {
         return;
@@ -310,7 +257,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
 
   const goToStep = (step: number) => {
     if (currentStep === 1 && step > currentStep) {
-      const fullNameError = validateFullName(data.personalInfo.fullName.trim());
+      const fullNameError = resumeValidation.validateFullName(data.personalInfo.fullName.trim());
       setNameError(fullNameError);
       if (fullNameError) {
         return;
@@ -348,375 +295,26 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
     setShowLocationSuggestions(false);
   });
   
-  const validateFullName = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return 'Full name is required.';
-    if (trimmedValue.length < 2) return 'Full name must be at least 2 characters.';
-    if (trimmedValue.length > 100) return 'Full name must be at most 100 characters.';
-    if (!/^[\p{L}\s.'-]+$/u.test(trimmedValue)) {
-      return 'Use letters, spaces, hyphens, apostrophes, or periods only.';
-    }
-    return '';
-  };
 
-  const validateJobTitle = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return '';
-    if (trimmedValue.length > 100) return 'Job title must be at most 100 characters.';
-    if (!/^[A-Za-z0-9 ,./#+&()-]+$/.test(trimmedValue)) {
-      return 'Use letters, numbers, spaces, hyphens, slashes, dots, plus, hash, commas, parentheses, or ampersands.';
-    }
-    return '';
-  };
-
-  const validateEmail = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return '';
-    if (trimmedValue.length > 254) return 'Email must be at most 254 characters.';
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(trimmedValue)) {
-      return 'Please enter a valid email address.';
-    }
-    return '';
-  };
-
-  const validatePhone = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return '';
-    if (trimmedValue.length > 30) return 'Phone number must be at most 30 characters.';
-    if (!/^[0-9 +().-]+$/.test(trimmedValue)) {
-      return 'Use numbers, spaces, plus, hyphens, or parentheses only.';
-    }
-    return '';
-  };
-
-  const validateLocation = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return '';
-    if (trimmedValue.length > 100) return 'Location must be at most 100 characters.';
-    return '';
-  };
-
-  const validateLinkedin = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return '';
-    if (trimmedValue.length > 255) return 'Link must be at most 255 characters.';
-
-    let urlToTest = trimmedValue;
-    if (!/^https?:\/\//i.test(trimmedValue) && !trimmedValue.startsWith('www.')) {
-      urlToTest = `https://${trimmedValue}`;
-    }
-
-    try {
-      const url = new URL(urlToTest);
-      if (!url.hostname.includes('.')) {
-        throw new Error('Invalid hostname');
-      }
-      return '';
-    } catch {
-      return 'Please enter a valid website or profile URL.';
-    }
-  };
-
-  const validateSummary = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return '';
-    if (trimmedValue.length > 1000) return 'Professional summary must be at most 1000 characters.';
-    return '';
-  };
-
-  // --- Education Validation ---
-  const validateEducationSchool = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return 'School / University is required.';
-    if (trimmedValue.length > 100) return 'School name must be at most 100 characters.';
-    return '';
-  };
-
-  const validateEducationDegree = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return 'Degree / Major is required.';
-    if (trimmedValue.length > 100) return 'Degree must be at most 100 characters.';
-    return '';
-  };
-
-  const validateEducationGraduationDate = (value: string) => {
-    if (!value) return '';
-    const date = new Date(value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (isNaN(date.getTime())) return 'Invalid date format.';
-    if (date > today) return 'Graduation date cannot be in the future.';
-    return '';
-  };
-
-  const validateEducationDescription = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return '';
-    if (trimmedValue.length > 500) return 'Description must be at most 500 characters.';
-    return '';
-  };
-
-  // --- Projects Validation ---
-  const validateProjectName = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return 'Project name is required.';
-    if (trimmedValue.length > 100) return 'Project name must be at most 100 characters.';
-    return '';
-  };
-
-  const validateProjectLink = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return '';
-    if (trimmedValue.length > 255) return 'Link must be at most 255 characters.';
-    let urlToTest = trimmedValue;
-    if (!/^https?:\/\//i.test(trimmedValue) && !trimmedValue.startsWith('www.')) {
-      urlToTest = `https://${trimmedValue}`;
-    }
-    try {
-      new URL(urlToTest);
-      return '';
-    } catch {
-      return 'Please enter a valid URL.';
-    }
-  };
-
-  const validateProjectDescription = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return '';
-    if (trimmedValue.length > 500) return 'Description must be at most 500 characters.';
-    return '';
-  };
-
-  // --- Certifications Validation ---
-  const validateCertificationName = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return 'Certification name is required.';
-    if (trimmedValue.length > 100) return 'Certification name must be at most 100 characters.';
-    return '';
-  };
-
-  const validateCertificationIssuer = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return 'Issuing organization is required.';
-    if (trimmedValue.length > 100) return 'Issuer name must be at most 100 characters.';
-    return '';
-  };
-
-  const validateCertificationDate = (value: string) => {
-    const trimmedValue = value.trim();
-    if (!trimmedValue) return '';
-    // Check if it's a valid year (4 digits)
-    if (!/^\d{4}$/.test(trimmedValue)) {
-      return 'Please enter a valid year (e.g. 2023).';
-    }
-    const year = parseInt(trimmedValue);
-    const currentYear = new Date().getFullYear();
-    if (year > currentYear) return 'Year cannot be in the future.';
-    return '';
-  };
-
-  // --- Centralized Save Validation ---
-  interface ValidationErrors {
-    personalInfo: {
-      fullName?: string;
-      email?: string;
-      jobTitle?: string;
-      phone?: string;
-      location?: string;
-      linkedin?: string;
-      summary?: string;
-    };
-    experience: Record<string, any>;
-    education: Record<string, any>;
-    projects: Record<string, any>;
-    certifications: Record<string, any>;
-  }
-
-  const validateResumeBeforeSave = (): { isValid: boolean; errors: ValidationErrors } => {
-    const errors: ValidationErrors = {
-      personalInfo: {},
-      experience: {},
-      education: {},
-      projects: {},
-      certifications: {},
-    };
-    let isValid = true;
-
-    // Validate Personal Info
-    const nameErr = validateFullName(data.personalInfo.fullName);
-    if (nameErr) {
-      errors.personalInfo.fullName = nameErr;
-      isValid = false;
-    }
-    const emailErr = validateEmail(data.personalInfo.email);
-    if (emailErr) {
-      errors.personalInfo.email = emailErr;
-      isValid = false;
-    }
-    const jobTitleErr = validateJobTitle(data.personalInfo.jobTitle);
-    if (jobTitleErr) {
-      errors.personalInfo.jobTitle = jobTitleErr;
-      isValid = false;
-    }
-    const phoneErr = validatePhone(data.personalInfo.phone);
-    if (phoneErr) {
-      errors.personalInfo.phone = phoneErr;
-      isValid = false;
-    }
-    const locationErr = validateLocation(data.personalInfo.location);
-    if (locationErr) {
-      errors.personalInfo.location = locationErr;
-      isValid = false;
-    }
-    const linkedinErr = validateLinkedin(data.personalInfo.linkedin);
-    if (linkedinErr) {
-      errors.personalInfo.linkedin = linkedinErr;
-      isValid = false;
-    }
-    const summaryErr = validateSummary(data.personalInfo.summary);
-    if (summaryErr) {
-      errors.personalInfo.summary = summaryErr;
-      isValid = false;
-    }
-
-    // Validate Experience
-    data.experience.forEach(exp => {
-      const roleErr = validateExperienceRole(exp.role);
-      const companyErr = validateExperienceCompany(exp.company);
-      const descErr = validateExperienceDescription(exp.description);
-      const dateErrs = validateExperienceDateRange(exp.startDate, exp.current ? '' : exp.endDate, exp.current);
-      
-      const expErrors: any = {};
-      if (roleErr) {
-        expErrors.role = roleErr;
-        isValid = false;
-      }
-      if (companyErr) {
-        expErrors.company = companyErr;
-        isValid = false;
-      }
-      if (!exp.startDate) {
-        expErrors.startDate = 'Start date is required.';
-        isValid = false;
-      } else if (dateErrs.startDate) {
-        expErrors.startDate = dateErrs.startDate;
-        isValid = false;
-      }
-      if (!exp.current && !exp.endDate) {
-        expErrors.endDate = 'End date is required if not currently working.';
-        isValid = false;
-      } else if (dateErrs.endDate) {
-        expErrors.endDate = dateErrs.endDate;
-        isValid = false;
-      }
-      if (descErr) {
-        expErrors.description = descErr;
-        isValid = false;
-      }
-      if (Object.keys(expErrors).length > 0) {
-        errors.experience[exp.id] = expErrors;
-      }
-    });
-
-    // Validate Education
-    data.education.forEach(edu => {
-      const schoolErr = validateEducationSchool(edu.school);
-      const degreeErr = validateEducationDegree(edu.degree);
-      const dateErr = validateEducationGraduationDate(edu.graduationDate);
-      const descErr = validateEducationDescription(edu.description);
-
-      const eduErrors: any = {};
-      if (schoolErr) {
-        eduErrors.school = schoolErr;
-        isValid = false;
-      }
-      if (degreeErr) {
-        eduErrors.degree = degreeErr;
-        isValid = false;
-      }
-      if (dateErr) {
-        eduErrors.graduationDate = dateErr;
-        isValid = false;
-      }
-      if (descErr) {
-        eduErrors.description = descErr;
-        isValid = false;
-      }
-      if (Object.keys(eduErrors).length > 0) {
-        errors.education[edu.id] = eduErrors;
-      }
-    });
-
-    // Validate Projects
-    data.projects.forEach(proj => {
-      const nameErr = validateProjectName(proj.name);
-      const linkErr = validateProjectLink(proj.link || '');
-      const descErr = validateProjectDescription(proj.description);
-
-      const projErrors: any = {};
-      if (nameErr) {
-        projErrors.name = nameErr;
-        isValid = false;
-      }
-      if (linkErr) {
-        projErrors.link = linkErr;
-        isValid = false;
-      }
-      if (descErr) {
-        projErrors.description = descErr;
-        isValid = false;
-      }
-      if (Object.keys(projErrors).length > 0) {
-        errors.projects[proj.id] = projErrors;
-      }
-    });
-
-    // Validate Certifications
-    data.certifications.forEach(cert => {
-      const nameErr = validateCertificationName(cert.name);
-      const issuerErr = validateCertificationIssuer(cert.issuer);
-      const dateErr = validateCertificationDate(cert.date);
-
-      const certErrors: any = {};
-      if (nameErr) {
-        certErrors.name = nameErr;
-        isValid = false;
-      }
-      if (issuerErr) {
-        certErrors.issuer = issuerErr;
-        isValid = false;
-      }
-      if (dateErr) {
-        certErrors.date = dateErr;
-        isValid = false;
-      }
-      if (Object.keys(certErrors).length > 0) {
-        errors.certifications[cert.id] = certErrors;
-      }
-    });
-
-    return { isValid, errors };
-  };
 
   const updatePersonalInfo = (field: string, value: string) => {
     const trimmedValue = value.trim();
     const normalizedValue = field === 'summary' ? value.trim() : trimmedValue;
 
     if (field === 'fullName') {
-      setNameError(value ? validateFullName(normalizedValue) : '');
+      setNameError(value ? resumeValidation.validateFullName(normalizedValue) : '');
     } else if (field === 'jobTitle') {
-      setJobTitleError(validateJobTitle(normalizedValue));
+      setJobTitleError(resumeValidation.validateJobTitle(normalizedValue));
     } else if (field === 'email') {
-      setEmailError(validateEmail(normalizedValue));
+      setEmailError(resumeValidation.validateEmail(normalizedValue));
     } else if (field === 'phone') {
-      setPhoneError(validatePhone(normalizedValue));
+      setPhoneError(resumeValidation.validatePhone(normalizedValue));
     } else if (field === 'location') {
-      setLocationError(validateLocation(normalizedValue));
+      setLocationError(resumeValidation.validateLocation(normalizedValue));
     } else if (field === 'linkedin') {
-      setLinkedinError(validateLinkedin(normalizedValue));
+      setLinkedinError(resumeValidation.validateLinkedin(normalizedValue));
     } else if (field === 'summary') {
-      setSummaryError(validateSummary(normalizedValue));
+      setSummaryError(resumeValidation.validateSummary(normalizedValue));
     }
 
     onChange({
@@ -726,29 +324,29 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
   };
 
   const handleFullNameBlur = (value: string) => {
-    setNameError(validateFullName(value.trim()));
+    setNameError(resumeValidation.validateFullName(value.trim()));
   };
 
   // Handle phone validation on blur
   const handlePhoneBlur = (value: string) => {
-    setPhoneError(validatePhone(value.trim()));
+    setPhoneError(resumeValidation.validatePhone(value.trim()));
   };
   
   // Handle email validation on blur
   const handleEmailBlur = (value: string) => {
-    setEmailError(validateEmail(value.trim()));
+    setEmailError(resumeValidation.validateEmail(value.trim()));
   };
 
   const handleLinkedinBlur = (value: string) => {
-    setLinkedinError(validateLinkedin(value.trim()));
+    setLinkedinError(resumeValidation.validateLinkedin(value.trim()));
   };
 
   const handleLocationBlur = (value: string) => {
-    setLocationError(validateLocation(value.trim()));
+    setLocationError(resumeValidation.validateLocation(value.trim()));
   };
 
   const handleSummaryBlur = (value: string) => {
-    setSummaryError(validateSummary(value.trim()));
+    setSummaryError(resumeValidation.validateSummary(value.trim()));
   };
 
 // Generic handler for array updates (Experience, Education, Projects, Certs)
@@ -915,7 +513,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                   label="Job Title"
                   value={data.personalInfo.jobTitle} 
                   onChange={e => updatePersonalInfo('jobTitle', e.target.value)} 
-                  onBlur={(e) => setJobTitleError(validateJobTitle(e.target.value.trim()))}
+                  onBlur={(e) => setJobTitleError(resumeValidation.validateJobTitle(e.target.value.trim()))}
                   placeholder="e.g. Software Engineer"
                   error={jobTitleError}
                   maxLength={100}
@@ -1217,7 +815,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                         onBlur={() => {
                           setEducationErrors(prev => ({
                             ...prev,
-                            [edu.id]: { ...prev[edu.id], school: validateEducationSchool(edu.school) }
+                            [edu.id]: { ...prev[edu.id], school: resumeValidation.validateEducationSchool(edu.school) }
                           }));
                         }}
                         placeholder="e.g. Stanford University" 
@@ -1231,7 +829,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                         onBlur={() => {
                           setEducationErrors(prev => ({
                             ...prev,
-                            [edu.id]: { ...prev[edu.id], degree: validateEducationDegree(edu.degree) }
+                            [edu.id]: { ...prev[edu.id], degree: resumeValidation.validateEducationDegree(edu.degree) }
                           }));
                         }}
                         placeholder="e.g. B.S. Computer Science" 
@@ -1246,7 +844,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                         onBlur={() => {
                           setEducationErrors(prev => ({
                             ...prev,
-                            [edu.id]: { ...prev[edu.id], graduationDate: validateEducationGraduationDate(edu.graduationDate) }
+                            [edu.id]: { ...prev[edu.id], graduationDate: resumeValidation.validateEducationGraduationDate(edu.graduationDate) }
                           }));
                         }}
                         error={educationErrors[edu.id]?.graduationDate}
@@ -1261,7 +859,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                           onBlur={() => {
                             setEducationErrors(prev => ({
                               ...prev,
-                              [edu.id]: { ...prev[edu.id], description: validateEducationDescription(edu.description) }
+                              [edu.id]: { ...prev[edu.id], description: resumeValidation.validateEducationDescription(edu.description) }
                             }));
                           }}
                           placeholder="Academic achievements, honors, relevant coursework..."
@@ -1379,7 +977,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                         onBlur={() => {
                           setProjectErrors(prev => ({
                             ...prev,
-                            [proj.id]: { ...prev[proj.id], name: validateProjectName(proj.name) }
+                            [proj.id]: { ...prev[proj.id], name: resumeValidation.validateProjectName(proj.name) }
                           }));
                         }}
                         placeholder="e.g. E-commerce Platform" 
@@ -1394,7 +992,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                         onBlur={() => {
                           setProjectErrors(prev => ({
                             ...prev,
-                            [proj.id]: { ...prev[proj.id], link: validateProjectLink(proj.link || '') }
+                            [proj.id]: { ...prev[proj.id], link: resumeValidation.validateProjectLink(proj.link || '') }
                           }));
                         }}
                         error={projectErrors[proj.id]?.link}
@@ -1410,7 +1008,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                           onBlur={() => {
                             setProjectErrors(prev => ({
                               ...prev,
-                              [proj.id]: { ...prev[proj.id], description: validateProjectDescription(proj.description) }
+                              [proj.id]: { ...prev[proj.id], description: resumeValidation.validateProjectDescription(proj.description) }
                             }));
                           }}
                           placeholder="Describe your role and achievements in this project..."
@@ -1484,7 +1082,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                         onBlur={() => {
                           setCertificationErrors(prev => ({
                             ...prev,
-                            [cert.id]: { ...prev[cert.id], name: validateCertificationName(cert.name) }
+                            [cert.id]: { ...prev[cert.id], name: resumeValidation.validateCertificationName(cert.name) }
                           }));
                         }}
                         placeholder="e.g. AWS Certified Solutions Architect" 
@@ -1498,7 +1096,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                         onBlur={() => {
                           setCertificationErrors(prev => ({
                             ...prev,
-                            [cert.id]: { ...prev[cert.id], issuer: validateCertificationIssuer(cert.issuer) }
+                            [cert.id]: { ...prev[cert.id], issuer: resumeValidation.validateCertificationIssuer(cert.issuer) }
                           }));
                         }}
                         placeholder="e.g. Amazon Web Services" 
@@ -1513,7 +1111,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                         onBlur={() => {
                           setCertificationErrors(prev => ({
                             ...prev,
-                            [cert.id]: { ...prev[cert.id], date: validateCertificationDate(cert.date) }
+                            [cert.id]: { ...prev[cert.id], date: resumeValidation.validateCertificationDate(cert.date) }
                           }));
                         }}
                         error={certificationErrors[cert.id]?.date}
@@ -1560,7 +1158,7 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                       onChange({ ...data, skills: cleanedSkills });
                     }
 
-                    const { isValid, errors } = validateResumeBeforeSave();
+                    const { isValid, errors } = resumeValidation.validateResumeBeforeSave(data);
                     
                     if (!isValid) {
                       setSaveError('Please fix the highlighted errors before saving your resume.');

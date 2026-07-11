@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Resume = require('../models/Resume');
 const authenticateToken = require('../middleware/auth');
+const { validateResumeBeforeSave } = require('../utils/resumeValidation');
 const router = express.Router();
 
 const isValidResumeId = (id) => typeof id === 'string' && mongoose.Types.ObjectId.isValid(id);
@@ -13,6 +14,15 @@ router.post('/save', authenticateToken, async (req, res) => {
     // Validate required title
     if (!title || !title.trim()) {
       return res.status(400).json({ message: 'Resume title is required' });
+    }
+
+    // Validate resume data
+    if (!data) {
+      return res.status(400).json({ message: 'Resume data is required' });
+    }
+    const { isValid } = validateResumeBeforeSave(data);
+    if (!isValid) {
+      return res.status(400).json({ message: 'Please fix the errors in your resume before saving' });
     }
     
     const userId = req.user.id;

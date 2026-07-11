@@ -14,6 +14,7 @@ import { useLocation } from '../components/layout/Navbar';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { apiUrl } from '../utils/api';
+import * as resumeValidation from '../utils/resumeValidation';
 
 export const ResumeBuilder: React.FC = () => {
   const [resumeData, setResumeData] = useState<ResumeData>(INITIAL_RESUME_DATA);
@@ -253,6 +254,13 @@ export const ResumeBuilder: React.FC = () => {
       return;
     }
     setTitleError('');
+
+    // Validate resume data
+    const { isValid } = resumeValidation.validateResumeBeforeSave(resumeData);
+    if (!isValid) {
+      addNotification('Please fix the highlighted errors before saving your resume.', 'error');
+      return;
+    }
     
     setIsSaving(true);
     
