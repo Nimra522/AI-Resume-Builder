@@ -573,7 +573,7 @@ const signup = async (req, res) => {
 
 const googleLoginStart = (req, res) => {
   const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-  const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:8080/api/auth/google/callback';
+  const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || `${process.env.BACKEND_URL || 'https://ai-resume-builder-production-25cb.up.railway.app'}/api/auth/google/callback`;
   
   // Generate a random state parameter for CSRF protection
   const state = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -609,8 +609,8 @@ const googleLoginStart = (req, res) => {
 const googleCallback = async (req, res) => {
   const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
   const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-  const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:8080/api/auth/google/callback';
-  const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || `${process.env.BACKEND_URL || 'https://ai-resume-builder-production-25cb.up.railway.app'}/api/auth/google/callback`;
+  const FRONTEND_URL = process.env.FRONTEND_URL || 'https://resumecraft-taupe.vercel.app';
   
   const code = req.query.code;
   const receivedState = req.query.state; // Get the state parameter from Google callback

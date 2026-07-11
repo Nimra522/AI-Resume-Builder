@@ -1,4 +1,5 @@
 const DEFAULT_LOCAL_API_BASE = 'http://localhost:8080';
+const DEFAULT_PRODUCTION_API_BASE = 'https://ai-resume-builder-production-25cb.up.railway.app';
 
 export const getApiBaseUrl = (): string => {
   const configured = (import.meta.env.VITE_API_URL || '').trim();
@@ -10,6 +11,10 @@ export const getApiBaseUrl = (): string => {
 
   if (configured) {
     return configured.replace(/\/+$/, '');
+  }
+
+  if (typeof window !== 'undefined' && window.location.hostname.endsWith('vercel.app')) {
+    return DEFAULT_PRODUCTION_API_BASE;
   }
 
   return DEFAULT_LOCAL_API_BASE;
