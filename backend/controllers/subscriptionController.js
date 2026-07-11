@@ -114,8 +114,8 @@ const createCheckoutSession = async (req, res) => {
         price: priceId,
         quantity: 1,
       }],
-      success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/pricing`,
+      success_url: `${process.env.FRONTEND_URL || 'https://resumecraft-taupe.vercel.app'}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL || 'https://resumecraft-taupe.vercel.app'}/pricing`,
       metadata: {
         userId: user._id.toString(),
         plan: normalizedPlan,

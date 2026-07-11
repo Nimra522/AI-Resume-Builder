@@ -808,8 +808,8 @@ const createCheckoutSession = async (req, res) => {
         quantity: 1,
       }],
       mode: 'payment',
-      success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/#/payment-success`,
-      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/#/payment-cancel`,
+      success_url: `${process.env.FRONTEND_URL || 'https://resumecraft-taupe.vercel.app'}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL || 'https://resumecraft-taupe.vercel.app'}/pricing`,
       metadata: {
         userId: userId,
         plan: plan  // Include the plan information in metadata
@@ -818,8 +818,8 @@ const createCheckoutSession = async (req, res) => {
 
     console.log('Stripe session created successfully:', session.id);
     console.log('Full session object:', JSON.stringify(session, null, 2));
-    console.log('Success URL being sent to Stripe:', `${process.env.FRONTEND_URL || 'http://localhost:3000'}/#/payment-success`);
-    console.log('Cancel URL being sent to Stripe:', `${process.env.FRONTEND_URL || 'http://localhost:3000'}/#/payment-cancel`);
+    console.log('Success URL being sent to Stripe:', `${process.env.FRONTEND_URL || 'https://resumecraft-taupe.vercel.app'}/payment-success?session_id={CHECKOUT_SESSION_ID}`);
+    console.log('Cancel URL being sent to Stripe:', `${process.env.FRONTEND_URL || 'https://resumecraft-taupe.vercel.app'}/pricing`);
     console.log('Frontend URL from env:', process.env.FRONTEND_URL);
     
     res.json({ sessionId: session.id, sessionUrl: session.url });
