@@ -1,8 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Resume = require('../models/Resume');
+const User = require('../models/User');
 const authenticateToken = require('../middleware/auth');
 const { validateResumeBeforeSave } = require('../utils/resumeValidation');
+const { canUserAccessTemplate } = require('../utils/templateAccess');
 const router = express.Router();
 
 const isValidResumeId = (id) => typeof id === 'string' && mongoose.Types.ObjectId.isValid(id);
@@ -26,7 +28,13 @@ router.post('/save', authenticateToken, async (req, res) => {
     }
     
     const userId = req.user.id;
+    const user = await User.findById(userId);
     const resolvedTemplateId = templateId || 'modern';
+
+    // Check template access before saving
+    if (!canUserAccessTemplate(user?.plan, resolvedTemplateId)) {
+      return res.status(403).json({ message: 'You do not have access to this template' });
+    }
 
     const updateData = {
       user: userId,
@@ -113,6 +121,12 @@ router.get('/:id', authenticateToken, async (req, res) => {
 
     if (!resume) {
       return res.status(404).json({ message: 'Resume not found' });
+    }
+
+    // Check template access before returning resume data
+    const user = await User.findById(req.user.id);
+    if (!canUserAccessTemplate(user?.plan, resume.templateId)) {
+      return res.status(403).json({ message: 'You do not have access to this resume' });
     }
 
     res.json(resume);

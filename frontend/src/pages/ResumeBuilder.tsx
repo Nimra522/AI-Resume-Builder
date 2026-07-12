@@ -5,7 +5,7 @@ import { ResumeForm } from '../components/resume/ResumeForm';
 import { LivePreview } from '../components/resume/LivePreview';
 import { INITIAL_RESUME_DATA, TEMPLATES } from '../data/templates';
 import { ResumeData, SavedResume } from '../types';
-import { Download, Eye, Palette, Save, Loader2 } from 'lucide-react';
+import { Download, Eye, Palette, Save, Loader2, Lock, ChevronDown } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useNotifications } from '../context/NotificationContext';
@@ -16,6 +16,8 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { apiUrl } from '../utils/api';
 import * as resumeValidation from '../utils/resumeValidation';
+import { canUserAccessTemplate, getTemplateRequiredPlan } from '../utils/templateAccess';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 export const ResumeBuilder: React.FC = () => {
   const [resumeData, setResumeData] = useState<ResumeData>(INITIAL_RESUME_DATA);
@@ -25,6 +27,7 @@ export const ResumeBuilder: React.FC = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [resumeTitle, setResumeTitle] = useState('');
   const [titleError, setTitleError] = useState('');
+  const [showTemplateDropdown, setShowTemplateDropdown] = useState(false);
   const hasLoadedResume = useRef(false); // Add ref to track if resume is already loaded
   
   const { search, navigate } = useLocation();
@@ -33,6 +36,8 @@ export const ResumeBuilder: React.FC = () => {
   const { user, isAuthenticated, openLoginModal, updateResumeCount, verifyTemplateAccess } = useAuth();
   const previewRef = useRef<HTMLDivElement>(null);
   const resumeFormRef = useRef<{ validate: () => { isValid: boolean } }>(null);
+  const templateDropdownRef = useRef<HTMLDivElement>(null);
+  useClickOutside(templateDropdownRef, () => setShowTemplateDropdown(false));
 
   // Load from local storage if available, and check template param
   useEffect(() => {
@@ -459,38 +464,68 @@ export const ResumeBuilder: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-2 ml-auto">
-            <div className="hidden md:flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm">
-              <Palette size={16} className="text-indigo-600" />
-              <select 
-                className="text-xs border-none bg-transparent focus:ring-0 cursor-pointer text-gray-800 font-semibold outline-none"
-                value={selectedTemplateId}
-                onChange={async (e) => {
-                  const nextTemplateId = e.target.value;
-                  const template = TEMPLATES.find(t => t.id === nextTemplateId);
-                  const needsAuth = template ? template.requiresAuth !== false : true;
-                  if (!isAuthenticated && needsAuth) {
-                    showToast("Please login to use this template", "warning");
-                    addNotification("Please login to use this template", "warning");
-                    openLoginModal('/dashboard');
-                    return;
-                  }
-                  if (needsAuth) {
-                    const accessResult = await verifyTemplateAccess(nextTemplateId, 'editor');
-                    if (!accessResult.success) {
-                      if (accessResult.status === 403) {
-                        showToast('Upgrade your plan to use this template.', 'warning');
-                        addNotification('Upgrade your plan to use this template.', 'warning');
-                      }
-                      return;
-                    }
-                  }
-                  setSelectedTemplateId(nextTemplateId);
-                }}
+            <div className="hidden md:flex items-center relative" ref={templateDropdownRef}>
+              <button
+                onClick={() => setShowTemplateDropdown(!showTemplateDropdown)}
+                className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm hover:border-indigo-300 transition-colors"
               >
-                {TEMPLATES.map(t => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
-                ))}
-              </select>
+                <Palette size={16} className="text-indigo-600" />
+                <span className="text-xs text-gray-800 font-semibold">
+                  {TEMPLATES.find(t => t.id === selectedTemplateId)?.name}
+                </span>
+                <ChevronDown size={14} className={`text-gray-500 transition-transform ${showTemplateDropdown ? 'rotate-180' : ''}`} />
+              </button>
+
+              {showTemplateDropdown && (
+                <div className="absolute top-full right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 w-64 max-h-80 overflow-y-auto z-50">
+                  {TEMPLATES.map(t => {
+                    const isLocked = !canUserAccessTemplate(user?.plan, t.id);
+                    const requiredPlan = getTemplateRequiredPlan(t.id);
+
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        disabled={isLocked}
+                        onClick={async () => {
+                          if (isLocked) return;
+                          
+                          const needsAuth = t.requiresAuth !== false;
+                          if (!isAuthenticated && needsAuth) {
+                            showToast("Please login to use this template", "warning");
+                            addNotification("Please login to use this template", "warning");
+                            openLoginModal('/dashboard');
+                            return;
+                          }
+                          if (needsAuth) {
+                            const accessResult = await verifyTemplateAccess(t.id, 'editor');
+                            if (!accessResult.success) {
+                              if (accessResult.status === 403) {
+                                showToast('Upgrade your plan to use this template.', 'warning');
+                                addNotification('Upgrade your plan to use this template.', 'warning');
+                              }
+                              return;
+                            }
+                          }
+                          setSelectedTemplateId(t.id);
+                          setShowTemplateDropdown(false);
+                        }}
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-left transition-colors ${
+                          selectedTemplateId === t.id ? 'bg-indigo-50 text-indigo-700' : 'text-gray-800 hover:bg-gray-50'
+                        } ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      >
+                        <div className="flex items-center gap-2 flex-1">
+                          {isLocked && <Lock size={14} className="text-gray-400" />}
+                          <span className="text-xs font-semibold">
+                            {t.name}
+                            {isLocked && <span className="ml-2 text-xs text-gray-400">({requiredPlan})</span>}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <Button 
