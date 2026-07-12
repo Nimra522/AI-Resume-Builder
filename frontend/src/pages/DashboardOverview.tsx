@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useToast } from '../context/ToastContext';
 import { Link, useLocation } from '../components/layout/Navbar';
 import { SavedResume } from '../types';
 import { TEMPLATES } from '../data/templates';
@@ -29,6 +30,7 @@ import { apiUrl } from '../utils/api';
 export const DashboardOverview: React.FC = () => {
   const { user, isAuthenticated, updateResumeCount, openLoginModal, verifyTemplateAccess } = useAuth();
   const { addNotification } = useNotifications();
+  const { showToast } = useToast();
   const { navigate } = useLocation();
   
   const [resumes, setResumes] = useState<SavedResume[]>([]);
@@ -158,9 +160,11 @@ export const DashboardOverview: React.FC = () => {
       // Update count in Auth Context
       updateResumeCount();
 
+      showToast("Resume deleted successfully", "success");
       addNotification("Resume deleted successfully", "success");
     } catch (err) {
       console.error(err);
+      showToast("Failed to delete resume", "error");
       addNotification("Failed to delete resume", "error");
     } finally {
       setDeleteId(null);

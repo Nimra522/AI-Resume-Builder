@@ -11,6 +11,7 @@ import { Button } from '../components/ui/Button';
 import { useLocation } from '../components/layout/Navbar';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useToast } from '../context/ToastContext';
 import { LivePreview } from '../components/resume/LivePreview';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -24,6 +25,7 @@ export const MyResumesPage: React.FC = () => {
   const { navigate } = useLocation();
   const { user, updateResumeCount } = useAuth();
   const { addNotification } = useNotifications();
+  const { showToast } = useToast();
   
   console.log('MyResumesPage rendered with', resumes.length, 'resumes');
   
@@ -176,20 +178,24 @@ export const MyResumesPage: React.FC = () => {
       
       // Show appropriate message based on API result
       if (apiSuccess || !apiErrorOccurred) {
+        showToast("Resume deleted successfully", "success");
         addNotification("Resume deleted successfully", "success");
       } else {
         // API failed but local delete succeeded
+        showToast("Resume deleted locally. Sync may be required.", "warning");
         addNotification("Resume deleted locally. Sync may be required.", "warning");
       }
       
     } catch (error) {
       console.error('Delete operation failed:', error);
+      showToast("Failed to delete resume. Please try again.", "error");
       addNotification("Failed to delete resume. Please try again.", "error");
       setIsDeleting(false);
     }
   };
 
   const handleDownload = async (resume: SavedResume) => {
+    showToast(`Preparing download for ${resume.title}...`, "info");
     addNotification(`Preparing download for ${resume.title}...`, "info");
     
     // Create a temporary hidden div with standard resume dimensions
@@ -317,9 +323,11 @@ export const MyResumesPage: React.FC = () => {
       const filename = `${resume.title.toLowerCase().replace(/\s+/g, '-')}.pdf`;
       pdf.save(filename);
       
+      showToast(`Downloaded "${filename}"`, "success");
       addNotification(`Downloaded "${filename}"`, "success");
     } catch (error) {
       console.error('PDF generation failed:', error);
+      showToast("PDF generation failed. Please try again.", "error");
       addNotification("PDF generation failed. Please try again.", "error");
     } finally {
       document.body.removeChild(tempDiv);

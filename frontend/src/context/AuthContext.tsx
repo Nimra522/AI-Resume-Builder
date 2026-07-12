@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { UserProfile, SavedResume } from '../types';
 import { useNotifications } from './NotificationContext';
+import { useToast } from './ToastContext';
 import { apiUrl } from '../utils/api';
 
 interface AuthContextType {
@@ -49,12 +50,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loginRedirectPath, setLoginRedirectPath] = useState('/dashboard');
   
   const { addNotification, clearNotifications } = useNotifications();
+  const { showToast } = useToast();
 
   const logout = () => {
     localStorage.removeItem(SESSION_KEY);
     setIsAuthenticated(false);
     setUser(null);
     setToken(null);
+    showToast("Logged out safely", "info");
     addNotification("Logged out safely", "info");
   };
 
@@ -166,6 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem(SESSION_KEY, newToken);
     setToken(newToken);
     await validateToken(newToken);
+    showToast("Signed in successfully with Google", "success");
     addNotification("Signed in successfully with Google", "success");
   };
 
@@ -190,6 +194,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(SESSION_KEY, data.token);
       setToken(data.token);
       await validateToken(data.token);
+      showToast(`Welcome to ResumeCraft, ${data.user.fullName.split(' ')[0]}!`, "success");
       addNotification(`Welcome to ResumeCraft, ${data.user.fullName.split(' ')[0]}!`, "success");
       return { success: true, message: 'Success' };
     } catch (e: any) {
@@ -225,6 +230,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(SESSION_KEY, data.token);
       setToken(data.token);
       await validateToken(data.token);
+      showToast(`Welcome back, ${data.user.fullName.split(' ')[0]}!`, "success");
       addNotification(`Welcome back, ${data.user.fullName.split(' ')[0]}!`, "success");
       return { success: true, message: 'Success' };
     } catch (e: any) {
@@ -250,6 +256,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const result = await res.json();
       
       if (!res.ok) {
+        showToast(result.message || 'Failed to update profile', "error");
         addNotification(result.message || 'Failed to update profile', "error");
         return { success: false, message: result.message || 'Failed to update profile' };
       }
@@ -291,10 +298,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { plan: _ignoredPlan, ...profileToStore } = updatedUser;
       localStorage.setItem(localProfileKey, JSON.stringify(profileToStore));
       
+      showToast("Profile updated successfully", "success");
       addNotification("Profile updated successfully", "success");
       return { success: true, message: 'Profile updated' };
     } catch (error) {
       console.error('Profile update error:', error);
+      showToast("Network error. Please try again.", "error");
       addNotification("Network error. Please try again.", "error");
       return { success: false, message: 'Network error. Please try again.' };
     }
@@ -317,14 +326,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const result = await res.json();
       
       if (!res.ok) {
+        showToast(result.message || 'Failed to update password', "error");
         addNotification(result.message || 'Failed to update password', "error");
         return { success: false, message: result.message || 'Failed to update password' };
       }
       
+      showToast("Password updated successfully", "success");
       addNotification("Password updated successfully", "success");
       return { success: true, message: 'Password updated successfully' };
     } catch (error) {
       console.error('Password update error:', error);
+      showToast("Network error. Please try again.", "error");
       addNotification("Network error. Please try again.", "error");
       return { success: false, message: 'Network error. Please try again.' };
     }
@@ -347,6 +359,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const result = await res.json();
       
       if (!res.ok) {
+        showToast(result.message || 'Failed to update preferences', "error");
         addNotification(result.message || 'Failed to update preferences', "error");
         return { success: false, message: result.message || 'Failed to update preferences' };
       }
@@ -360,6 +373,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       });
       
+      showToast("Preferences updated successfully", "success");
       addNotification("Preferences updated successfully", "success");
       return { 
         success: true, 
@@ -368,6 +382,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
     } catch (error) {
       console.error('Preferences update error:', error);
+      showToast("Network error. Please try again.", "error");
       addNotification("Network error. Please try again.", "error");
       return { success: false, message: 'Network error. Please try again.' };
     }
@@ -389,6 +404,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const result = await res.json();
       
       if (!res.ok) {
+        showToast(result.message || 'Failed to delete account', "error");
         addNotification(result.message || 'Failed to delete account', "error");
         return { success: false, message: result.message || 'Failed to delete account' };
       }
@@ -405,10 +421,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Clear notifications
       clearNotifications();
       
+      showToast("Your account has been deleted successfully", "info");
       addNotification("Your account has been deleted successfully", "info");
       return { success: true, message: 'Account deleted successfully' };
     } catch (error) {
       console.error('Account deletion error:', error);
+      showToast("Network error. Please try again.", "error");
       addNotification("Network error. Please try again.", "error");
       return { success: false, message: 'Network error. Please try again.' };
     }

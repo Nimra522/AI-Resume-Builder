@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { ResumeData, Experience, Education, Project, Certification } from '../../types';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -8,6 +8,8 @@ import { LOCATION_OPTIONS, LocationOption } from '../../data/locations';
 import { useClickOutside } from '../../hooks/useClickOutside';
 
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
+import { useNotifications } from '../../context/NotificationContext';
 import { apiUrl } from '../../utils/api';
 import * as resumeValidation from '../../utils/resumeValidation';
 
@@ -28,8 +30,14 @@ const steps = [
   { id: 6, title: 'Certifications', icon: Award, color: 'text-indigo-600' },
 ];
 
-export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, isSaving }) => {
+export interface ResumeFormHandle {
+  validate: () => { isValid: boolean };
+}
+
+export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data, onChange, onSave, isSaving }, ref) => {
   const { token } = useAuth();
+  const { showToast } = useToast();
+  const { addNotification } = useNotifications();
   
   // Multi-step wizard state
   const [currentStep, setCurrentStep] = useState(1);
@@ -67,6 +75,81 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
   }>>({});
 
   const [saveError, setSaveError] = useState<string>('');
+
+  // Reusable validation function for both bottom save button and top save button (via ref)
+  const doValidate = (): { isValid: boolean } => {
+    setSaveError('');
+    // Clean skills before saving
+    const cleanedSkills = data.skills.filter(s => s.trim() !== '');
+    if (cleanedSkills.length !== data.skills.length) {
+      onChange({ ...data, skills: cleanedSkills });
+    }
+
+    const { isValid, errors } = resumeValidation.validateResumeBeforeSave(data);
+    
+    if (!isValid) {
+      const msg = 'Please fix the highlighted errors before saving your resume.';
+      setSaveError(msg);
+      showToast(msg, 'error');
+      addNotification(msg, 'error');
+      // Update all error states
+      if (errors.personalInfo.fullName) setNameError(errors.personalInfo.fullName);
+      if (errors.personalInfo.email) setEmailError(errors.personalInfo.email);
+      if (errors.personalInfo.jobTitle) setJobTitleError(errors.personalInfo.jobTitle);
+      if (errors.personalInfo.phone) setPhoneError(errors.personalInfo.phone);
+      if (errors.personalInfo.location) setLocationError(errors.personalInfo.location);
+      if (errors.personalInfo.linkedin) setLinkedinError(errors.personalInfo.linkedin);
+      if (errors.personalInfo.summary) setSummaryError(errors.personalInfo.summary);
+      
+      setExperienceErrors(errors.experience);
+      setEducationErrors(errors.education);
+      setProjectErrors(errors.projects);
+      setCertificationErrors(errors.certifications);
+      
+      // Find first error section and navigate to that step
+      let firstErrorStep = 1; // Default to Personal Info (step 1)
+      const hasPersonalErrors = Object.values(errors.personalInfo).some(err => !!err);
+      
+      if (hasPersonalErrors) {
+        firstErrorStep = 1;
+      } else if (Object.keys(errors.experience).length > 0) {
+        firstErrorStep = 2;
+        // Open the first experience item's accordion that has errors
+        const firstExpIdWithError = Object.keys(errors.experience)[0];
+        setOpenSections(prev => ({ ...prev, [firstExpIdWithError]: true }));
+      } else if (Object.keys(errors.education).length > 0) {
+        firstErrorStep = 3;
+        // Open the first education item's accordion that has errors
+        const firstEduIdWithError = Object.keys(errors.education)[0];
+        setOpenSections(prev => ({ ...prev, [firstEduIdWithError]: true }));
+      } else if (Object.keys(errors.projects).length > 0) {
+        firstErrorStep = 5;
+        // Open the first project item's accordion that has errors
+        const firstProjIdWithError = Object.keys(errors.projects)[0];
+        setOpenSections(prev => ({ ...prev, [firstProjIdWithError]: true }));
+      } else if (Object.keys(errors.certifications).length > 0) {
+        firstErrorStep = 6;
+        // Open the first certification item's accordion that has errors
+        const firstCertIdWithError = Object.keys(errors.certifications)[0];
+        setOpenSections(prev => ({ ...prev, [firstCertIdWithError]: true }));
+      }
+      
+      // Update current step to show the first error section
+      setCurrentStep(firstErrorStep);
+      
+      // Wait a little bit for the step to render before scrolling
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 100);
+    }
+
+    return { isValid };
+  };
+
+  // Expose validate function to parent via ref
+  useImperativeHandle(ref, () => ({
+    validate: doValidate
+  }));
 
   // AI Loading states
   const [aiLoading, setAiLoading] = useState<{
@@ -1151,37 +1234,10 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
                   variant="primary"
                   size="sm"
                   onClick={() => {
-                    setSaveError('');
-                    // Clean skills before saving
-                    const cleanedSkills = data.skills.filter(s => s.trim() !== '');
-                    if (cleanedSkills.length !== data.skills.length) {
-                      onChange({ ...data, skills: cleanedSkills });
+                    const { isValid } = doValidate();
+                    if (isValid && onSave) {
+                      onSave();
                     }
-
-                    const { isValid, errors } = resumeValidation.validateResumeBeforeSave(data);
-                    
-                    if (!isValid) {
-                      setSaveError('Please fix the highlighted errors before saving your resume.');
-                      // Update all error states
-                      if (errors.personalInfo.fullName) setNameError(errors.personalInfo.fullName);
-                      if (errors.personalInfo.email) setEmailError(errors.personalInfo.email);
-                      if (errors.personalInfo.jobTitle) setJobTitleError(errors.personalInfo.jobTitle);
-                      if (errors.personalInfo.phone) setPhoneError(errors.personalInfo.phone);
-                      if (errors.personalInfo.location) setLocationError(errors.personalInfo.location);
-                      if (errors.personalInfo.linkedin) setLinkedinError(errors.personalInfo.linkedin);
-                      if (errors.personalInfo.summary) setSummaryError(errors.personalInfo.summary);
-                      
-                      setExperienceErrors(errors.experience);
-                      setEducationErrors(errors.education);
-                      setProjectErrors(errors.projects);
-                      setCertificationErrors(errors.certifications);
-                      
-                      // Scroll to first invalid section
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                      return;
-                    }
-
-                    onSave();
                   }}
                   disabled={isSaving}
                   icon={isSaving ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
@@ -1242,4 +1298,4 @@ export const ResumeForm: React.FC<ResumeFormProps> = ({ data, onChange, onSave, 
       )}
     </div>
   );
-};
+});

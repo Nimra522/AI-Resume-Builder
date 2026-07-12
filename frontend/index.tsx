@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './src/app/App';
 import { NotificationProvider } from './src/context/NotificationContext';
+import { ToastProvider } from './src/context/ToastContext';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -12,8 +13,10 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <NotificationProvider>
-      <App />
-    </NotificationProvider>
+    <ToastProvider>
+      <NotificationProvider>
+        <App />
+      </NotificationProvider>
+    </ToastProvider>
   </React.StrictMode>
 );

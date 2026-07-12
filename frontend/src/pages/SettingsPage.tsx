@@ -5,31 +5,22 @@ import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { ToggleSwitch } from '../components/ui/ToggleSwitch';
-import { Toast, ToastType } from '../components/ui/Toast';
 import { DeleteAccountModal } from '../components/profile/DeleteAccountModal';
 import { Camera, User, Lock, Palette, ShieldAlert, ShieldCheck, Save, X, Loader2, UserCircle, Phone, Mail, Bell, Monitor, CreditCard, HelpCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from '../components/layout/Navbar';
 import { useNotifications } from '../context/NotificationContext';
+import { useToast } from '../context/ToastContext';
+import { ToastType } from '../components/ui/Toast';
 
 export const SettingsPage: React.FC = () => {
   const { user, updateProfile, updatePassword, deleteAccount, setup2FA, verify2FA, disable2FA, resend2FAOTP } = useAuth();
   const { navigate } = useLocation();
   const { addNotification } = useNotifications();
+  const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
-
-  // --- Toast State ---
-  const [toast, setToast] = useState<{ visible: boolean; message: string; type: ToastType }>({
-    visible: false,
-    message: '',
-    type: 'success'
-  });
-
-  const showToast = (message: string, type: ToastType = 'success') => {
-    setToast({ visible: true, message, type });
-  };
 
   // Handle profile image upload
   const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,13 +30,17 @@ export const SettingsPage: React.FC = () => {
     // Validation
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
     if (!validTypes.includes(file.type)) {
-      addNotification("Please select a valid image (JPG, PNG, or WEBP)", "error");
+      const msg = "Please select a valid image (JPG, PNG, or WEBP)";
+      showToast(msg, "error");
+      addNotification(msg, "error");
       return;
     }
 
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
-      addNotification("Image size must be less than 5MB", "error");
+      const msg = "Image size must be less than 5MB";
+      showToast(msg, "error");
+      addNotification(msg, "error");
       return;
     }
 
@@ -59,9 +54,13 @@ export const SettingsPage: React.FC = () => {
       const result = await updateProfile({ profileImage: base64String });
       
       if (result.success) {
-        addNotification("Profile picture updated successfully", "success");
+        const msg = "Profile picture updated successfully";
+        showToast(msg, "success");
+        addNotification(msg, "success");
       } else {
-        addNotification(result.message || "Failed to update profile picture", "error");
+        const msg = result.message || "Failed to update profile picture";
+        showToast(msg, "error");
+        addNotification(msg, "error");
       }
       
       setIsUploading(false);
@@ -71,7 +70,9 @@ export const SettingsPage: React.FC = () => {
       }
     };
     reader.onerror = () => {
-      addNotification("Failed to read image file", "error");
+      const msg = "Failed to read image file";
+      showToast(msg, "error");
+      addNotification(msg, "error");
       setIsUploading(false);
     };
     reader.readAsDataURL(file);
@@ -87,9 +88,13 @@ export const SettingsPage: React.FC = () => {
     const result = await updateProfile({ profileImage: '' });
     
     if (result.success) {
-      addNotification("Profile picture removed successfully", "success");
+      const msg = "Profile picture removed successfully";
+      showToast(msg, "success");
+      addNotification(msg, "success");
     } else {
-      addNotification(result.message || "Failed to remove profile picture", "error");
+      const msg = result.message || "Failed to remove profile picture";
+      showToast(msg, "error");
+      addNotification(msg, "error");
     }
     
     setIsRemoving(false);
@@ -154,9 +159,13 @@ export const SettingsPage: React.FC = () => {
     });
     
     if (result.success) {
-      showToast('Profile updated successfully');
+      const msg = 'Profile updated successfully';
+      showToast(msg);
+      addNotification(msg, 'success');
     } else {
-      showToast(result.message, 'error');
+      const msg = result.message || 'Failed to update profile';
+      showToast(msg, 'error');
+      addNotification(msg, 'error');
     }
     setIsSavingProfile(false);
   };
@@ -164,15 +173,21 @@ export const SettingsPage: React.FC = () => {
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password.new !== password.confirm) {
-      showToast('New passwords do not match', 'error');
+      const msg = 'New passwords do not match';
+      showToast(msg, 'error');
+      addNotification(msg, 'error');
       return;
     }
     if (password.new.length < 8) {
-        showToast('Password must be at least 8 characters', 'error');
+        const msg = 'Password must be at least 8 characters';
+        showToast(msg, 'error');
+        addNotification(msg, 'error');
         return;
     }
     if (!password.current) {
-      showToast('Current password is required', 'error');
+      const msg = 'Current password is required';
+      showToast(msg, 'error');
+      addNotification(msg, 'error');
       return;
     }
 
@@ -182,9 +197,13 @@ export const SettingsPage: React.FC = () => {
     
     if (result.success) {
       setPassword({ current: '', new: '', confirm: '' });
-      showToast('Password changed successfully');
+      const msg = 'Password changed successfully';
+      showToast(msg);
+      addNotification(msg, 'success');
     } else {
-      showToast(result.message, 'error');
+      const msg = result.message || 'Failed to change password';
+      showToast(msg, 'error');
+      addNotification(msg, 'error');
     }
     
     setIsChangingPassword(false);
@@ -200,7 +219,9 @@ export const SettingsPage: React.FC = () => {
       const phone = user.phone || '';
       
       if (!phone) {
-        showToast('Please add a phone number first in Account Settings', 'error');
+        const msg = 'Please add a phone number first in Account Settings';
+        showToast(msg, 'error');
+        addNotification(msg, 'error');
         setAccount(prev => ({ ...prev, twoFactor: false }));
         setIsUpdating2FA(false);
         return;
@@ -214,9 +235,13 @@ export const SettingsPage: React.FC = () => {
           phone: phone,
           show: true
         });
-        showToast('OTP sent to your phone ending in ' + result.phone, 'success');
+        const msg = 'OTP sent to your phone ending in ' + result.phone;
+        showToast(msg, 'success');
+        addNotification(msg, 'success');
       } else {
-        showToast(result.message || 'Failed to setup 2FA', 'error');
+        const msg = result.message || 'Failed to setup 2FA';
+        showToast(msg, 'error');
+        addNotification(msg, 'error');
         setAccount(prev => ({ ...prev, twoFactor: false }));
       }
     } else {
@@ -225,7 +250,9 @@ export const SettingsPage: React.FC = () => {
         setTwoFADisableData({ show: true });
       } else {
         setAccount(prev => ({ ...prev, twoFactor: false }));
-        showToast('2FA is already disabled', 'error');
+        const msg = '2FA is already disabled';
+        showToast(msg, 'error');
+        addNotification(msg, 'error');
       }
     }
     
@@ -246,7 +273,9 @@ export const SettingsPage: React.FC = () => {
   // Handle 2FA verification
   const handle2FAVerify = async () => {
     if (!twoFAVerifyCode || twoFAVerifyCode.length < 6) {
-      showToast('Please enter a valid 6-digit code', 'error');
+      const msg = 'Please enter a valid 6-digit code';
+      showToast(msg, 'error');
+      addNotification(msg, 'error');
       return;
     }
     
@@ -254,13 +283,17 @@ export const SettingsPage: React.FC = () => {
     const result = await verify2FA(twoFAVerifyCode);
     
     if (result.success) {
-      showToast('2FA enabled successfully!', 'success');
+      const msg = '2FA enabled successfully!';
+      showToast(msg, 'success');
+      addNotification(msg, 'success');
       setTwoFASetupData({ phone: '', show: false });
       setTwoFAVerifyCode('');
       // Refresh account state
       setAccount(prev => ({ ...prev, twoFactor: true }));
     } else {
-      showToast(result.message || 'Invalid verification code', 'error');
+      const msg = result.message || 'Invalid verification code';
+      showToast(msg, 'error');
+      addNotification(msg, 'error');
     }
     
     setIsVerifying2FA(false);
@@ -269,7 +302,9 @@ export const SettingsPage: React.FC = () => {
   // Handle 2FA disable
   const handle2FADisable = async () => {
     if (!twoFADisableCode || twoFADisableCode.length < 6) {
-      showToast('Please enter a valid 6-digit code', 'error');
+      const msg = 'Please enter a valid 6-digit code';
+      showToast(msg, 'error');
+      addNotification(msg, 'error');
       return;
     }
     
@@ -277,13 +312,17 @@ export const SettingsPage: React.FC = () => {
     const result = await disable2FA(twoFADisableCode);
     
     if (result.success) {
-      showToast('2FA disabled successfully!', 'success');
+      const msg = '2FA disabled successfully!';
+      showToast(msg, 'success');
+      addNotification(msg, 'success');
       setTwoFADisableData({ show: false });
       setTwoFADisableCode('');
       // Refresh account state
       setAccount(prev => ({ ...prev, twoFactor: false }));
     } else {
-      showToast(result.message || 'Invalid verification code', 'error');
+      const msg = result.message || 'Invalid verification code';
+      showToast(msg, 'error');
+      addNotification(msg, 'error');
     }
     
     setIsDisabling2FA(false);
@@ -297,7 +336,9 @@ export const SettingsPage: React.FC = () => {
       setShowDeleteModal(false);
       navigate('/');
     } else {
-      showToast(result.message, 'error');
+      const msg = result.message || 'Failed to delete account';
+      showToast(msg, 'error');
+      addNotification(msg, 'error');
       setIsDeleting(false);
     }
   };
@@ -554,12 +595,6 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* --- Modals & Overlays --- */}
-        <Toast 
-          message={toast.message} 
-          type={toast.type} 
-          isVisible={toast.visible} 
-          onClose={() => setToast({...toast, visible: false})} 
-        />
         
         {showDeleteModal && (
           <DeleteAccountModal 

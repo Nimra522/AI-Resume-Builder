@@ -9,6 +9,7 @@ import { Download, Eye, Palette, Save, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useNotifications } from '../context/NotificationContext';
+import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from '../components/layout/Navbar';
 import html2canvas from 'html2canvas';
@@ -28,8 +29,10 @@ export const ResumeBuilder: React.FC = () => {
   
   const { search, navigate } = useLocation();
   const { addNotification } = useNotifications();
+  const { showToast } = useToast();
   const { user, isAuthenticated, openLoginModal, updateResumeCount, verifyTemplateAccess } = useAuth();
   const previewRef = useRef<HTMLDivElement>(null);
+  const resumeFormRef = useRef<{ validate: () => { isValid: boolean } }>(null);
 
   // Load from local storage if available, and check template param
   useEffect(() => {
@@ -58,24 +61,25 @@ export const ResumeBuilder: React.FC = () => {
       const needsAuth = template ? template.requiresAuth !== false : true;
 
       if (!isAuthenticated && needsAuth) {
-        openLoginModal(`/dashboard?template=${templateParam}`);
-        return;
-      }
+          openLoginModal(`/dashboard?template=${templateParam}`);
+          return;
+        }
 
-      if (needsAuth) {
-        verifyTemplateAccess(templateParam, 'editor').then(result => {
-          if (result.success) {
-            hasLoadedResume.current = true;
-            setSelectedTemplateId(templateParam);
-            // Clear localStorage for new template to start fresh
-            localStorage.removeItem('resume_builder_data');
-            localStorage.removeItem('resume_builder_title');
-            setResumeData(INITIAL_RESUME_DATA);
-            setResumeTitle('');
-          } else if (result.status === 403) {
-            addNotification('Upgrade your plan to use this template.', 'warning');
-          }
-        });
+        if (needsAuth) {
+          verifyTemplateAccess(templateParam, 'editor').then(result => {
+            if (result.success) {
+              hasLoadedResume.current = true;
+              setSelectedTemplateId(templateParam);
+              // Clear localStorage for new template to start fresh
+              localStorage.removeItem('resume_builder_data');
+              localStorage.removeItem('resume_builder_title');
+              setResumeData(INITIAL_RESUME_DATA);
+              setResumeTitle('');
+            } else if (result.status === 403) {
+              showToast('Upgrade your plan to use this template.', 'warning');
+              addNotification('Upgrade your plan to use this template.', 'warning');
+            }
+          });
       } else {
         hasLoadedResume.current = true;
         setSelectedTemplateId(templateParam);
@@ -243,6 +247,7 @@ export const ResumeBuilder: React.FC = () => {
     const needsAuth = tpl ? tpl.requiresAuth !== false : true;
 
     if (!isAuthenticated && needsAuth) {
+      showToast("Please login to save your resume", "warning");
       addNotification("Please login to save your resume", "warning");
       openLoginModal('/dashboard');
       return;
@@ -255,10 +260,9 @@ export const ResumeBuilder: React.FC = () => {
     }
     setTitleError('');
 
-    // Validate resume data
-    const { isValid } = resumeValidation.validateResumeBeforeSave(resumeData);
+    // Validate resume data using the form's validate() method
+    const { isValid } = resumeFormRef.current?.validate() || { isValid: false };
     if (!isValid) {
-      addNotification('Please fix the highlighted errors before saving your resume.', 'error');
       return;
     }
     
@@ -327,10 +331,12 @@ export const ResumeBuilder: React.FC = () => {
       // Update resume count
       updateResumeCount();
       
+      showToast(`"${resumeTitle}" saved successfully.`, 'success');
       addNotification(`"${resumeTitle}" saved successfully.`, 'success');
     } catch (err) {
       console.error(err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to save resume. Please try again.';
+      showToast(errorMessage, "error");
       addNotification(errorMessage, "error");
     } finally {
       setIsSaving(false);
@@ -342,12 +348,14 @@ export const ResumeBuilder: React.FC = () => {
     const needsAuth = tpl ? tpl.requiresAuth !== false : true;
 
     if (!isAuthenticated && needsAuth) {
+      showToast("Please login to export your resume", "warning");
       addNotification("Please login to export your resume", "warning");
       openLoginModal('/dashboard');
       return;
     }
 
     if (!previewRef.current) {
+      showToast("Preview not available", "error");
       addNotification("Preview not available", "error");
       return;
     }
@@ -356,8 +364,10 @@ export const ResumeBuilder: React.FC = () => {
       const accessResult = await verifyTemplateAccess(selectedTemplateId, 'download');
       if (!accessResult.success) {
         if (accessResult.status === 403) {
+          showToast('Upgrade your plan to download this template.', 'warning');
           addNotification('Upgrade your plan to download this template.', 'warning');
         } else if (accessResult.message) {
+          showToast(accessResult.message, 'error');
           addNotification(accessResult.message, 'error');
         }
         return;
@@ -365,6 +375,7 @@ export const ResumeBuilder: React.FC = () => {
     }
 
     setIsDownloading(true);
+    showToast("Preparing your PDF download...", "info");
     addNotification("Preparing your PDF download...", "info");
 
     try {
@@ -416,9 +427,11 @@ export const ResumeBuilder: React.FC = () => {
       const filename = resumeTitle ? `${resumeTitle.toLowerCase().replace(/\s+/g, '-')}.pdf` : 'resume.pdf';
       pdf.save(filename);
 
+      showToast(`Downloaded "${filename}"`, "success");
       addNotification(`Downloaded "${filename}"`, "success");
     } catch (err) {
       console.error('PDF generation failed:', err);
+      showToast("PDF generation failed. Please try again.", "error");
       addNotification("PDF generation failed. Please try again.", "error");
     } finally {
       setIsDownloading(false);
@@ -456,6 +469,7 @@ export const ResumeBuilder: React.FC = () => {
                   const template = TEMPLATES.find(t => t.id === nextTemplateId);
                   const needsAuth = template ? template.requiresAuth !== false : true;
                   if (!isAuthenticated && needsAuth) {
+                    showToast("Please login to use this template", "warning");
                     addNotification("Please login to use this template", "warning");
                     openLoginModal('/dashboard');
                     return;
@@ -464,6 +478,7 @@ export const ResumeBuilder: React.FC = () => {
                     const accessResult = await verifyTemplateAccess(nextTemplateId, 'editor');
                     if (!accessResult.success) {
                       if (accessResult.status === 403) {
+                        showToast('Upgrade your plan to use this template.', 'warning');
                         addNotification('Upgrade your plan to use this template.', 'warning');
                       }
                       return;
@@ -519,7 +534,7 @@ export const ResumeBuilder: React.FC = () => {
            ${showMobilePreview ? 'hidden md:block' : 'block'}
          `}>
            <div className="p-5 sm:p-8 max-w-2xl mx-auto">
-             <ResumeForm data={resumeData} onChange={setResumeData} onSave={handleSave} isSaving={isSaving} />
+             <ResumeForm ref={resumeFormRef} data={resumeData} onChange={setResumeData} onSave={handleSave} isSaving={isSaving} />
            </div>
          </div>
 
