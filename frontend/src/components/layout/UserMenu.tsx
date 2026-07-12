@@ -196,18 +196,21 @@ export const UserMenu: React.FC<UserMenuProps> = ({ variant = 'navbar', isEditor
                     <p className="text-sm font-black text-indigo-600">{displayPlan}</p>
                   </div>
                 </div>
-              </div>
-              <div className="p-4 space-y-1">
-                <div className="flex items-center gap-2 px-3 py-1.5 mb-2 text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                <div className="flex items-center gap-2 px-3 py-1.5 mt-3 text-[10px] font-bold text-text-muted uppercase tracking-wider">
                   <Clock size={10} /> Last Login: {user.lastLogin}
                 </div>
-                <MenuButton icon={User} label="View Profile" onClick={() => closeAndNavigate('/profile')} />
-                <MenuButton icon={Settings} label="Account Settings" onClick={() => closeAndNavigate('/settings')} />
               </div>
-              <div className="p-2 border-t border-gray-50 bg-gray-50/30">
+              <div className="px-1 py-1">
+                <MenuLink to="/profile" icon={User} label="View Profile" onClick={() => setIsOpen(false)} />
+                <MenuLink to="/dashboard" icon={LayoutDashboard} label="Dashboard" onClick={() => setIsOpen(false)} />
+                <MenuLink to="/dashboard/resumes" icon={FileText} label="My Resumes" onClick={() => setIsOpen(false)} />
+                <MenuLink to="/settings" icon={Settings} label="Settings" onClick={() => setIsOpen(false)} />
+                <MenuLink to="/dashboard/support" icon={HelpCircle} label="Help & Support" onClick={() => setIsOpen(false)} />
+              </div>
+              <div className="px-1 py-1 mt-1 border-t border-gray-50">
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <LogOut size={16} />
                   Log Out
