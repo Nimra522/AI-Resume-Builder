@@ -74,7 +74,7 @@ export const Home: React.FC = () => {
               {
                 icon: LayoutTemplate,
                 title: 'Expert-Designed Templates',
-                desc: '10+ ATS-friendly templates crafted by career experts for different industries and experience levels.',
+                desc: '100+ ATS-friendly templates crafted by career experts for different industries and experience levels.',
                 iconColor: '#4f46e5',
                 iconBg: '#eef2ff'
               },
