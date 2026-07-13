@@ -112,6 +112,15 @@ export const Signup: React.FC = () => {
   );
 
   if (isSuccess) {
+    // Check if there's a stored template redirect after signup
+    const storedTemplateId = localStorage.getItem('post_login_redirect_template');
+    const redirectPath = storedTemplateId ? `/templates?id=${storedTemplateId}` : '/dashboard';
+    
+    // If there is a stored template ID, we will clear it
+    if (storedTemplateId) {
+      localStorage.removeItem('post_login_redirect_template');
+    }
+
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         {/* Decorative background glows */}
@@ -137,11 +146,11 @@ export const Signup: React.FC = () => {
             <div className="w-full">
               <SuccessMessage 
                 title="Account Created"
-                message="Your account has been created successfully. You are now being redirected to your dashboard."
-                autoRedirectPath="/dashboard"
+                message="Your account has been created successfully. You are now being redirected."
+                autoRedirectPath={redirectPath}
                 navigate={navigate}
-                buttonText="Go to Dashboard"
-                onButtonClick={() => navigate('/dashboard')}
+                buttonText="Go"
+                onButtonClick={() => navigate(redirectPath)}
               />
             </div>
           </div>

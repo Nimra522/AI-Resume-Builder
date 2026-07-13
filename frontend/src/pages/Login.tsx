@@ -30,7 +30,17 @@ export const Login: React.FC = () => {
     }
     
     if (result.success) {
-      navigate('/dashboard');
+      // Check if there's a stored template redirect after login
+      const storedTemplateId = localStorage.getItem('post_login_redirect_template');
+      
+      if (storedTemplateId) {
+        // Redirect to the specific template
+        navigate(`/templates?id=${storedTemplateId}`);
+        localStorage.removeItem('post_login_redirect_template');
+      } else {
+        // Default redirect to dashboard
+        navigate('/dashboard');
+      }
     } else if (result.twoFactorRequired) {
       setTwoFactorRequired(true);
       setError('Please enter your 2FA code');

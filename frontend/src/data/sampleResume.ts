@@ -9,6 +9,7 @@ export const SAMPLE_RESUME_DATA: ResumeData = {
     location: 'San Francisco, CA',
     website: 'mayachen.design',
     linkedin: 'linkedin.com/in/mayachen',
+    photoUrl: '/profile-placeholder.jpg',
     summary:
       'Strategic product designer with 8+ years of experience shaping SaaS products from discovery through launch. Skilled at translating customer insights into polished, accessible interfaces that improve activation, retention, and team velocity.',
   },

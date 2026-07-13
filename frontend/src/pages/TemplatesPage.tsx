@@ -69,7 +69,10 @@ export const TemplatesPage: React.FC = () => {
 
     // Check authentication first for paid templates
     if (!isAuthenticated) {
-      openLoginModal(`/templates?id=${templateId}`);
+      // Store the template ID for post-login redirect
+      localStorage.setItem('post_login_redirect_template', templateId);
+      // Navigate to dedicated login page
+      navigate('/login');
       return;
     }
 

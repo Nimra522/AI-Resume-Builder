@@ -49,19 +49,6 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
           }}
         />
 
-        {/* ACCESS badge */}
-        {isLocked && (
-          <div className="absolute top-3 right-3">
-            <div className={`px-2.5 py-1 rounded-full text-xs font-bold text-white shadow-md ${
-              template.access === 'paid'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600'
-                : 'bg-gradient-to-r from-blue-600 to-cyan-600'
-            }`}>
-              {template.access === 'paid' ? 'Premium' : 'Pro'}
-            </div>
-          </div>
-        )}
-
         {/* HOVER overlay */}
         <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-250 flex items-center justify-center ${
           isLocked ? 'bg-primary/10' : 'bg-primary/10'
@@ -90,9 +77,21 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
 
       {/* Text Section */}
       <div className="flex flex-col flex-1">
-        <h3 className="font-bold text-lg text-[#374151] leading-tight truncate">
-          {template.name}
-        </h3>
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="font-bold text-lg text-[#374151] leading-tight truncate flex-1">
+            {template.name}
+          </h3>
+          {/* Plan Badge (only for Pro/Premium) */}
+          {(template.access === 'pro' || template.access === 'paid') && (
+            <div className={`px-2.5 py-1 rounded-full text-xs font-bold text-white shadow-md flex-shrink-0 ${
+              template.access === 'paid'
+                ? 'bg-gradient-to-r from-purple-600 to-indigo-600'
+                : 'bg-gradient-to-r from-blue-600 to-cyan-600'
+            }`}>
+              {template.access === 'paid' ? 'Premium' : 'Pro'}
+            </div>
+          )}
+        </div>
         <p className="text-xs font-medium text-[#6B7280] mt-1 truncate">
           Resume Template
         </p>
