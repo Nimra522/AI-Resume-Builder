@@ -183,12 +183,21 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
         body: JSON.stringify(payload),
       });
       if (!response.ok) {
-        throw new Error('Failed to call AI');
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { message: 'Unknown error' };
+        }
+        if (response.status === 401) {
+          throw new Error('Session expired, please log in again');
+        }
+        throw new Error(errorData.error || errorData.message || 'Failed to call AI');
       }
       return await response.json();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert('Something went wrong with AI. Please try again.');
+      alert(error.message || 'Something went wrong with AI. Please try again.');
       throw error;
     }
   };

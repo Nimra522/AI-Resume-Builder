@@ -1,5 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+console.log('[aiHelper] Initializing Google Generative AI with API Key:', process.env.GEMINI_API_KEY ? 'Loaded' : 'NOT LOADED');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Lower temperature = consistent, professional quality
@@ -9,7 +10,8 @@ const generationConfig = {
   topP: 0.9,
   topK: 40,
   maxOutputTokens: 2048,
-  thinkingConfig: { thinkingBudget: 0 }
+  // thinkingConfig might not be supported on all models, remove to be safe
+  // thinkingConfig: { thinkingBudget: 0 }
 };
 
 const SYSTEM_PROMPT = `
@@ -54,6 +56,7 @@ Never fabricate experience, skills, or numbers the user hasn't given you.
  * @returns {Object} The Gemini model instance
  */
 const getModel = () => {
+  console.log('[aiHelper] Creating model with gemini-2.0-flash');
   return genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
     systemInstruction: SYSTEM_PROMPT,   // proper system role, not concatenated text
@@ -77,8 +80,9 @@ const buildPrompt = (featurePrompt) => {
  * @returns {Object} The Gemini model instance with JSON mode enabled
  */
 const getJsonModel = () => {
+  console.log('[aiHelper] Creating JSON model with gemini-2.0-flash');
   return genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.0-flash',
     systemInstruction: SYSTEM_PROMPT,
     generationConfig: {
       ...generationConfig,

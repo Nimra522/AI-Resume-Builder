@@ -5,19 +5,34 @@ const router = express.Router();
 
 // Helper to safely extract text and handle empty Gemini responses
 const safeGenerate = async (model, prompt) => {
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  const text = response.text();
-  
-  if (!text || !text.trim()) {
-    throw new Error('AI returned an empty response');
+  console.log('[safeGenerate] Starting AI generation with prompt length:', prompt.length);
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    if (!text || !text.trim()) {
+      throw new Error('AI returned an empty response');
+    }
+    console.log('[safeGenerate] AI response received, length:', text.length);
+    return text.trim();
+  } catch (err) {
+    console.error('[safeGenerate] Gemini API call failed:', err);
+    
+    // Check for rate limit error
+    if (err.message && err.message.includes('429')) {
+      throw new Error('Rate limit exceeded: Gemini API quota has been reached. Please try again later or check your plan and billing details.');
+    }
+    
+    // Re-throw with more context
+    throw new Error(`AI generation failed: ${err.message}`);
   }
-  return text.trim();
 };
 
 // Generate Bullet Points
 router.post('/generate', authenticateToken, async (req, res) => {
   try {
+    console.log('[generate] Incoming request body:', req.body);
     const { jobTitle, company, industry, yearsExp } = req.body;
 
     if (!jobTitle || !company) {
@@ -31,14 +46,15 @@ router.post('/generate', authenticateToken, async (req, res) => {
     const text = await safeGenerate(model, buildPrompt(featurePrompt));
     res.json({ bulletPoints: text.split('\n').filter(line => line.trim()) });
   } catch (error) {
-    console.error('Error generating bullet points:', error);
-    res.status(500).json({ message: 'Failed to generate bullet points' });
+    console.error('[generate] Error generating bullet points:', error);
+    res.status(500).json({ message: 'Failed to generate bullet points', error: error.message });
   }
 });
 
 // Generate Professional Summary
 router.post('/generate-summary', authenticateToken, async (req, res) => {
   try {
+    console.log('[generate-summary] Incoming request body:', req.body);
     const { jobTitle, yearsExp } = req.body;
 
     if (!jobTitle) {
@@ -76,14 +92,15 @@ OUTPUT FORMAT RULES:
 
     res.json({ summary: text });
   } catch (error) {
-    console.error('Error generating summary:', error);
-    res.status(500).json({ message: 'Failed to generate summary' });
+    console.error('[generate-summary] Error generating summary:', error);
+    res.status(500).json({ message: 'Failed to generate summary', error: error.message });
   }
 });
 
 // Generate Experience Description
 router.post('/generate-experience', authenticateToken, async (req, res) => {
   try {
+    console.log('[generate-experience] Incoming request body:', req.body);
     const { role, company, keywords } = req.body;
 
     if (!role || !company) {
@@ -124,14 +141,15 @@ CORRECT OUTPUT EXAMPLE:
 
     res.json({ description: text });
   } catch (error) {
-    console.error('Error generating experience description:', error);
-    res.status(500).json({ message: 'Failed to generate description' });
+    console.error('[generate-experience] Error generating experience description:', error);
+    res.status(500).json({ message: 'Failed to generate description', error: error.message });
   }
 });
 
 // Suggest Skills
 router.post('/suggest-skills', authenticateToken, async (req, res) => {
   try {
+    console.log('[suggest-skills] Incoming request body:', req.body);
     const { jobTitle, existingSkills = [] } = req.body;
 
     if (!jobTitle) {
@@ -147,14 +165,15 @@ router.post('/suggest-skills', authenticateToken, async (req, res) => {
       skills: text.split(',').map(s => s.trim()).filter(s => s.length > 0)
     });
   } catch (error) {
-    console.error('Error suggesting skills:', error);
-    res.status(500).json({ message: 'Failed to suggest skills' });
+    console.error('[suggest-skills] Error suggesting skills:', error);
+    res.status(500).json({ message: 'Failed to suggest skills', error: error.message });
   }
 });
 
 // Improve Writing/Grammar
 router.post('/improve-writing', authenticateToken, async (req, res) => {
   try {
+    console.log('[improve-writing] Incoming request body:', req.body);
     const { text } = req.body;
 
     if (!text || !text.trim()) {
@@ -169,14 +188,15 @@ router.post('/improve-writing', authenticateToken, async (req, res) => {
     const improvedText = await safeGenerate(model, buildPrompt(featurePrompt));
     res.json({ improvedText, originalText: text });
   } catch (error) {
-    console.error('Error improving text:', error);
-    res.status(500).json({ message: 'Failed to improve text' });
+    console.error('[improve-writing] Error improving text:', error);
+    res.status(500).json({ message: 'Failed to improve text', error: error.message });
   }
 });
 
-// ATS Score — uses JSON mode, no manual backtick stripping needed
+// ATS Score — uses JSON mode
 router.post('/ats-score', authenticateToken, async (req, res) => {
   try {
+    console.log('[ats-score] Incoming request body:', req.body);
     const { resumeText, jobDescription } = req.body;
 
     if (!resumeText || !jobDescription) {
@@ -196,17 +216,20 @@ router.post('/ats-score', authenticateToken, async (req, res) => {
     JOB DESCRIPTION: ${jobDescription}`;
 
     const text = await safeGenerate(jsonModel, featurePrompt);
-    const data = JSON.parse(text);
+    // Clean any markdown code fences if present
+    const cleanText = text.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    const data = JSON.parse(cleanText);
     res.json(data);
   } catch (error) {
-    console.error('Error calculating ATS score:', error);
-    res.status(500).json({ message: 'Failed to calculate ATS score' });
+    console.error('[ats-score] Error calculating ATS score:', error);
+    res.status(500).json({ message: 'Failed to calculate ATS score', error: error.message });
   }
 });
 
 // Interview Questions — uses JSON mode
 router.post('/interview', authenticateToken, async (req, res) => {
   try {
+    console.log('[interview] Incoming request body:', req.body);
     const { resumeText, jobTitle } = req.body;
 
     if (!resumeText || !jobTitle) {
@@ -229,17 +252,20 @@ router.post('/interview', authenticateToken, async (req, res) => {
     RESUME: ${resumeText}`;
 
     const text = await safeGenerate(jsonModel, featurePrompt);
-    const data = JSON.parse(text);
+    // Clean any markdown code fences if present
+    const cleanText = text.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    const data = JSON.parse(cleanText);
     res.json(data);
   } catch (error) {
-    console.error('Error generating interview questions:', error);
-    res.status(500).json({ message: 'Failed to generate interview questions' });
+    console.error('[interview] Error generating interview questions:', error);
+    res.status(500).json({ message: 'Failed to generate interview questions', error: error.message });
   }
 });
 
 // AI Chatbot for Resume Help
 router.post('/chat', authenticateToken, async (req, res) => {
   try {
+    console.log('[chat] Incoming request body:', req.body);
     const { message, history = [] } = req.body;
 
     if (!message || !message.trim()) {
@@ -256,47 +282,11 @@ router.post('/chat', authenticateToken, async (req, res) => {
 
     res.json({ response: aiResponse });
   } catch (error) {
-    console.error('Error with chatbot:', error);
-    res.status(500).json({ message: 'Failed to get chatbot response' });
+    console.error('[chat] Error with chatbot:', error);
+    res.status(500).json({ message: 'Failed to get chatbot response', error: error.message });
   }
 });
 
-// Chat endpoint for the floating chat widget
-router.post('/chat', authenticateToken, async (req, res) => {
-  try {
-    const { message } = req.body;
-    console.log('Incoming chat message:', message);
 
-    const systemPrompt = `You are an AI Resume Assistant for ResumeCraft, a professional resume builder platform.
-
-Your job is to help users:
-- Write and improve resume summaries, skills, experience bullet points
-- Suggest better phrasing for their job descriptions
-- Fix formatting and grammar in resume content
-- Recommend relevant skills for specific job roles
-- Guide them on how to use ResumeCraft features (create resume, pick templates, edit sections)
-
-How to use ResumeCraft:
-1. Click "Create Your First Resume" on the Dashboard
-2. Choose a template from Recommended Templates
-3. Fill in your personal info, work experience, education, and skills
-4. Download or share your finished resume
-
-Always give specific, helpful answers. Never say "can you share more details?" unless you truly need more info. If the user asks a general question, answer it directly and helpfully.`;
-
-    const fullPrompt = `${systemPrompt}\n\nUSER MESSAGE: ${message}\n\nYOUR RESPONSE:`;
-    const result = await model.generateContent(fullPrompt);
-    const response = await result.response;
-    const text = response.text();
-    console.log('Gemini response:', text);
-    
-    res.json({ reply: text.trim() });
-  } catch (error) {
-    console.error('Error in chat:', error);
-    res.status(500).json({ 
-      message: 'Sorry, I\'m having trouble responding right now. Please try again.' 
-    });
-  }
-});
 
 module.exports = router;
