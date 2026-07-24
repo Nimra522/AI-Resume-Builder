@@ -138,8 +138,8 @@ export const Home: React.FC = () => {
             </Link>
           </div>
 
-          {/* Horizontal Scrollable Container */}
-          <div className="flex overflow-x-auto pb-6 gap-6 snap-x snap-mandatory scrollbar-hide">
+          {/* Template Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
              {featuredTemplates.map(template => (
                 <FeaturedTemplateCard key={template.id} template={template} />
              ))}

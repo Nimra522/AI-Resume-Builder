@@ -11,10 +11,10 @@ export const FeaturedTemplateCard: React.FC<FeaturedTemplateCardProps> = ({ temp
   return (
     <Link
       to={`/templates?id=${template.id}`}
-      className="group relative flex-shrink-0 w-80 bg-white rounded-[20px] border-2 border-[#33CFFF] shadow-[0_10px_25px_rgba(0,180,255,0.12),0_0_0_1px_rgba(51,207,255,0.25),0_0_18px_rgba(51,207,255,0.18)] hover:shadow-[0_16px_40px_rgba(0,180,255,0.2),0_0_0_2px_rgba(51,207,255,0.4),0_0_28px_rgba(51,207,255,0.25)] hover:-translate-y-[6px] transition-all duration-250 ease-out overflow-hidden flex flex-col p-6"
+      className="group relative bg-gray-100 rounded-[20px] border-2 border-[#33CFFF] shadow-[0_10px_25px_rgba(0,180,255,0.12),0_0_0_1px_rgba(51,207,255,0.25),0_0_18px_rgba(51,207,255,0.18)] hover:shadow-[0_16px_40px_rgba(0,180,255,0.2),0_0_0_2px_rgba(51,207,255,0.4),0_0_28px_rgba(51,207,255,0.25)] hover:-translate-y-[6px] transition-all duration-250 ease-out overflow-hidden flex flex-col p-4 h-full"
     >
       {/* Thumbnail Container */}
-      <div className="relative w-full rounded-[14px] bg-gray-100 overflow-hidden flex items-center justify-center aspect-[4/5]">
+      <div className="relative w-full rounded-[14px] bg-gray-100 overflow-hidden flex items-center justify-center aspect-[3/4]">
         <img
           src={template.thumbnailUrl}
           alt={`${template.name} template preview`}
@@ -35,14 +35,14 @@ export const FeaturedTemplateCard: React.FC<FeaturedTemplateCardProps> = ({ temp
       </div>
 
       {/* Spacer */}
-      <div className="h-6" />
+      <div className="h-4" />
 
       {/* Text Section */}
-      <div className="flex flex-col">
-        <h3 className="font-bold text-[34px] text-[#374151] leading-none group-hover:text-primary transition-colors">
+      <div className="flex flex-col flex-1">
+        <h3 className="font-bold text-lg text-[#374151] leading-tight truncate group-hover:text-primary transition-colors">
           {template.name}
         </h3>
-        <p className="text-[18px] font-medium text-[#6B7280] mt-2">
+        <p className="text-xs font-medium text-[#6B7280] mt-1 truncate">
           Resume Template
         </p>
 
