@@ -74,7 +74,7 @@ export const FloatingChatButton: React.FC = () => {
 
       if (res.ok) {
         const data = await res.json();
-        setMessages(prev => [...prev, { sender: 'ai', text: data.reply }]);
+        setMessages(prev => [...prev, { sender: 'ai', text: data.response }]);
       } else {
         const data = await res.json();
         setMessages(prev => [...prev, { 

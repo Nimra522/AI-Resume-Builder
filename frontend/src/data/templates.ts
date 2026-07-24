@@ -1349,6 +1349,7 @@ export const INITIAL_RESUME_DATA = {
     jobTitle: '',
     email: '',
     phone: '',
+    countryCode: '+1',
     location: '',
     website: '',
     linkedin: '',

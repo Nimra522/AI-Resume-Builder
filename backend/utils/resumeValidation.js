@@ -35,8 +35,10 @@ const validateEmail = (value) => {
 const validatePhone = (value) => {
   const trimmedValue = value ? value.trim() : '';
   if (!trimmedValue) return '';
-  if (trimmedValue.length > 30) return 'Phone number must be at most 30 characters.';
-  if (!/^[0-9 +().-]+$/.test(trimmedValue)) {
+  const digits = trimmedValue.replace(/\D/g, '');
+  if (digits.length < 7) return 'Phone number must have at least 7 digits.';
+  if (digits.length > 15) return 'Phone number must have at most 15 digits.';
+  if (!/^[\d\s\-+()]+$/.test(trimmedValue)) {
     return 'Use numbers, spaces, plus, hyphens, or parentheses only.';
   }
   return '';
@@ -394,5 +396,5 @@ const validateResumeBeforeSave = (data) => {
   return { isValid, errors };
 };
 
-module.exports = { validateResumeBeforeSave };
+module.exports = { validateResumeBeforeSave, validateLocation };
 

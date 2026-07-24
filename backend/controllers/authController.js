@@ -10,6 +10,7 @@ const Resume = require('../models/Resume');
 const twilio = require('twilio');
 const crypto = require('crypto');
 const { sendEmail } = require('../utils/emailService');
+const { validateLocation } = require('../utils/resumeValidation');
 
 // Initialize Twilio client
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -334,7 +335,13 @@ const updateProfile = async (req, res) => {
     if (name || fullName) user.fullName = name || fullName;
     if (username !== undefined) user.username = username;
     if (phone !== undefined) user.phone = phone;
-    if (location !== undefined) user.location = location;
+    if (location !== undefined) {
+      const locErr = validateLocation(location);
+      if (locErr) {
+        return res.status(400).json({ message: locErr });
+      }
+      user.location = location;
+    }
     if (bio !== undefined) user.bio = bio;
     if (twoFactorEnabled !== undefined) user.twoFactorEnabled = twoFactorEnabled;
     if (profileImage !== undefined) user.profileImage = profileImage; // Add profileImage handling

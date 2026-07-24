@@ -41,12 +41,6 @@ export const ResumeBuilder: React.FC = () => {
 
   // Load from local storage if available, and check template param
   useEffect(() => {
-    // If we've already loaded the resume, don't run this effect again!
-    if (hasLoadedResume.current) {
-      console.log('Resume already loaded, skipping initial load');
-      return;
-    }
-    
     console.log('ResumeBuilder mounting/updating, loading saved data...');
     const savedData = localStorage.getItem('resume_builder_data');
     const savedTitle = localStorage.getItem('resume_builder_title');
@@ -75,11 +69,18 @@ export const ResumeBuilder: React.FC = () => {
             if (result.success) {
               hasLoadedResume.current = true;
               setSelectedTemplateId(templateParam);
-              // Clear localStorage for new template to start fresh
-              localStorage.removeItem('resume_builder_data');
-              localStorage.removeItem('resume_builder_title');
-              setResumeData(INITIAL_RESUME_DATA);
-              setResumeTitle('');
+              if (savedData) {
+                try {
+                  setResumeData(JSON.parse(savedData));
+                  if (savedTitle) setResumeTitle(savedTitle);
+                } catch {
+                  setResumeData(INITIAL_RESUME_DATA);
+                  setResumeTitle('');
+                }
+              } else {
+                setResumeData(INITIAL_RESUME_DATA);
+                setResumeTitle('');
+              }
             } else if (result.status === 403) {
               showToast('Upgrade your plan to use this template.', 'warning');
               addNotification('Upgrade your plan to use this template.', 'warning');
@@ -88,11 +89,18 @@ export const ResumeBuilder: React.FC = () => {
       } else {
         hasLoadedResume.current = true;
         setSelectedTemplateId(templateParam);
-        // Clear localStorage for new template to start fresh
-        localStorage.removeItem('resume_builder_data');
-        localStorage.removeItem('resume_builder_title');
-        setResumeData(INITIAL_RESUME_DATA);
-        setResumeTitle('');
+        if (savedData) {
+          try {
+            setResumeData(JSON.parse(savedData));
+            if (savedTitle) setResumeTitle(savedTitle);
+          } catch {
+            setResumeData(INITIAL_RESUME_DATA);
+            setResumeTitle('');
+          }
+        } else {
+          setResumeData(INITIAL_RESUME_DATA);
+          setResumeTitle('');
+        }
       }
     } else if (editParam) {
       console.log('Edit parameter found in URL:', editParam);
@@ -200,52 +208,6 @@ export const ResumeBuilder: React.FC = () => {
     }, 1000);
     return () => clearTimeout(timeout);
   }, [resumeData, resumeTitle, selectedTemplateId]);
-
-  // Auto-save to server when autoSave is enabled
-  useEffect(() => {
-    if (!isAuthenticated || !user?.autoSave) return;
-    
-    const timeout = setTimeout(async () => {
-      try {
-        // Only save if we have a resume title (indicating we're editing an existing resume)
-        if (!resumeTitle) return;
-        
-        const storeKey = `saved_resumes_${user?.id || 'guest'}`;
-        const savedResumes: SavedResume[] = JSON.parse(localStorage.getItem(storeKey) || '[]');
-        
-        // Find if we're editing an existing resume
-        const urlParams = new URLSearchParams(window.location.search);
-        const editingId = urlParams.get('edit');
-        
-        let existingIdx = -1;
-        if (editingId) {
-          existingIdx = savedResumes.findIndex(r => r.id === editingId);
-        }
-        
-        if (existingIdx >= 0) {
-          // Update existing resume
-          const currentTime = new Date();
-          const updatedResume = {
-            ...savedResumes[existingIdx],
-            lastEdited: currentTime.toISOString(),
-            data: resumeData
-          };
-          
-          savedResumes[existingIdx] = updatedResume;
-          localStorage.setItem(storeKey, JSON.stringify(savedResumes));
-          
-          // Update resume count
-          updateResumeCount();
-          
-          console.log('Auto-saved resume to server');
-        }
-      } catch (error) {
-        console.error('Auto-save failed:', error);
-      }
-    }, 800); // 800ms debounce
-    
-    return () => clearTimeout(timeout);
-  }, [resumeData, resumeTitle, selectedTemplateId, isAuthenticated, user?.autoSave, user?.id, updateResumeCount]);
 
   const handleSave = async () => {
     const tpl = TEMPLATES.find(t => t.id === selectedTemplateId);

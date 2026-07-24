@@ -1,38 +1,11 @@
 const express = require('express');
 const authenticateToken = require('../middleware/auth');
-const { buildPrompt, getModel, getJsonModel } = require('../utils/aiHelper');
+const { buildPrompt, getModel, getJsonModel, safeGenerate } = require('../utils/aiHelper');
 const router = express.Router();
-
-// Helper to safely extract text and handle empty Gemini responses
-const safeGenerate = async (model, prompt) => {
-  console.log('[safeGenerate] Starting AI generation with prompt length:', prompt.length);
-  try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    
-    if (!text || !text.trim()) {
-      throw new Error('AI returned an empty response');
-    }
-    console.log('[safeGenerate] AI response received, length:', text.length);
-    return text.trim();
-  } catch (err) {
-    console.error('[safeGenerate] Gemini API call failed:', err);
-    
-    // Check for rate limit error
-    if (err.message && err.message.includes('429')) {
-      throw new Error('Rate limit exceeded: Gemini API quota has been reached. Please try again later or check your plan and billing details.');
-    }
-    
-    // Re-throw with more context
-    throw new Error(`AI generation failed: ${err.message}`);
-  }
-};
 
 // Generate Bullet Points
 router.post('/generate', authenticateToken, async (req, res) => {
   try {
-    console.log('[generate] Incoming request body:', req.body);
     const { jobTitle, company, industry, yearsExp } = req.body;
 
     if (!jobTitle || !company) {
@@ -40,7 +13,7 @@ router.post('/generate', authenticateToken, async (req, res) => {
     }
 
     const model = getModel();
-    const featurePrompt = `Write 4 powerful, achievement-focused resume bullet points for a ${jobTitle} at ${company} in ${industry || 'this field'} with ${yearsExp || 'some'} years experience. 
+    const featurePrompt = `Write 4 powerful, achievement-focused resume bullet points for a ${jobTitle} at ${company} in ${industry || 'this field'} with ${yearsExp || 'some'} years experience.
     Use strong action verbs and make it sound realistic. Return only 4 bullet points, one per line.`;
 
     const text = await safeGenerate(model, buildPrompt(featurePrompt));
@@ -54,23 +27,41 @@ router.post('/generate', authenticateToken, async (req, res) => {
 // Generate Professional Summary
 router.post('/generate-summary', authenticateToken, async (req, res) => {
   try {
-    console.log('[generate-summary] Incoming request body:', req.body);
-    const { jobTitle, yearsExp } = req.body;
+    const { jobTitle, experience, education, skills, objective } = req.body;
 
     if (!jobTitle) {
       return res.status(400).json({ message: 'jobTitle is required' });
     }
 
     const model = getModel();
-    const yearsExpText = yearsExp ? ` with ${yearsExp} years of experience` : '';
-    let featurePrompt = `Write a professional resume summary (3-4 sentences, ~80-100 words) for a ${jobTitle}${yearsExpText}. Base this only on what a typical ${jobTitle} role involves — do not invent a specific company, named achievements, or fabricated metrics.`;
+
+    // Build context from actual resume data
+    let contextParts = [];
+    if (experience && experience.length > 0) {
+      const expLines = experience.map(e =>
+        `- ${e.role || 'Role'} at ${e.company || 'Company'}`
+      );
+      contextParts.push(`Experience:\n${expLines.join('\n')}`);
+    }
+    if (education && education.length > 0) {
+      const eduLines = education.map(e =>
+        `- ${e.degree || 'Degree'} in ${e.fieldOfStudy || e.field || ''} from ${e.school || 'School'}`
+      );
+      contextParts.push(`Education:\n${eduLines.join('\n')}`);
+    }
+    if (skills && skills.length > 0) {
+      contextParts.push(`Skills: ${skills.join(', ')}`);
+    }
+    const contextStr = contextParts.length > 0 ? `\n\nUser's actual background:\n${contextParts.join('\n')}` : '';
+
+    let featurePrompt = `Write a professional resume summary (3-4 sentences, ~80-100 words) for a ${jobTitle}.${contextStr} Base the summary on the actual experience, education, and skills listed above — do not invent a specific company, named achievements, or fabricated metrics that aren't listed.`;
 
     // Add explicit output format instructions
     featurePrompt += `
 
 OUTPUT FORMAT RULES:
 - Return ONLY the summary text. No introduction, no explanation, no meta-commentary about what you're doing.
-- Do not say things like "here's how I'd put it" or "okay, so you need."
+- Do not say things like "here's how I'd put it" or "okay, so you need".
 - Start directly with the summary content itself.`;
 
     let text = await safeGenerate(model, buildPrompt(featurePrompt));
@@ -100,7 +91,6 @@ OUTPUT FORMAT RULES:
 // Generate Experience Description
 router.post('/generate-experience', authenticateToken, async (req, res) => {
   try {
-    console.log('[generate-experience] Incoming request body:', req.body);
     const { role, company, keywords } = req.body;
 
     if (!role || !company) {
@@ -121,7 +111,7 @@ router.post('/generate-experience', authenticateToken, async (req, res) => {
 
 OUTPUT FORMAT RULES:
 - Return ONLY the bullet points. No introduction, no explanation, no closing remarks.
-- Do not say things like "here are some bullets" or "remember to customize these."
+- Do not say things like "here are some bullets" or "remember to customize these".
 - Each bullet must be on its own separate line, starting with "• ".
 - Do not number them.
 - Do not add any text before the first bullet or after the last one.
@@ -149,7 +139,6 @@ CORRECT OUTPUT EXAMPLE:
 // Suggest Skills
 router.post('/suggest-skills', authenticateToken, async (req, res) => {
   try {
-    console.log('[suggest-skills] Incoming request body:', req.body);
     const { jobTitle, existingSkills = [] } = req.body;
 
     if (!jobTitle) {
@@ -173,7 +162,6 @@ router.post('/suggest-skills', authenticateToken, async (req, res) => {
 // Improve Writing/Grammar
 router.post('/improve-writing', authenticateToken, async (req, res) => {
   try {
-    console.log('[improve-writing] Incoming request body:', req.body);
     const { text } = req.body;
 
     if (!text || !text.trim()) {
@@ -181,8 +169,8 @@ router.post('/improve-writing', authenticateToken, async (req, res) => {
     }
 
     const model = getModel();
-    const featurePrompt = `Improve this text for a professional resume: "${text}". 
-    Make it more concise, professional, and grammatically correct while keeping the original meaning. 
+    const featurePrompt = `Improve this text for a professional resume: "${text}".
+    Make it more concise, professional, and grammatically correct while keeping the original meaning.
     Use strong action verbs where appropriate. Return only the improved text, no extra explanation.`;
 
     const improvedText = await safeGenerate(model, buildPrompt(featurePrompt));
@@ -196,7 +184,6 @@ router.post('/improve-writing', authenticateToken, async (req, res) => {
 // ATS Score — uses JSON mode
 router.post('/ats-score', authenticateToken, async (req, res) => {
   try {
-    console.log('[ats-score] Incoming request body:', req.body);
     const { resumeText, jobDescription } = req.body;
 
     if (!resumeText || !jobDescription) {
@@ -211,7 +198,7 @@ router.post('/ats-score', authenticateToken, async (req, res) => {
       "missing": [array of important keywords from job description missing in resume],
       "tip": string (a practical, actionable tip for improvement)
     }
-    
+
     RESUME: ${resumeText}
     JOB DESCRIPTION: ${jobDescription}`;
 
@@ -229,7 +216,6 @@ router.post('/ats-score', authenticateToken, async (req, res) => {
 // Interview Questions — uses JSON mode
 router.post('/interview', authenticateToken, async (req, res) => {
   try {
-    console.log('[interview] Incoming request body:', req.body);
     const { resumeText, jobTitle } = req.body;
 
     if (!resumeText || !jobTitle) {
@@ -237,7 +223,7 @@ router.post('/interview', authenticateToken, async (req, res) => {
     }
 
     const jsonModel = getJsonModel();
-    const featurePrompt = `Generate 5 thoughtful interview questions for a ${jobTitle} role based on this resume. 
+    const featurePrompt = `Generate 5 thoughtful interview questions for a ${jobTitle} role based on this resume.
     Return JSON with this exact shape:
     {
       "questions": [
@@ -248,7 +234,7 @@ router.post('/interview', authenticateToken, async (req, res) => {
         }
       ]
     }
-    
+
     RESUME: ${resumeText}`;
 
     const text = await safeGenerate(jsonModel, featurePrompt);
@@ -265,7 +251,6 @@ router.post('/interview', authenticateToken, async (req, res) => {
 // AI Chatbot for Resume Help
 router.post('/chat', authenticateToken, async (req, res) => {
   try {
-    console.log('[chat] Incoming request body:', req.body);
     const { message, history = [] } = req.body;
 
     if (!message || !message.trim()) {
@@ -286,7 +271,5 @@ router.post('/chat', authenticateToken, async (req, res) => {
     res.status(500).json({ message: 'Failed to get chatbot response', error: error.message });
   }
 });
-
-
 
 module.exports = router;

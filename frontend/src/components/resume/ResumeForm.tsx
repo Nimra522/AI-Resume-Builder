@@ -3,7 +3,7 @@ import { ResumeData, Experience, Education, Project, Certification } from '../..
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { FormSection } from '../ui/FormSection';
-import { Plus, User, Briefcase, GraduationCap, Code, FolderGit2, Award, ChevronLeft, ChevronRight, CheckCircle2, Sparkles, RefreshCw, Loader2, X, Save } from 'lucide-react';
+import { Plus, User, Briefcase, GraduationCap, Code, FolderGit2, Award, ChevronLeft, ChevronRight, ChevronDown, CheckCircle2, Sparkles, RefreshCw, Loader2, X, Save } from 'lucide-react';
 import { LOCATION_OPTIONS, LocationOption } from '../../data/locations';
 import { useClickOutside } from '../../hooks/useClickOutside';
 
@@ -208,7 +208,7 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
 
   const updateExperienceItem = (id: string, field: keyof Experience, value: string | boolean) => {
     const normalizedValue = field === 'role' || field === 'company'
-      ? (typeof value === 'string' ? value.trim() : value)
+      ? value
       : field === 'description'
         ? (typeof value === 'string' && value.trim() === '' ? '' : value)
         : value;
@@ -252,7 +252,7 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
 
   // --- Education Update Handler ---
   const updateEducationItem = (id: string, field: keyof Education, value: string) => {
-    const normalizedValue = typeof value === 'string' ? value.trim() : value;
+    const normalizedValue = value;
     const updatedEducation = data.education.map(item =>
       item.id === id ? { ...item, [field]: normalizedValue } : item
     );
@@ -278,7 +278,7 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
 
   // --- Project Update Handler ---
   const updateProjectItem = (id: string, field: keyof Project, value: string) => {
-    const normalizedValue = typeof value === 'string' ? value.trim() : value;
+    const normalizedValue = value;
     const updatedProjects = data.projects.map(item =>
       item.id === id ? { ...item, [field]: normalizedValue } : item
     );
@@ -302,7 +302,7 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
 
   // --- Certification Update Handler ---
   const updateCertificationItem = (id: string, field: keyof Certification, value: string) => {
-    const normalizedValue = typeof value === 'string' ? value.trim() : value;
+    const normalizedValue = value;
     const updatedCertifications = data.certifications.map(item =>
       item.id === id ? { ...item, [field]: normalizedValue } : item
     );
@@ -386,27 +386,140 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
   useClickOutside(locationRef, () => {
     setShowLocationSuggestions(false);
   });
+
+  const COUNTRY_CODES = [
+    { code: '+92', country: 'PK', label: 'Pakistan' },
+    { code: '+1', country: 'US', label: 'United States / Canada' },
+    { code: '+44', country: 'GB', label: 'United Kingdom' },
+    { code: '+971', country: 'AE', label: 'UAE' },
+    { code: '+966', country: 'SA', label: 'Saudi Arabia' },
+    { code: '+91', country: 'IN', label: 'India' },
+    { code: '+61', country: 'AU', label: 'Australia' },
+    { code: '+49', country: 'DE', label: 'Germany' },
+    { code: '+33', country: 'FR', label: 'France' },
+    { code: '+39', country: 'IT', label: 'Italy' },
+    { code: '+34', country: 'ES', label: 'Spain' },
+    { code: '+86', country: 'CN', label: 'China' },
+    { code: '+81', country: 'JP', label: 'Japan' },
+    { code: '+82', country: 'KR', label: 'South Korea' },
+    { code: '+65', country: 'SG', label: 'Singapore' },
+    { code: '+60', country: 'MY', label: 'Malaysia' },
+    { code: '+62', country: 'ID', label: 'Indonesia' },
+    { code: '+90', country: 'TR', label: 'Turkey' },
+    { code: '+7', country: 'RU', label: 'Russia' },
+    { code: '+55', country: 'BR', label: 'Brazil' },
+    { code: '+52', country: 'MX', label: 'Mexico' },
+    { code: '+20', country: 'EG', label: 'Egypt' },
+    { code: '+27', country: 'ZA', label: 'South Africa' },
+    { code: '+234', country: 'NG', label: 'Nigeria' },
+    { code: '+880', country: 'BD', label: 'Bangladesh' },
+    { code: '+63', country: 'PH', label: 'Philippines' },
+    { code: '+84', country: 'VN', label: 'Vietnam' },
+    { code: '+66', country: 'TH', label: 'Thailand' },
+    { code: '+31', country: 'NL', label: 'Netherlands' },
+    { code: '+41', country: 'CH', label: 'Switzerland' },
+    { code: '+64', country: 'NZ', label: 'New Zealand' },
+    { code: '+46', country: 'SE', label: 'Sweden' },
+    { code: '+47', country: 'NO', label: 'Norway' },
+    { code: '+45', country: 'DK', label: 'Denmark' },
+    { code: '+358', country: 'FI', label: 'Finland' },
+    { code: '+353', country: 'IE', label: 'Ireland' },
+    { code: '+48', country: 'PL', label: 'Poland' },
+    { code: '+852', country: 'HK', label: 'Hong Kong' },
+    { code: '+886', country: 'TW', label: 'Taiwan' },
+  ];
+
+  // Phone country code dropdown state
+  const [showPhoneDropdown, setShowPhoneDropdown] = useState<boolean>(false);
+  const phoneDropdownRef = useRef<HTMLDivElement>(null);
+
+  useClickOutside(phoneDropdownRef, () => {
+    setShowPhoneDropdown(false);
+  });
+
+  const handleCountryCodeSelect = (newCode: string) => {
+    const currentCode = data.personalInfo.countryCode || '+1';
+    const currentPhone = data.personalInfo.phone;
+    const localNumber = currentPhone.startsWith(currentCode)
+      ? currentPhone.slice(currentCode.length).replace(/[^\d\s\-()]/g, '').trim()
+      : currentPhone.replace(/[^\d\s\-()]/g, '').trim();
+    const newPhone = newCode + localNumber;
+
+    onChange({
+      ...data,
+      personalInfo: { ...data.personalInfo, countryCode: newCode, phone: newPhone }
+    });
+
+    if (newPhone) {
+      setPhoneError(resumeValidation.validatePhone(newPhone));
+    } else {
+      setPhoneError('');
+    }
+    setShowPhoneDropdown(false);
+  };
+
+  const handlePhoneInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+
+    // Detect paste of full international number with + prefix
+    if (raw.startsWith('+')) {
+      const matched = COUNTRY_CODES.find(c => raw.startsWith(c.code));
+      if (matched) {
+        const localPart = raw.slice(matched.code.length).replace(/[^\d\s\-()]/g, '').trim();
+        if (localPart) {
+          const newPhone = matched.code + localPart;
+          onChange({
+            ...data,
+            personalInfo: { ...data.personalInfo, countryCode: matched.code, phone: newPhone }
+          });
+          const err = resumeValidation.validatePhone(newPhone);
+          setPhoneError(err || '');
+          return;
+        }
+      }
+    }
+
+    const filtered = raw.replace(/[^\d\s\-()]/g, '').trim();
+    const code = data.personalInfo.countryCode || '+1';
+    const newPhone = code + filtered;
+
+    onChange({
+      ...data,
+      personalInfo: { ...data.personalInfo, phone: newPhone }
+    });
+
+    if (newPhone) {
+      setPhoneError(resumeValidation.validatePhone(newPhone));
+    } else {
+      setPhoneError('');
+    }
+  };
+
+  const displayPhoneNumber = () => {
+    const code = data.personalInfo.countryCode || '+1';
+    const phone = data.personalInfo.phone;
+    return phone.startsWith(code) ? phone.slice(code.length).trim() : phone.trim();
+  };
   
 
 
   const updatePersonalInfo = (field: string, value: string) => {
-    const trimmedValue = value.trim();
-    const normalizedValue = field === 'summary' ? value.trim() : trimmedValue;
+    const normalizedValue = value;
 
     if (field === 'fullName') {
-      setNameError(value ? resumeValidation.validateFullName(normalizedValue) : '');
+      if (nameError) setNameError('');
     } else if (field === 'jobTitle') {
-      setJobTitleError(resumeValidation.validateJobTitle(normalizedValue));
+      setJobTitleError(resumeValidation.validateJobTitle(value.trim()));
     } else if (field === 'email') {
-      setEmailError(resumeValidation.validateEmail(normalizedValue));
+      setEmailError(resumeValidation.validateEmail(value.trim()));
     } else if (field === 'phone') {
-      setPhoneError(resumeValidation.validatePhone(normalizedValue));
+      setPhoneError(resumeValidation.validatePhone(value.trim()));
     } else if (field === 'location') {
-      setLocationError(resumeValidation.validateLocation(normalizedValue));
+      setLocationError(resumeValidation.validateLocation(value.trim()));
     } else if (field === 'linkedin') {
-      setLinkedinError(resumeValidation.validateLinkedin(normalizedValue));
+      setLinkedinError(resumeValidation.validateLinkedin(value.trim()));
     } else if (field === 'summary') {
-      setSummaryError(resumeValidation.validateSummary(normalizedValue));
+      setSummaryError(resumeValidation.validateSummary(value.trim()));
     }
 
     onChange({
@@ -420,8 +533,8 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
   };
 
   // Handle phone validation on blur
-  const handlePhoneBlur = (value: string) => {
-    setPhoneError(resumeValidation.validatePhone(value.trim()));
+  const handlePhoneBlur = () => {
+    setPhoneError(resumeValidation.validatePhone(data.personalInfo.phone));
   };
   
   // Handle email validation on blur
@@ -523,8 +636,7 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
     setAiLoading(prev => ({ ...prev, skills: true }));
     try {
       const res = await callAI('/suggest-skills', {
-        experience: data.experience,
-        education: data.education,
+        jobTitle: data.personalInfo.jobTitle,
         existingSkills: data.skills,
       });
       setSuggestedSkills(res.skills);
@@ -621,19 +733,53 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
                   error={emailError}
                   maxLength={254}
                 />
-                <Input 
-                  label="Phone"
-                  value={data.personalInfo.phone} 
-                  onChange={e => updatePersonalInfo('phone', e.target.value)} 
-                  onBlur={(e) => handlePhoneBlur(e.target.value)}
-                  placeholder="Enter phone number"
-                  error={phoneError}
-                  maxLength={30}
-                />
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-medium text-text-main">Phone</label>
+                  <div className="flex w-full">
+                    <div className="relative" ref={phoneDropdownRef}>
+                      <button
+                        type="button"
+                        onClick={() => setShowPhoneDropdown(!showPhoneDropdown)}
+                        className="h-[47px] w-[45px] px-1 border border-r-0 border-gray-300 rounded-l-lg bg-gray-50 hover:bg-gray-100 text-sm font-medium text-text-main flex items-center gap-1 transition-colors"
+                      >
+                        {data.personalInfo.countryCode || '+1'}
+                        <ChevronDown size={20} strokeWidth={4} className="text-gray-500" />
+                      </button>
+                      {showPhoneDropdown && (
+                        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto z-50 min-w-[180px]">
+                          {COUNTRY_CODES.map(c => (
+                            <button
+                              key={c.code + c.country}
+                              type="button"
+                              onClick={() => handleCountryCodeSelect(c.code)}
+                              className={`w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 transition-colors ${
+                                (data.personalInfo.countryCode || '+1') === c.code ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-700'
+                              }`}
+                            >
+                              <span>{c.country}</span>
+                              <span className="text-gray-400 ml-2">{c.code}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <input
+                      type="text"
+                      value={displayPhoneNumber()}
+                      onChange={handlePhoneInputChange}
+                      onBlur={handlePhoneBlur}
+                      placeholder="300 1234567"
+                      className="flex-1 block w-full rounded-r-lg border border-gray-300 bg-white px-4 py-2.5 text-text-main placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 shadow-sm"
+                    />
+                  </div>
+                  {phoneError && (
+                    <p className="text-sm text-red-500">{phoneError}</p>
+                  )}
+                </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-gray-800">Location</label>
+                <label className="block text-sm font-medium text-text-main">Location</label>
                 <div className="relative" ref={locationRef}>
                   <input
                     type="text"
@@ -655,7 +801,7 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
                       setShowLocationSuggestions(true);
                     }}
                     maxLength={100}
-                    className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 shadow-sm"
+                    className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-text-main placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 shadow-sm"
                   />
                   {showLocationSuggestions && (
                     <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
@@ -831,10 +977,11 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
                               {exp.description.length}/500
                             </span>
                           </div>
-                          <div className="flex flex-wrap gap-2 mt-2">
+                          <div className="flex gap-2 mt-2">
                             <Button
                               variant="outline"
                               size="sm"
+                              className="whitespace-nowrap"
                               onClick={() => generateExperienceDescription(exp.id, exp.role, exp.company)}
                               disabled={!exp.role.trim() || !exp.company.trim() || aiLoading.experiences[exp.id]}
                               icon={aiLoading.experiences[exp.id] ? <Loader2 className="animate-spin" size={16} /> : <Sparkles size={16} />}
@@ -844,6 +991,7 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
                             <Button
                               variant="outline"
                               size="sm"
+                              className="whitespace-nowrap"
                               onClick={() => improveText('experience', exp.description, exp.id)}
                               disabled={!exp.role.trim() || !exp.company.trim() || !exp.description.trim()}
                             >
@@ -1249,9 +1397,8 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
                     }
                   }}
                   disabled={isSaving}
-                  icon={isSaving ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
+                  icon={isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
                   iconPosition="left"
-                  className="px-3 py-1.5 shadow-sm text-xs h-8"
                 >
                   {isSaving ? 'Saving...' : 'Save Resume'}
                 </Button>

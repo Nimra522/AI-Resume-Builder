@@ -92,6 +92,7 @@ export interface ResumeData {
     fullName: string;
     email: string;
     phone: string;
+    countryCode?: string;
     location: string;
     website: string;
     linkedin: string;
