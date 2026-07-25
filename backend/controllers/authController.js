@@ -330,7 +330,7 @@ const updateProfile = async (req, res) => {
     }
     
     // Update allowed fields
-    const { name, fullName, username, phone, location, bio, twoFactorEnabled, profileImage } = req.body;
+    const { name, fullName, username, phone, location, bio, profileImage } = req.body;
     
     if (name || fullName) user.fullName = name || fullName;
     if (username !== undefined) user.username = username;
@@ -343,7 +343,6 @@ const updateProfile = async (req, res) => {
       user.location = location;
     }
     if (bio !== undefined) user.bio = bio;
-    if (twoFactorEnabled !== undefined) user.twoFactorEnabled = twoFactorEnabled;
     if (profileImage !== undefined) user.profileImage = profileImage; // Add profileImage handling
     
     // Update last login timestamp
@@ -389,7 +388,12 @@ const updatePassword = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: 'Current password is incorrect' });
     }
-    
+
+    // Validate new password length
+    if (!newPassword || newPassword.length < 8) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+    }
+
     // Hash new password
     const newPasswordHash = await bcrypt.hash(newPassword, 10);
     
@@ -457,80 +461,105 @@ const deleteAccount = async (req, res) => {
 
 // 7. Authentication controllers (no token required)
 const login = async (req, res) => {
-  const { email, password, twoFactorOTP } = req.body;
-  const normalizedEmail = (email || '').trim().toLowerCase();
+  try {
+    const { email, password, twoFactorOTP } = req.body;
+    const normalizedEmail = (email || '').trim().toLowerCase();
 
-  const user = await User.findOne({ email: normalizedEmail });
-  if (!user || user.authProvider !== 'email')
-    return res.status(400).json({ message: 'Invalid credentials' });
+    const user = await User.findOne({ email: normalizedEmail });
 
-  const isMatch = await bcrypt.compare(password, user.passwordHash);
-  if (!isMatch)
-    return res.status(400).json({ message: 'Invalid credentials' });
+    if (!user || user.authProvider !== 'email') {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
-  // Check if 2FA is enabled
-  if (user.twoFactorEnabled && user.twoFactorVerified) {
-    // If 2FA OTP is not provided, check if we need to generate/send OTP
-    if (!twoFactorOTP) {
-      // Only generate new OTP if none exists or expired
-      if (!user.twoFactorOTP || user.twoFactorOTPExpiry < Date.now()) {
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Check 2FA
+    if (user.twoFactorEnabled && user.twoFactorVerified) {
+
+      // First login attempt - send OTP
+      if (!twoFactorOTP) {
+
         const otp = generateOTP();
+
         user.twoFactorOTP = otp;
         user.twoFactorOTPExpiry = Date.now() + 10 * 60 * 1000;
+
         await user.save();
-        
-        console.log('🔍 About to call sendSMS from login function');
-        console.log('🔍 User phone number:', user.twoFactorPhone);
-        // Send OTP via SMS
-        const smsResult = await sendSMS(user.twoFactorPhone, `Your ResumeBuilder login code is: ${otp}. Valid for 10 minutes.`);
-        console.log('🔍 sendSMS result from login:', smsResult);
-        
+
+        const smsResult = await sendSMS(
+          user.twoFactorPhone,
+          `Your ResumeBuilder login code is: ${otp}. Valid for 10 minutes.`
+        );
+
         if (!smsResult.success) {
-          console.log('❌ sendSMS failed in login function');
-          return res.status(500).json({ 
-            message: 'Failed to send 2FA code. Please try again.' 
+          return res.status(500).json({
+            message: 'Failed to send 2FA code. Please try again.'
           });
         }
-        console.log('✅ sendSMS succeeded in login function');
+
+        return res.status(401).json({
+          message: '2FA required',
+          twoFactorRequired: true,
+          phone: user.twoFactorPhone.slice(-4)
+        });
       }
-      
-      return res.status(401).json({ 
-        message: '2FA required', 
-        twoFactorRequired: true,
-        phone: user.twoFactorPhone.slice(-4) // Return last 4 digits
-      });
+
+
+      // Verify entered OTP
+      if (user.twoFactorOTP !== twoFactorOTP) {
+        return res.status(400).json({
+          message: 'Invalid OTP'
+        });
+      }
+
+
+      // Check expiry
+      if (user.twoFactorOTPExpiry < Date.now()) {
+        return res.status(400).json({
+          message: 'OTP expired'
+        });
+      }
+
+
+      // Clear OTP
+      user.twoFactorOTP = null;
+      user.twoFactorOTPExpiry = null;
     }
-    
-    // Verify OTP
-    if (user.twoFactorOTP !== twoFactorOTP) {
-      return res.status(400).json({ message: 'Invalid OTP' });
-    }
-    
-    // Check if OTP is expired
-    if (user.twoFactorOTPExpiry < Date.now()) {
-      return res.status(400).json({ message: 'OTP expired' });
-    }
-    
-    // Clear OTP after successful verification
-    user.twoFactorOTP = null;
-    user.twoFactorOTPExpiry = null;
+
+
+    // Update login time
+    user.lastLogin = new Date();
+
+    await user.save();
+
+
+    const token = generateToken(user);
+
+    return res.status(200).json({
+      token,
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        profileImage: user.profileImage,
+        twoFactorEnabled: user.twoFactorEnabled || false
+      }
+    });
+
+
+  } catch (error) {
+
+    console.error('Login error:', error);
+
+    return res.status(500).json({
+      message: 'Server error'
+    });
+
   }
-
-  // Update last login
-  user.lastLogin = new Date();
-  await user.save();
-
-  const token = generateToken(user);
-  return res.status(200).json({ 
-    token, 
-    user: { 
-      _id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      profileImage: user.profileImage,
-      twoFactorEnabled: user.twoFactorEnabled || false
-    } 
-  });
 };
 
 const signup = async (req, res) => {
@@ -555,6 +584,11 @@ const signup = async (req, res) => {
   const existingUser = await User.findOne({ email: normalizedEmail });
   if (existingUser)
     return res.status(400).json({ message: 'User already exists' });
+
+  // Validate password length
+  if (!password || password.length < 8) {
+    return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+  }
 
   const passwordHash = await bcrypt.hash(password, 10);
 
@@ -930,8 +964,8 @@ const resetPassword = async (req, res) => {
     }
     
     // Validate new password
-    if (newPassword.length < 6) {
-      return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+    if (newPassword.length < 8) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters long' });
     }
     
     // Set new password

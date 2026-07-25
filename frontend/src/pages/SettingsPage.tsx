@@ -6,7 +6,7 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { ToggleSwitch } from '../components/ui/ToggleSwitch';
 import { DeleteAccountModal } from '../components/profile/DeleteAccountModal';
-import { Camera, User, Lock, Palette, ShieldAlert, ShieldCheck, Save, X, Loader2, UserCircle, Phone, Mail, Bell, Monitor, CreditCard, HelpCircle } from 'lucide-react';
+import { Camera, User, Lock, Palette, ShieldAlert, ShieldCheck, Save, X, Loader2, UserCircle, Phone, Mail, Monitor, CreditCard, HelpCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from '../components/layout/Navbar';
 import { useNotifications } from '../context/NotificationContext';
@@ -245,9 +245,22 @@ export const SettingsPage: React.FC = () => {
         setAccount(prev => ({ ...prev, twoFactor: false }));
       }
     } else {
-      // Disable 2FA - require current 2FA code
+      // Disable 2FA - send fresh OTP then show verification modal
       if (user.twoFactorEnabled) {
-        setTwoFADisableData({ show: true });
+        setIsUpdating2FA(true);
+        const resendResult = await resend2FAOTP();
+        if (resendResult.success) {
+          setTwoFADisableData({ show: true });
+          const msg = 'OTP sent to your phone';
+          showToast(msg, 'success');
+          addNotification(msg, 'success');
+        } else {
+          setAccount(prev => ({ ...prev, twoFactor: true }));
+          const msg = resendResult.message || 'Failed to send OTP. Please try again.';
+          showToast(msg, 'error');
+          addNotification(msg, 'error');
+        }
+        setIsUpdating2FA(false);
       } else {
         setAccount(prev => ({ ...prev, twoFactor: false }));
         const msg = '2FA is already disabled';
@@ -297,6 +310,23 @@ export const SettingsPage: React.FC = () => {
     }
     
     setIsVerifying2FA(false);
+  };
+
+  // Handle OTP resend during setup
+  const [isResendingOTP, setIsResendingOTP] = useState(false);
+  const handleResendSetupOTP = async () => {
+    setIsResendingOTP(true);
+    const result = await resend2FAOTP();
+    if (result.success) {
+      const msg = 'OTP resent successfully';
+      showToast(msg, 'success');
+      addNotification(msg, 'success');
+    } else {
+      const msg = result.message || 'Failed to resend OTP';
+      showToast(msg, 'error');
+      addNotification(msg, 'error');
+    }
+    setIsResendingOTP(false);
   };
 
   // Handle 2FA disable
@@ -546,32 +576,9 @@ export const SettingsPage: React.FC = () => {
                      <Button type="submit" isLoading={isChangingPassword} variant="outline" className="w-full shadow-sm">Update Password</Button>
                    </div>
                 </form>
-             </div>
+              </div>
 
-             {/* Notifications */}
-             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-                  <Bell size={24} className="text-indigo-600" />
-                  <h2 className="text-xl font-bold text-gray-900">Notifications</h2>
-                </div>
-
-                <div className="space-y-5">
-                   <ToggleSwitch 
-                     label="Email Notifications" 
-                     description="Receive updates via email about your account and activity."
-                     checked={true} 
-                     onChange={() => {}}
-                   />
-                   <ToggleSwitch 
-                     label="Marketing Emails" 
-                     description="Get the latest tips, tutorials, and offers."
-                     checked={false} 
-                     onChange={() => {}}
-                   />
-                </div>
-             </div>
-
-             {/* Danger Zone */}
+              {/* Danger Zone */}
              <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl border border-red-100 shadow-sm p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
                   <ShieldAlert size={24} className="text-red-500" />
@@ -630,6 +637,17 @@ export const SettingsPage: React.FC = () => {
                   maxLength={6}
                 />
                 
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={handleResendSetupOTP}
+                    disabled={isResendingOTP}
+                    className="text-sm text-primary hover:text-primary-dark underline disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isResendingOTP ? 'Resending...' : 'Resend OTP'}
+                  </button>
+                </div>
+
                 <div className="flex gap-4 pt-2">
                   <Button 
                     variant="outline" 
@@ -671,7 +689,7 @@ export const SettingsPage: React.FC = () => {
               <div className="space-y-6">
                 <Input
                   label="Current 2FA Code"
-                  placeholder="Enter 6-digit code from your app"
+                  placeholder="Enter the 6-digit code sent to your phone"
                   value={twoFADisableCode}
                   onChange={(e) => setTwoFADisableCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   maxLength={6}

@@ -14,6 +14,7 @@ export const Login: React.FC = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [twoFactorRequired, setTwoFactorRequired] = useState(false);
   const [twoFactorToken, setTwoFactorToken] = useState('');
+  const [isResendingOTP, setIsResendingOTP] = useState(false);
   const { navigate } = useLocation();
   const { login, loginWith2FA } = useAuth();
 
@@ -49,6 +50,18 @@ export const Login: React.FC = () => {
     }
     
     setIsLoading(false);
+  };
+
+  const handleResendLoginOTP = async () => {
+    setIsResendingOTP(true);
+    setError('');
+    const result = await login(formData.email, formData.password);
+    if (result.twoFactorRequired) {
+      setError('A new code has been sent to your phone');
+    } else {
+      setError(result.message || 'Failed to resend code');
+    }
+    setIsResendingOTP(false);
   };
 
   const handleGoogleLogin = () => {
@@ -107,6 +120,16 @@ export const Login: React.FC = () => {
               autoFocus
               maxLength={6}
             />
+            <div className="text-center">
+              <button 
+                type="button"
+                onClick={handleResendLoginOTP}
+                disabled={isResendingOTP}
+                className="text-sm text-primary hover:text-primary-dark underline disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isResendingOTP ? 'Resending...' : 'Resend OTP'}
+              </button>
+            </div>
             <button 
               type="button" 
               onClick={() => {

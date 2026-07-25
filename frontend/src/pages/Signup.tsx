@@ -71,8 +71,8 @@ export const Signup: React.FC = () => {
       setError("Please enter a valid email address");
       return;
     }
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters");
       return;
     }
     if (formData.password !== formData.confirmPassword) {
@@ -293,7 +293,7 @@ export const Signup: React.FC = () => {
                 <Input
                   label="Password"
                   type="password"
-                  placeholder="At least 6 characters"
+                  placeholder="At least 8 characters"
                   icon={Lock}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}

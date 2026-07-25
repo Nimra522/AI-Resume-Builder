@@ -22,7 +22,11 @@ export const LoginModal: React.FC = () => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-    const result = mode === 'login' ? await login(formData.email, formData.password) : await signup(formData.name, formData.email, formData.password);
+    const result = mode === 'login' 
+      ? await login(formData.email, formData.password) 
+      : formData.password.length < 8 
+        ? { success: false, message: 'Password must be at least 8 characters long' } 
+        : await signup(formData.name, formData.email, formData.password);
     if (result.success) {
       setIsSuccess(true);
       
