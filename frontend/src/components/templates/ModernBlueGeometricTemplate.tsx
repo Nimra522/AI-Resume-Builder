@@ -72,7 +72,7 @@ const ModernBlueGeometricComponent: React.FC<ModernBlueGeometricProps> = ({ data
   const hasAddInfo = projects.length > 0;
 
   return (
-    <div className="w-full h-full min-h-[1000px] bg-white text-gray-800 shadow-xl relative overflow-hidden">
+    <div className="w-full min-h-[1000px] bg-white text-gray-800 shadow-xl relative overflow-hidden">
       <GeometricCorner position="tr" />
       <GeometricCorner position="bl" />
 

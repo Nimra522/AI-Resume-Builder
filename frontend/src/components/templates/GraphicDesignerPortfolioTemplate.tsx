@@ -59,7 +59,7 @@ const GraphicDesignerPortfolioComponent: React.FC<GraphicDesignerPortfolioProps>
   const hasContact = personalInfo.phone || personalInfo.email || personalInfo.location || personalInfo.website || personalInfo.linkedin;
 
   return (
-    <div className="w-full h-full min-h-[1056px] bg-white text-gray-800 shadow-xl relative overflow-hidden flex">
+    <div className="w-full min-h-[1056px] bg-white text-gray-800 shadow-xl relative overflow-hidden flex">
 
       {/* Left Column — Beige */}
       <div className="w-[60%] bg-[#F5F0EB] relative z-10 flex flex-col">

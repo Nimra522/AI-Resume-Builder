@@ -40,7 +40,7 @@ const FreshGraduateModernComponent: React.FC<FreshGraduateModernProps> = ({ data
   const hasCertifications = certifications.length > 0;
 
   return (
-    <div className="w-full h-full min-h-[1000px] bg-white text-gray-700 shadow-xl relative overflow-hidden">
+    <div className="w-full min-h-[1000px] bg-white text-gray-700 shadow-xl relative overflow-hidden">
       {/* Background decorative shapes */}
       <div className="absolute top-0 right-0 w-64 h-64 opacity-[0.04] pointer-events-none">
         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">

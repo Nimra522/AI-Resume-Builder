@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
-import { ResumeForm } from '../components/resume/ResumeForm';
+import { ResumeForm, ResumeFormHandle } from '../components/resume/ResumeForm';
 import { LivePreview } from '../components/resume/LivePreview';
 import { INITIAL_RESUME_DATA, TEMPLATES } from '../data/templates';
 import { ResumeData, SavedResume } from '../types';
@@ -35,7 +35,7 @@ export const ResumeBuilder: React.FC = () => {
   const { showToast } = useToast();
   const { user, isAuthenticated, openLoginModal, updateResumeCount, verifyTemplateAccess } = useAuth();
   const previewRef = useRef<HTMLDivElement>(null);
-  const resumeFormRef = useRef<{ validate: () => { isValid: boolean } }>(null);
+  const resumeFormRef = useRef<ResumeFormHandle>(null);
   const templateDropdownRef = useRef<HTMLDivElement>(null);
   useClickOutside(templateDropdownRef, () => setShowTemplateDropdown(false));
 
@@ -235,6 +235,9 @@ export const ResumeBuilder: React.FC = () => {
     
     setIsSaving(true);
     
+    // Get the absolute latest form data (including unblurred skills)
+    const latestData = resumeFormRef.current?.getLatestData?.() || resumeData;
+    
     try {
       // Check if we're editing an existing resume
       const urlParams = new URLSearchParams(search);
@@ -242,7 +245,7 @@ export const ResumeBuilder: React.FC = () => {
       
       const requestData = {
         title: resumeTitle,
-        data: resumeData,
+        data: latestData,
         templateId: selectedTemplateId,
         resumeId: editingId // send only if editing
       };

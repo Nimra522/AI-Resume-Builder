@@ -50,7 +50,7 @@ const IsabelMercadoComponent: React.FC<IsabelMercadoProps> = ({ data }) => {
   const hasExperience = experience.length > 0;
 
   return (
-    <div className="w-full h-full min-h-[1000px] bg-[#FDFBF7] text-gray-800 shadow-xl relative overflow-hidden">
+    <div className="w-full min-h-[1000px] bg-[#FDFBF7] text-gray-800 shadow-xl relative overflow-hidden">
       {/* Abstract Overlapping Circles - Top Right */}
       <div className="absolute top-0 right-0 w-72 h-72 pointer-events-none opacity-60">
         <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">

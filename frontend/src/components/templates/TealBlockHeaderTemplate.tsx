@@ -9,9 +9,9 @@ const TealBlockHeaderTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
   return (
     <div className="w-full bg-white text-[#2A2A2A] font-['Inter',sans-serif] shadow-xl mx-auto overflow-hidden" style={{ maxWidth: '793px', minHeight: '1122px' }}>
       {/* HEADER */}
-      <div className="relative h-[180px]">
+      <div className="flex min-h-[180px]">
         {/* Left teal block */}
-        <div className="absolute left-0 top-0 bottom-0 w-[75%] bg-[#084C5A] flex items-center px-8">
+        <div className="w-[75%] bg-[#084C5A] flex items-center px-8">
           <div>
             <h1 className="text-[58px] font-extrabold text-white uppercase leading-[1.05] tracking-[0.02em]">
               {personalInfo.fullName || 'Full Name'}
@@ -22,7 +22,7 @@ const TealBlockHeaderTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
           </div>
         </div>
         {/* Right narrow teal block */}
-        <div className="absolute right-0 top-0 bottom-0 w-[12px] bg-[#084C5A]" />
+        <div className="w-[12px] bg-[#084C5A]" />
       </div>
 
       {/* SUMMARY — Full width */}

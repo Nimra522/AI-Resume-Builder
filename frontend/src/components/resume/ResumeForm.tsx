@@ -32,6 +32,7 @@ const steps = [
 
 export interface ResumeFormHandle {
   validate: () => { isValid: boolean };
+  getLatestData: () => ResumeData;
 }
 
 export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data, onChange, onSave, isSaving }, ref) => {
@@ -79,11 +80,6 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
   // Reusable validation function for both bottom save button and top save button (via ref)
   const doValidate = (): { isValid: boolean } => {
     setSaveError('');
-    // Clean skills before saving
-    const cleanedSkills = data.skills.filter(s => s.trim() !== '');
-    if (cleanedSkills.length !== data.skills.length) {
-      onChange({ ...data, skills: cleanedSkills });
-    }
 
     const { isValid, errors } = resumeValidation.validateResumeBeforeSave(data);
     
@@ -148,7 +144,11 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
 
   // Expose validate function to parent via ref
   useImperativeHandle(ref, () => ({
-    validate: doValidate
+    validate: doValidate,
+    getLatestData: () => {
+      const parsedSkills = skillsInput.split(',').map(s => s.trim()).filter(s => s !== '');
+      return { ...data, skills: parsedSkills };
+    }
   }));
 
   // AI Loading states
@@ -161,6 +161,9 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
 
   // State for suggested skills
   const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
+
+  // Local text input for skills (preserves raw typing without cursor jumping)
+  const [skillsInput, setSkillsInput] = useState(data.skills.join(', '));
 
   // State for improve text modal
   const [improveModal, setImproveModal] = useState<{
@@ -600,7 +603,15 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
 
   // Skills
   const handleSkillsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const skillsArray = e.target.value.split(',').map(s => s.trim()).filter(s => s !== '');
+    const raw = e.target.value;
+    setSkillsInput(raw);
+    // Parse immediately for real-time template preview
+    const skillsArray = raw.split(',').map(s => s.trim()).filter(s => s !== '');
+    onChange({ ...data, skills: skillsArray });
+  };
+
+  const handleSkillsBlur = () => {
+    const skillsArray = skillsInput.split(',').map(s => s.trim()).filter(s => s !== '');
     onChange({ ...data, skills: skillsArray });
   };
 
@@ -647,7 +658,9 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
 
   const addSuggestedSkill = (skill: string) => {
     if (!data.skills.includes(skill)) {
-      onChange({ ...data, skills: [...data.skills, skill] });
+      const newSkills = [...data.skills, skill];
+      onChange({ ...data, skills: newSkills });
+      setSkillsInput(newSkills.join(', '));
     }
   };
 
@@ -1140,8 +1153,9 @@ export const ResumeForm = forwardRef<ResumeFormHandle, ResumeFormProps>(({ data,
               <textarea 
                 className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
                 rows={6}
-                value={data.skills.join(', ')}
+                value={skillsInput}
                 onChange={handleSkillsChange}
+                onBlur={handleSkillsBlur}
                 placeholder="React, TypeScript, Figma, Project Management..."
               />
               <div className="mb-4">

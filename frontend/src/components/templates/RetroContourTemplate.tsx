@@ -34,7 +34,7 @@ const RetroContourComponent: React.FC<RetroContourProps> = ({ data }) => {
   const leftHasContent = hasSkills || hasSummary;
 
   return (
-    <div className="w-full h-full min-h-[1000px] bg-[#FDF8F3] text-[#3D2B1F] shadow-xl relative overflow-hidden p-7">
+    <div className="w-full min-h-[1000px] bg-[#FDF8F3] text-[#3D2B1F] shadow-xl relative overflow-hidden p-7">
       {/* Header Section */}
       <div className="relative mb-8">
         {/* Flower + Photo positioned on the left, overlapping the pill */}

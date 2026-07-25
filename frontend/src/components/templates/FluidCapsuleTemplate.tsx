@@ -62,7 +62,7 @@ const FluidCapsuleComponent: React.FC<FluidCapsuleProps> = ({ data }) => {
 
 
   return (
-    <div className="w-full h-full min-h-[1000px] bg-[#F8F7F5] text-gray-800 shadow-xl relative overflow-hidden">
+    <div className="w-full min-h-[1000px] bg-[#F8F7F5] text-gray-800 shadow-xl relative overflow-hidden">
       <DotGridCorner position="tr" />
       <DotGridCorner position="bl" />
 

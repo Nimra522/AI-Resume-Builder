@@ -39,7 +39,7 @@ const StudentProfileBannerComponent: React.FC<Props> = ({ data }) => {
       <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleUpload} />
 
       {/* Dark Charcoal Banner */}
-      <div style={{ background: CHARCOAL, height: '190px', position: 'relative', display: 'flex', alignItems: 'center', paddingLeft: '220px' }}>
+      <div style={{ background: CHARCOAL, minHeight: '190px', position: 'relative', display: 'flex', alignItems: 'center', paddingLeft: '220px' }}>
         {/* Circular Photo - overlapping top and bottom */}
         <div style={{
           position: 'absolute', left: '40px', top: '50%', transform: 'translateY(-50%)',

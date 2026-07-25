@@ -21,7 +21,7 @@ const ThreePanelBlackTimelineTemplate: React.FC<{ data: ResumeData }> = ({ data 
   return (
     <div className="w-full bg-white text-black font-['Inter',sans-serif] shadow-xl mx-auto overflow-hidden" style={{ maxWidth: '793px', minHeight: '1122px' }}>
       {/* HEADER — Three blocks */}
-      <div className="flex h-[200px]">
+      <div className="flex min-h-[200px]">
         {/* Left — Photo */}
         <input type="file" ref={fileRef} accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
         <div className="w-[200px] flex-shrink-0 overflow-hidden cursor-pointer" onClick={() => fileRef.current?.click()}>
