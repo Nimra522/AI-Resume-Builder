@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { Search, LifeBuoy, MessageCircle, BookOpen, Shield, FileText, ArrowRight } from 'lucide-react';
 import { SUPPORT_CATEGORIES, SUPPORT_FAQS } from '../data/supportData';
@@ -10,6 +11,7 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 
 export const HelpSupportPage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -65,9 +67,15 @@ export const HelpSupportPage: React.FC = () => {
                     <div className="flex-1">
                        <h3 className="text-lg font-bold text-gray-900 mb-2">Help Center</h3>
                        <p className="text-sm text-gray-500 mb-4">Browse our comprehensive guides and tutorials.</p>
-                       <button className="text-sm font-semibold text-indigo-600 flex items-center gap-1 hover:text-indigo-800">
-                         Read guides <ArrowRight size={14} />
-                       </button>
+                        <button
+                          onClick={() => {
+                            const el = document.getElementById('faq-section');
+                            el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }}
+                          className="text-sm font-semibold text-indigo-600 flex items-center gap-1 hover:text-indigo-800"
+                        >
+                          Read guides <ArrowRight size={14} />
+                        </button>
                     </div>
                  </div>
               </div>
@@ -79,10 +87,13 @@ export const HelpSupportPage: React.FC = () => {
                     </div>
                     <div className="flex-1">
                        <h3 className="text-lg font-bold text-gray-900 mb-2">Live Chat</h3>
-                       <p className="text-sm text-gray-500 mb-4">Get instant help from our support agents.</p>
-                       <button className="text-sm font-semibold text-emerald-600 flex items-center gap-1 hover:text-emerald-800">
-                         Start chat <ArrowRight size={14} />
-                       </button>
+                        <p className="text-sm text-gray-500 mb-4">Get instant help from our AI assistant.</p>
+                        <button
+                          onClick={() => window.dispatchEvent(new Event('open-ai-chat'))}
+                          className="text-sm font-semibold text-emerald-600 flex items-center gap-1 hover:text-emerald-800"
+                        >
+                          Start chat <ArrowRight size={14} />
+                        </button>
                     </div>
                  </div>
               </div>
@@ -95,9 +106,12 @@ export const HelpSupportPage: React.FC = () => {
                     <div className="flex-1">
                        <h3 className="text-lg font-bold text-gray-900 mb-2">Contact Us</h3>
                        <p className="text-sm text-gray-500 mb-4">Send us a message, we'll reply within 24 hours.</p>
-                       <button className="text-sm font-semibold text-amber-600 flex items-center gap-1 hover:text-amber-800">
-                         Contact now <ArrowRight size={14} />
-                       </button>
+                        <button
+                          onClick={() => navigate('/contact')}
+                          className="text-sm font-semibold text-amber-600 flex items-center gap-1 hover:text-amber-800"
+                        >
+                          Contact now <ArrowRight size={14} />
+                        </button>
                     </div>
                  </div>
               </div>

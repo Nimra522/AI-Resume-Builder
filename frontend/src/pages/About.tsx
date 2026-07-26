@@ -1,39 +1,39 @@
 
 import React from 'react';
 import { Link, useLocation } from '../components/layout/Navbar';
-import { 
-  Rocket, 
-  Target, 
-  FileText, 
-  ShieldCheck, 
-  LayoutGrid, 
+import {
+  Rocket,
+  Target,
+  FileText,
+  ShieldCheck,
+  LayoutGrid,
   CheckCircle2,
   Heart,
-  Zap,
   Users,
   Sparkles,
-  TrendingUp
+  TrendingUp,
+  BrainCircuit,
+  Layers
 } from 'lucide-react';
 
 export const About: React.FC = () => {
   const { navigate } = useLocation();
 
   const stats = [
-    { number: '10K+', label: 'Happy Users', icon: Users, iconColor: '#4f46e5', iconBg: '#eef2ff' },
-    { number: '15+', label: 'Templates', icon: LayoutGrid, iconColor: '#0284c7', iconBg: '#e0f2fe' },
-    { number: '50K+', label: 'Resumes Built', icon: FileText, iconColor: '#7c3aed', iconBg: '#f3e8ff' },
-    { number: '98%', label: 'Satisfaction', icon: Heart, iconColor: '#059669', iconBg: '#d1fae5' },
+    { number: '100+', label: 'Templates', icon: LayoutGrid, iconColor: '#0284c7', iconBg: '#e0f2fe' },
+    { number: 'AI', label: 'Writing Assistant', icon: BrainCircuit, iconColor: '#7c3aed', iconBg: '#f3e8ff' },
+    { number: '7', label: 'Free Templates', icon: Users, iconColor: '#4f46e5', iconBg: '#eef2ff' },
+    { number: 'PDF', label: 'Export Ready', icon: FileText, iconColor: '#059669', iconBg: '#d1fae5' },
   ];
 
   return (
     <div className="space-y-12 pb-16 bg-gray-50">
-      
+
       {/* 1. Hero Section */}
       <section className="pt-24 pb-20 bg-gradient-to-r from-gray-900 to-indigo-900 border-b border-indigo-950 text-white relative overflow-hidden">
-        {/* Background decoration */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-400/10 rounded-full blur-3xl transform -translate-x-1/3 translate-y-1/3"></div>
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-slate-700 mb-6">
@@ -41,16 +41,16 @@ export const About: React.FC = () => {
               <span className="text-xs font-semibold text-indigo-300 tracking-widest uppercase">About ResumeCraft</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
-              Empowering Your Career Journey
+              Helping You Build a Resume That Works
             </h1>
             <p className="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
-              We're on a mission to help job seekers create professional, ATS-friendly resumes that stand out from the crowd.
+              ResumeCraft combines a library of professional templates with AI-powered writing tools to help you create a resume that gets results — no design experience needed.
             </p>
           </div>
         </div>
       </section>
 
-      {/* 2. Stats Section */}
+      {/* 2. Stats / Highlights Section */}
       <section className="py-12 -mt-12 relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -81,10 +81,10 @@ export const About: React.FC = () => {
             <span className="text-xs font-semibold text-indigo-700 tracking-widest uppercase">Our Purpose</span>
           </div>
           <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
-            Why We Started This Journey
+            Why We Built ResumeCraft
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
-            We believe everyone deserves a chance to shine in their career, and a great resume is the first step.
+            Job hunting is hard enough. Your resume should not be another obstacle. We built ResumeCraft to remove the friction from creating a professional resume so you can focus on landing the role.
           </p>
         </div>
 
@@ -99,7 +99,7 @@ export const About: React.FC = () => {
             </div>
             <h3 className="font-bold text-gray-900 text-lg mb-3">Our Mission</h3>
             <p className="text-gray-600 text-sm leading-relaxed">
-              To make professional resume creation accessible to everyone, regardless of technical or design skills, by providing an intuitive platform that simplifies the resume-building process.
+              To simplify resume creation for every job seeker by combining an intuitive editor, a wide selection of templates, and AI-powered writing assistance — all in one platform.
             </p>
           </div>
 
@@ -113,7 +113,7 @@ export const About: React.FC = () => {
             </div>
             <h3 className="font-bold text-gray-900 text-lg mb-3">Our Vision</h3>
             <p className="text-gray-600 text-sm leading-relaxed">
-              To become the go-to platform for job seekers worldwide, helping them build resumes that open doors to their dream careers.
+              A world where every job seeker can present their best self on paper — without hiring a designer or wrestling with formatting tools.
             </p>
           </div>
         </div>
@@ -131,10 +131,10 @@ export const About: React.FC = () => {
               What Sets Us Apart
             </h2>
             <p className="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
-              Essential tools for creating professional resumes that get noticed.
+              Practical tools designed to make your resume stand out.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div
               className="group bg-white/10 backdrop-blur-md rounded-2xl p-8 transition-all duration-300 hover:-translate-y-2 cursor-default border border-white/10 hover:border-indigo-400/40 hover:bg-white/15 hover:shadow-2xl"
@@ -144,9 +144,9 @@ export const About: React.FC = () => {
               >
                 <LayoutGrid size={28} className="text-white" />
               </div>
-              <h3 className="font-bold text-white text-lg mb-3">Modern & Professional Templates</h3>
+              <h3 className="font-bold text-white text-lg mb-3">100+ Professional Templates</h3>
               <p className="text-indigo-100/80 text-sm leading-relaxed">
-                Choose from a variety of professionally designed templates that suit different industries and career levels.
+                Choose from a large library of professionally designed templates across free, pro, and premium tiers suitable for every industry and career level.
               </p>
             </div>
 
@@ -158,9 +158,9 @@ export const About: React.FC = () => {
               >
                 <ShieldCheck size={28} className="text-white" />
               </div>
-              <h3 className="font-bold text-white text-lg mb-3">ATS-Friendly PDF Export</h3>
+              <h3 className="font-bold text-white text-lg mb-3"> Professional PDF Export</h3>
               <p className="text-indigo-100/80 text-sm leading-relaxed">
-                Export your resume as a PDF that's optimized for Applicant Tracking Systems to ensure it gets noticed by employers.
+                Download your resume as a professionally formatted PDF, ready to share with employers and recruiters.
               </p>
             </div>
 
@@ -172,50 +172,135 @@ export const About: React.FC = () => {
               >
                 <FileText size={28} className="text-white" />
               </div>
-              <h3 className="font-bold text-white text-lg mb-3">Easy-to-Use Resume Editor</h3>
+              <h3 className="font-bold text-white text-lg mb-3">AI-Powered Writing Tools</h3>
               <p className="text-indigo-100/80 text-sm leading-relaxed">
-                Intuitive drag-and-drop interface that makes editing and customizing your resume simple and efficient.
+                Generate bullet points, rewrite experience descriptions, and get smart skill suggestions with built-in AI assistance powered by Gemini.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 5. Our Values */}
+      {/* 5. Why Choose ResumeCraft */}
       <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-50 border border-yellow-100 mb-6">
-            <Heart size={14} className="text-yellow-600" />
-            <span className="text-xs font-semibold text-yellow-700 tracking-widest uppercase">Our Values</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-50 border border-cyan-100 mb-6">
+            <Layers size={14} className="text-cyan-600" />
+            <span className="text-xs font-semibold text-cyan-700 tracking-widest uppercase">Why ResumeCraft</span>
           </div>
           <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
-            What Guides Us Every Day
+            Built for Job Seekers, by Job Seekers
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
-            The principles that shape everything we do.
+            Every feature in ResumeCraft exists to solve a real problem in the resume-building process.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { icon: Heart, title: 'Care', desc: 'We care deeply about your career success and are here to support you every step of the way.', iconColor: '#DC2626', iconBg: '#FEE2E2' },
-            { icon: CheckCircle2, title: 'Quality', desc: 'We never compromise on the quality of our service and always strive for excellence.', iconColor: '#059669', iconBg: '#D1FAE5' },
-            { icon: TrendingUp, title: 'Innovation', desc: 'We constantly improve our platform with new features to help you stay ahead in your job search.', iconColor: '#7C3AED', iconBg: '#F3E8FF' },
-          ].map((value, idx) => (
-            <div
-              key={idx}
-              className="group bg-white rounded-2xl p-8 transition-all duration-300 hover:-translate-y-2 cursor-default border border-gray-100 hover:border-indigo-200 hover:shadow-2xl"
-            >
-              <div
-                className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
-                style={{ background: value.iconBg }}
-              >
-                <value.icon size={28} color={value.iconColor} />
-              </div>
-              <h3 className="font-bold text-gray-900 text-lg mb-3">{value.title}</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">{value.desc}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="flex items-start gap-5 bg-white rounded-2xl p-7 border border-gray-100 hover:border-indigo-200 hover:shadow-lg transition-all duration-300">
+            <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0 mt-1">
+              <LayoutGrid size={22} className="text-indigo-600" />
             </div>
-          ))}
+            <div>
+              <h3 className="font-bold text-gray-900 mb-1">Start Fast with a Template</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">Pick a template that fits your style. Every template is designed to be complete and polished right from the start.</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-5 bg-white rounded-2xl p-7 border border-gray-100 hover:border-indigo-200 hover:shadow-lg transition-all duration-300">
+            <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0 mt-1">
+              <BrainCircuit size={22} className="text-purple-600" />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900 mb-1">Write Better with AI</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">Stuck on a summary or bullet point? Use the AI assistant to generate content, improving experience descriptions, and creating professional summaries.</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-5 bg-white rounded-2xl p-7 border border-gray-100 hover:border-indigo-200 hover:shadow-lg transition-all duration-300">
+            <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0 mt-1">
+              <CheckCircle2 size={22} className="text-green-600" />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900 mb-1">Form-Based Editor, No Design Skills Needed</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">Fill in your details step by step. The editor handles layout, spacing, and formatting so you do not have to touch a single CSS rule.</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-5 bg-white rounded-2xl p-7 border border-gray-100 hover:border-indigo-200 hover:shadow-lg transition-all duration-300">
+            <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0 mt-1">
+              <TrendingUp size={22} className="text-amber-600" />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900 mb-1">Professional PDF Export</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">Download your completed resume as a professionally formatted PDF that is ready to share with employers.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Our Values */}
+      <section className="py-16 bg-gradient-to-r from-gray-900 to-indigo-900 border-y border-indigo-950 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-slate-700 mb-6">
+              <Heart size={14} className="text-yellow-400" />
+              <span className="text-xs font-semibold text-yellow-300 tracking-widest uppercase">Our Values</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+              What Guides Us Every Day
+            </h2>
+            <p className="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
+              The principles that shape everything we build.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="group bg-white/10 backdrop-blur-md rounded-2xl p-8 transition-all duration-300 hover:-translate-y-2 cursor-default border border-white/10 hover:border-indigo-400/40 hover:bg-white/15 hover:shadow-2xl">
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 bg-gradient-to-br from-red-500 to-rose-600">
+                <Heart size={28} className="text-white" />
+              </div>
+              <h3 className="font-bold text-white text-lg mb-3">Care</h3>
+              <p className="text-indigo-100/80 text-sm leading-relaxed">We care about your career success and build features that genuinely help, not just impress.</p>
+            </div>
+
+            <div className="group bg-white/10 backdrop-blur-md rounded-2xl p-8 transition-all duration-300 hover:-translate-y-2 cursor-default border border-white/10 hover:border-indigo-400/40 hover:bg-white/15 hover:shadow-2xl">
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 bg-gradient-to-br from-emerald-500 to-teal-600">
+                <CheckCircle2 size={28} className="text-white" />
+              </div>
+              <h3 className="font-bold text-white text-lg mb-3">Quality</h3>
+              <p className="text-indigo-100/80 text-sm leading-relaxed">Every template and tool is crafted with attention to detail so your resume looks its best.</p>
+            </div>
+
+            <div className="group bg-white/10 backdrop-blur-md rounded-2xl p-8 transition-all duration-300 hover:-translate-y-2 cursor-default border border-white/10 hover:border-indigo-400/40 hover:bg-white/15 hover:shadow-2xl">
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 bg-gradient-to-br from-violet-500 to-purple-600">
+                <TrendingUp size={28} className="text-white" />
+              </div>
+              <h3 className="font-bold text-white text-lg mb-3">Innovation</h3>
+              <p className="text-indigo-100/80 text-sm leading-relaxed">We continuously improve the platform with new features driven by real user needs.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Final CTA */}
+      <section className="py-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="bg-gradient-to-br from-indigo-50 to-white rounded-3xl p-12 border border-indigo-100 shadow-sm">
+          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <FileText size={28} className="text-white" />
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+            Ready to Build Your Resume?
+          </h2>
+          <p className="text-gray-600 max-w-lg mx-auto mb-8 text-lg leading-relaxed">
+            No account required to get started. Pick a template and begin creating your professional resume in minutes.
+          </p>
+          <Link
+            to="/templates"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 shadow-lg"
+          >
+            Browse Templates <Rocket size={18} />
+          </Link>
         </div>
       </section>
 

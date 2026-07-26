@@ -25,10 +25,10 @@ export const PRICING_PLANS: PricingPlan[] = [
     description: 'Essential tools to build a simple resume.',
     priceMonthly: 0,
     features: [
-      '1 Resume Template',
+      '7 Resume Template',
       'Basic Writing Suggestions',
-      'Export to TXT',
-      '7-day access to history'
+      'Export Resume as PDF',
+      'Save and Manage Your Resume'
     ],
     buttonText: 'Start Free',
     buttonVariant: 'outline'
@@ -40,11 +40,10 @@ export const PRICING_PLANS: PricingPlan[] = [
     priceMonthly: 12,
     isPopular: true,
     features: [
-      'All Premium Templates',
+      'Access to Pro Templates',
       'Advanced Writing Assistance',
-      'Export to PDF & Word',
-      'Cover Letter Generator',
-      'No Branding'
+      'Export Resume as PDF',
+      'Premium Resume Designs'
     ],
     buttonText: 'Upgrade to Pro',
     buttonVariant: 'primary'
@@ -52,14 +51,13 @@ export const PRICING_PLANS: PricingPlan[] = [
   {
     id: 'premium',
     name: 'Premium',
-    description: 'Ultimate power for career growth.',
+    description: 'Unlock advanced features for creating standout resumes.',
     priceMonthly: 20,
     features: [
+      '100+ Resume Templates',
       'Everything in Pro',
-      'Resume Optimization Tips',
-      'ATS Compatibility Check',
-      'Priority Support',
-      '1-on-1 Career Coaching (1hr/mo)'
+      'Premium Templates Collection',
+      'AI Assistancefor Resume writing'
     ],
     buttonText: 'Get Premium',
     buttonVariant: 'secondary'
@@ -89,15 +87,19 @@ export const COMPARISON_FEATURES = [
 
 export const PRICING_FAQS = [
   {
-    question: "What happens to my resumes if I downgrade to Free?",
-    answer: "Your resumes will be saved, but you will only be able to edit and download the most recent one. Premium templates will be locked until you resubscribe, but your data remains safe."
+    question: "Can I upgrade my plan anytime?",
+    answer: "Yes, you can upgrade your plan anytime. Payments are securely processed through Stripe, and your account access is updated after successful payment."
   },
   {
-    question: "Do you offer a student discount?",
+    question: "How are payments processed?",
     answer: "Yes! We offer a 50% discount for students with a valid educational email address. Please contact our support team to get your unique discount code."
   },
   {
-    question: "Do you offer a refund policy?",
-    answer: "We offer a 7-day money-back guarantee. If you are not satisfied with our Pro or Premium plan, simply reach out to us within the first 7 days for a full refund."
+    question: "What happens after upgrading my plan?",
+    answer: "After successful payment, your account gets access to the templates and features included in your selected plan."
+  },
+  {
+    question: "Can I access premium templates with the Free plan?",
+    answer: "Free users can access available free templates, while Pro and Premium plans unlock additional template options."
   }
 ];

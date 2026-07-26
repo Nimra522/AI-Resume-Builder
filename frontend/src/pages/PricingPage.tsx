@@ -87,13 +87,13 @@ const lockedTemplate = templateId
         <div className="relative z-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-indigo-100 text-primary text-xs font-semibold mb-6 shadow-md animate-fade-in-up">
             <ShieldCheck size={14} />
-            <span>7-Day Money-Back Guarantee</span>
+            <span>Secure Stripe Payments</span>
           </div>
           <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
             Invest in Your <span className="text-primary">Career Success</span>
           </h1>
           <p className="text-lg text-gray-600 mb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            Choose the plan that fits your goals. Unlock premium templates, advanced features, and unlimited downloads.
+            Choose a plan that fits your needs. Access professional templates, AI-powered writing assistance, and premium features as you grow.
           </p>
         </div>
       </section>
@@ -137,10 +137,10 @@ const lockedTemplate = templateId
            
            <div className="relative z-10">
              <h2 className="text-2xl md:text-3xl font-bold mb-4">
-               Ready to land your dream job?
+               Ready to Build Your Professional Resume?
              </h2>
              <p className="text-indigo-100 text-base mb-8 max-w-xl mx-auto">
-               Join thousands of professionals who have used ResumeCraft to advance their careers. Start building for free today.
+               Start creating your resume with professional templates and powerful tools designed to simplify the process.
              </p>
              <Button 
                variant="secondary" 

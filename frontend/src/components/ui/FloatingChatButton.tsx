@@ -56,6 +56,12 @@ export const FloatingChatButton: React.FC = () => {
     };
   }, [open]);
 
+  useEffect(() => {
+    const handleOpenChat = () => setOpen(true);
+    window.addEventListener('open-ai-chat', handleOpenChat);
+    return () => window.removeEventListener('open-ai-chat', handleOpenChat);
+  }, []);
+
   const sendMessage = async (text: string) => {
     if (!text.trim()) return;
     setMessages(prev => [...prev, { sender: 'user', text }]);

@@ -71,20 +71,20 @@ export const Contact: React.FC = () => {
           
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
             <FAQItem 
-              question="How long does it take to get a response?" 
-              answer="We typically respond to all inquiries within 24 hours via email. For urgent technical issues, please check our help center resources first." 
-            />
+             question="How can I get help?"
+             answer="You can contact us through the support form, and we will review your request and provide assistance."
+            />           
             <FAQItem 
-              question="Can I request support for specific resume templates?" 
-              answer="Absolutely! If you're having trouble formatting a specific template, let us know the template name in your message and we'll guide you through it." 
+              question="Can I get help with resume templates?"
+              answer="Yes, you can mention the template name or issue in your message, and we will review your request."
             />
             <FAQItem 
               question="Do you offer live chat support?" 
-              answer="Currently, we offer email support to ensure we can provide detailed and accurate assistance. We are working on adding live chat in the near future." 
+              answer="Currently, ResumeCraft provides AI-powered assistance through the built-in chatbot. Human live chat support may be added in future updates." 
             />
             <FAQItem 
               question="Is my personal data secure?" 
-              answer="Yes, we take security seriously. All your personal information and resume data are encrypted and stored securely using industry-standard protocols." 
+              answer="We use authentication and secure database practices to protect your account information and resume data." 
             />
           </div>
         </section>

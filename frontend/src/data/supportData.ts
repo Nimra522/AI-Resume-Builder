@@ -58,13 +58,13 @@ export const SUPPORT_FAQS: SupportFAQ[] = [
     id: 'ar1',
     category: 'account-resume',
     question: 'How do I create a new resume?',
-    answer: 'Navigate to the Resume Builder page from your dashboard. Click "Create New Resume" and choose a template. Enter your personal information, work experience, education, and skills. Your resume will auto-save as you work.'
+    answer: 'Navigate to the Resume Builder page from your dashboard. Click "Create New Resume" and select a template. Add your personal information, work experience, education, and skills. Click "Save Resume" when you are ready to store your resume in your account.'
   },
   {
     id: 'ar2',
     category: 'account-resume',
     question: 'Can I edit my resume after saving?',
-    answer: 'Yes, all your resumes are fully editable at any time. Go to "My Resumes" in your dashboard, select the resume you want to edit, and click "Edit". Changes are automatically saved.'
+    answer: 'Yes, all your resumes are fully editable at any time. Go to "My Resumes" in your dashboard, select the resume you want to edit, and click "Edit". Your progress is saved locally while you work. Click "Save Resume" to permanently save your changes.'
   },
   {
     id: 'ar3',
@@ -78,7 +78,7 @@ export const SUPPORT_FAQS: SupportFAQ[] = [
     id: 'sp1',
     category: 'subscription',
     question: 'What is the difference between Free, Pro, and Premium?',
-    answer: 'Free Plan: Access to basic templates and standard features. Pro Plan ($12/month): Access to free templates plus professional pro templates. Premium Plan ($20/month): Access to all templates including exclusive designs, advanced formatting options, and priority support.'
+    answer: 'Free Plan: Access to basic templates and standard features. Pro Plan ($12/month): Access to free templates plus professional pro templates. Premium Plan ($20/month): Access to all templates.'
   },
   {
     id: 'sp2',
@@ -90,13 +90,7 @@ export const SUPPORT_FAQS: SupportFAQ[] = [
     id: 'sp3',
     category: 'subscription',
     question: 'Can I cancel my subscription anytime?',
-    answer: 'Yes, you can cancel your subscription at any time. Go to Settings > Billing and click "Cancel Subscription". Your premium features will remain active until the end of your current billing period.'
-  },
-  {
-    id: 'sp4',
-    category: 'subscription',
-    question: 'What happens if I downgrade?',
-    answer: 'When downgrading, you\'ll retain access to your current plan\'s features until the end of your billing cycle. After that, you\'ll have access to the features of your new plan. Any resumes created with premium features will remain accessible.'
+    answer: 'Subscription cancellation is not currently available from your dashboard. For any billing-related requests, please contact our support team.'
   },
 
   // Billing & Payments FAQs
@@ -116,7 +110,7 @@ export const SUPPORT_FAQS: SupportFAQ[] = [
     id: 'bp3',
     category: 'billing',
     question: 'Can I get a refund?',
-    answer: 'We offer a 7-day money-back guarantee for all subscription plans. If you\'re not satisfied, contact us within 7 days of purchase for a full refund. Please note that refunds for partial months are prorated.'
+    answer: 'Refund requests are handled on a case-by-case basis. Please contact our support team for assistance with payment-related issues.'
   }
 ];
 
