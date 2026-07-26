@@ -7,6 +7,7 @@ import { apiUrl } from '../utils/api';
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  isAuthLoading: boolean;
   user: UserProfile | null;
   token: string | null;
   login: (email: string, password: string) => Promise<{ success: boolean; message: string; twoFactorRequired?: boolean }>;
@@ -44,6 +45,7 @@ const SESSION_KEY = 'resume_ai_token';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -76,8 +78,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Check for local overrides (mocking profile updates when server persistence is limited)
         const localProfileKey = `user_profile_data_${userData._id}`;
         const localProfile = JSON.parse(localStorage.getItem(localProfileKey) || '{}');
-        // Ensure safeLocalProfile never includes plan, even if old data exists
+        // Ensure safeLocalProfile never includes plan, twoFactorEnabled, or lastLogin, even if old data exists
         delete localProfile.plan;
+        delete localProfile.twoFactorEnabled;
+        delete localProfile.lastLogin;
         const { plan: _ignoredPlan, ...safeLocalProfile } = localProfile;
 
         // Format the joined date from createdAt
@@ -98,9 +102,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           location: userData.location || safeLocalProfile.location || '',
           avatarUrl: safeLocalProfile.profileImage || userData.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.fullName.split(' ')[0]}`,
           resumeCount: savedResumes.length,
-          lastLogin: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ', Today',
+          lastLogin: userData.lastLogin ? new Date(userData.lastLogin).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Not available',
           joinedDate: joinedDate,
           autoSave: userData.autoSave !== undefined ? userData.autoSave : true,
+          twoFactorEnabled: userData.twoFactorEnabled || false,
           passwordLastChanged: userData.passwordChangedAt ? 
             new Date(userData.passwordChangedAt).toLocaleDateString('en-US', { 
               month: 'long', 
@@ -149,7 +154,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const savedToken = localStorage.getItem(SESSION_KEY);
     if (savedToken) {
       setToken(savedToken);
-      validateToken(savedToken);
+      validateToken(savedToken).finally(() => setIsAuthLoading(false));
+    } else {
+      setIsAuthLoading(false);
     }
   }, []);
 
@@ -284,7 +291,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         profileImage: result.profileImage || '', // Add profileImage to user state
         plan: normalizedPlan,
         resumeCount: savedResumes.length,
-        lastLogin: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ', Today',
+        lastLogin: result.lastLogin ? new Date(result.lastLogin).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Not available',
         joinedDate: joinedDate,
         bio: result.bio || '',
         twoFactorEnabled: result.twoFactorEnabled || false,
@@ -626,6 +633,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <AuthContext.Provider value={{
       isAuthenticated,
+      isAuthLoading,
       user,
       token,
       login,

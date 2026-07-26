@@ -21,6 +21,9 @@ const ResumeSchema = new mongoose.Schema({
   data: {
     type: mongoose.Schema.Types.Mixed,
     required: true
+  },
+  thumbnail: {
+    type: String
   }
 });
 

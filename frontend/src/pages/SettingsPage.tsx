@@ -500,14 +500,13 @@ export const SettingsPage: React.FC = () => {
                </div>
 
                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-800">Phone Number</label>
-                    <Input 
-                      value={account.phone} 
-                      onChange={e => setAccount({...account, phone: e.target.value})} 
-                      placeholder="+1 (555) 000-0000"
-                    />
-                  </div>
+                   <div className="space-y-2">
+                     <label className="text-sm font-semibold text-gray-800">Phone Number</label>
+                     <div className="block w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-text-main shadow-sm">
+                       {account.phone || <span className="text-gray-400">+1 (555) 000-0000</span>}
+                     </div>
+                     <p className="text-xs text-gray-400">This phone number is used for Two-Factor Authentication.To change it, edit your profile.</p>
+                   </div>
                   
                   <div className="border-t border-gray-100 pt-6">
                      <ToggleSwitch 
@@ -614,21 +613,21 @@ export const SettingsPage: React.FC = () => {
         {/* 2FA Setup Modal */}
         {twoFASetupData.show && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-fade-in">
-              <div className="text-center mb-8">
-                <div className="mx-auto w-20 h-20 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-full flex items-center justify-center mb-6 border border-indigo-100">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
+              <div className="text-center mb-5">
+                <div className="mx-auto w-20 h-20 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-full flex items-center justify-center mb-4 border border-indigo-100">
                   <ShieldCheck className="w-10 h-10 text-indigo-600" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900">Setup Two-Factor Authentication</h3>
-                <p className="text-gray-500 mt-3">Enter the 6-digit code sent to your phone</p>
+                <p className="text-gray-500 mt-3">Enter the 6-digit verification code to enable 2FA.</p>
               </div>
               
-              <div className="mb-8 p-5 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl text-center border border-indigo-100">
-                <p className="text-sm text-gray-600 mb-2">OTP sent to:</p>
+              <div className="mb-5 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl text-center border border-indigo-100">
+                <p className="text-sm text-gray-600 mb-2">Registered Phone Number:</p>
                 <p className="font-bold text-gray-900 text-lg">***-***-{twoFASetupData.phone?.slice(-4)}</p>
               </div>
               
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <Input
                   label="Verification Code"
                   placeholder="Enter 6-digit OTP"
@@ -636,7 +635,7 @@ export const SettingsPage: React.FC = () => {
                   onChange={(e) => setTwoFAVerifyCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   maxLength={6}
                 />
-                
+                <p className="text-xs text-gray-400 text-center">Demo Mode: OTP is available in server logs.</p>
                 <div className="text-center">
                   <button
                     type="button"

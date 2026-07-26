@@ -11,7 +11,7 @@ const isValidResumeId = (id) => typeof id === 'string' && mongoose.Types.ObjectI
 
 router.post('/save', authenticateToken, async (req, res) => {
   try {
-    const { resumeId, title, data, templateId, atsScore } = req.body;
+    const { resumeId, title, data, templateId, atsScore, thumbnail } = req.body;
     
     // Validate required title
     if (!title || !title.trim()) {
@@ -48,6 +48,10 @@ router.post('/save', authenticateToken, async (req, res) => {
       updateData.atsScore = atsScore;
     }
 
+    if (thumbnail !== undefined) {
+      updateData.thumbnail = thumbnail;
+    }
+
     let resume;
 
     if (resumeId) {
@@ -76,7 +80,7 @@ router.get('/all', authenticateToken, async (req, res) => {
   try {
     const resumes = await Resume.find(
       { user: req.user.id },
-      'title atsScore lastEdited data templateId'
+      'title atsScore lastEdited data templateId thumbnail'
     ).sort({ lastEdited: -1 });
 
     res.json(resumes);

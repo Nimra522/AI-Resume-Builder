@@ -38,6 +38,19 @@ const formatPhoneNumber = (phone) => {
 
 // Real SMS Service using Twilio
 const sendSMS = async (to, message) => {
+  // DEMO OTP Mode: log OTP to console instead of sending via Twilio
+  if (process.env.DEMO_OTP_MODE === 'true') {
+    const otp = message.match(/\d{6}/)?.[0] || 'Unknown';
+    console.log('========================================');
+    console.log('DEMO OTP MODE ENABLED');
+    console.log('Phone:', to);
+    console.log('OTP:', otp);
+    console.log('Message:', message);
+    console.log('Expiry: 10 minutes');
+    console.log('========================================');
+    return { success: true, demoMode: true };
+  }
+
   try {
     console.log('🔍 sendSMS function called with:', { to, message });
     console.log('🔍 Twilio environment variables status:');

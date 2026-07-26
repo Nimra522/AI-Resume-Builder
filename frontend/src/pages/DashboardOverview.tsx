@@ -51,19 +51,26 @@ export const DashboardOverview: React.FC = () => {
           if (response.ok) {
             const apiResumes = await response.json();
             
-            // Convert to SavedResume format
-            const formattedResumes: SavedResume[] = apiResumes.map((res: any) => ({
-              id: res._id,
-              title: res.title,
-              templateId: res.templateId,
-              lastEdited: new Date(res.lastEdited).toISOString(),
-              data: res.data
-            }));
+            // Merge API data with existing localStorage so local-only fields (e.g. thumbnail) are preserved
+            const storeKey = `saved_resumes_${user?.id || 'guest'}`;
+            const existingResumes: SavedResume[] = JSON.parse(localStorage.getItem(storeKey) || '[]');
+            const existingMap = new Map(existingResumes.map(r => [r.id, r]));
+            
+            const formattedResumes: SavedResume[] = apiResumes.map((res: any) => {
+              const existing = existingMap.get(res._id);
+              return {
+                id: res._id,
+                title: res.title,
+                templateId: res.templateId,
+                lastEdited: new Date(res.lastEdited).toISOString(),
+                data: res.data,
+                thumbnail: res.thumbnail || existing?.thumbnail
+              };
+            });
             
             // Update state and also update localStorage
             setResumes(formattedResumes);
             
-            const storeKey = `saved_resumes_${user?.id || 'guest'}`;
             localStorage.setItem(storeKey, JSON.stringify(formattedResumes));
           }
         } catch (err) {

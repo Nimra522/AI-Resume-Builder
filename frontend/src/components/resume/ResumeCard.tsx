@@ -40,17 +40,25 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({ resume, onEdit, onDelete
       
       {/* Thumbnail Area (Clickable) */}
       <div 
-        className="relative h-48 bg-gray-100 cursor-pointer overflow-hidden border-b border-gray-100"
+        className="relative aspect-[8/11] bg-gray-100 cursor-pointer overflow-hidden border-b border-gray-100 flex items-center justify-center"
         onClick={() => onEdit(resume)}
       >
-        <div className={`absolute inset-4 shadow-sm bg-white p-3 transform group-hover:scale-105 transition-transform duration-500 origin-top flex flex-col gap-2 ${getThumbnailStyle(resume.templateId)}`}>
-           {/* Abstract Lines */}
-           <div className="h-3 w-1/2 bg-current opacity-20 rounded-sm mb-2"></div>
-           <div className="h-1.5 w-full bg-current opacity-10 rounded-sm"></div>
-           <div className="h-1.5 w-5/6 bg-current opacity-10 rounded-sm"></div>
-           <div className="h-1.5 w-full bg-current opacity-10 rounded-sm"></div>
-           <div className="h-10 w-full bg-current opacity-5 rounded-sm mt-2"></div>
-        </div>
+        {resume.thumbnail ? (
+          <img
+            src={resume.thumbnail}
+            alt={resume.title}
+            className="w-full h-full object-contain object-center bg-white"
+          />
+        ) : (
+          <div className={`absolute inset-4 shadow-sm bg-white p-3 transform group-hover:scale-105 transition-transform duration-500 origin-top flex flex-col gap-2 ${getThumbnailStyle(resume.templateId)}`}>
+             {/* Abstract Lines */}
+             <div className="h-3 w-1/2 bg-current opacity-20 rounded-sm mb-2"></div>
+             <div className="h-1.5 w-full bg-current opacity-10 rounded-sm"></div>
+             <div className="h-1.5 w-5/6 bg-current opacity-10 rounded-sm"></div>
+             <div className="h-1.5 w-full bg-current opacity-10 rounded-sm"></div>
+             <div className="h-10 w-full bg-current opacity-5 rounded-sm mt-2"></div>
+          </div>
+        )}
 
         {/* Edit Overlay */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">

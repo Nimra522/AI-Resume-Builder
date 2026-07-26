@@ -243,14 +243,44 @@ export const ResumeBuilder: React.FC = () => {
       const urlParams = new URLSearchParams(search);
       const editingId = urlParams.get('edit');
       
+      // Generate thumbnail from the rendered preview before the API call
+      let thumbnail: string | undefined;
+      if (previewRef.current) {
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = 'position:absolute;left:-9999px;top:0;width:800px;height:1100px;overflow:hidden;background:white;';
+        try {
+          const clone = previewRef.current.cloneNode(true) as HTMLElement;
+          clone.style.cssText = 'width:800px;min-height:1100px;transform:none;';
+          wrapper.appendChild(clone);
+          document.body.appendChild(wrapper);
+          const canvas = await html2canvas(wrapper, {
+            scale: 1.5,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            allowTaint: true,
+            width: 800,
+            height: 1100,
+          });
+          thumbnail = canvas.toDataURL('image/jpeg', 0.75);
+        } catch (e) {
+          console.warn('Thumbnail generation failed, continuing save:', e);
+        } finally {
+          if (wrapper.parentNode) {
+            wrapper.parentNode.removeChild(wrapper);
+          }
+        }
+      }
+      
       const requestData = {
         title: resumeTitle,
         data: latestData,
         templateId: selectedTemplateId,
-        resumeId: editingId // send only if editing
+        resumeId: editingId, // send only if editing
+        thumbnail
       };
       
-      // Call backend API
+      // Call backend API (stores thumbnail on the server)
       const response = await fetch(apiUrl('/resume/save'), {
         method: 'POST',
         headers: {
@@ -282,7 +312,8 @@ export const ResumeBuilder: React.FC = () => {
         title: savedResume.title,
         templateId: savedResume.templateId,
         lastEdited: new Date(savedResume.lastEdited).toISOString(),
-        data: savedResume.data
+        data: savedResume.data,
+        thumbnail: savedResume.thumbnail || thumbnail
       };
       
       if (existingIdx >= 0) {

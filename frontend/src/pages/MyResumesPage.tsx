@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { ResumeCard } from '../components/resume/ResumeCard';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -139,32 +140,18 @@ export const MyResumesPage: React.FC = () => {
     setIsDeleting(true);
     
     try {
-      // First, try to delete from API
-      let apiSuccess = false;
-      let apiErrorOccurred = false;
-      
-      try {
-        const response = await fetch(apiUrl(`/resume/${deleteId}`), {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        apiSuccess = response.ok;
-        if (!apiSuccess) {
-          console.warn('API delete failed, falling back to local delete');
+      const response = await fetch(apiUrl(`/resume/${deleteId}`), {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('resume_ai_token')}`,
+          'Content-Type': 'application/json'
         }
-      } catch (apiError) {
-        console.warn('API call failed, falling back to local delete:', apiError);
-        apiErrorOccurred = true;
-      }
+      });
       
-      // Always update local state regardless of API success
+      if (!response.ok) throw new Error('Failed to delete resume from server');
+      
+      // Update local state and localStorage
       const updated = resumes.filter(r => r.id !== deleteId);
-      
-      // Update state and localStorage
       setResumes(updated);
       const storeKey = `saved_resumes_${user?.id || 'guest'}`;
       localStorage.setItem(storeKey, JSON.stringify(updated));
@@ -172,25 +159,16 @@ export const MyResumesPage: React.FC = () => {
       // Update resume count in auth context
       updateResumeCount();
       
-      // Reset delete state
       setDeleteId(null);
       setIsDeleting(false);
       
-      // Show appropriate message based on API result
-      if (apiSuccess || !apiErrorOccurred) {
-        showToast("Resume deleted successfully", "success");
-        addNotification("Resume deleted successfully", "success");
-      } else {
-        // API failed but local delete succeeded
-        showToast("Resume deleted locally. Sync may be required.", "warning");
-        addNotification("Resume deleted locally. Sync may be required.", "warning");
-      }
-      
+      showToast("Resume deleted successfully", "success");
+      addNotification("Resume deleted successfully", "success");
     } catch (error) {
       console.error('Delete operation failed:', error);
+      setIsDeleting(false);
       showToast("Failed to delete resume. Please try again.", "error");
       addNotification("Failed to delete resume. Please try again.", "error");
-      setIsDeleting(false);
     }
   };
 
@@ -198,90 +176,20 @@ export const MyResumesPage: React.FC = () => {
     showToast(`Preparing download for ${resume.title}...`, "info");
     addNotification(`Preparing download for ${resume.title}...`, "info");
     
-    // Create a temporary hidden div with standard resume dimensions
+    // Create a temporary off-screen container for the template render
     const tempDiv = document.createElement('div');
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-    tempDiv.style.top = '-9999px';
-    tempDiv.style.width = '800px';
-    tempDiv.style.minHeight = '1100px';
-    tempDiv.style.backgroundColor = 'white';
-    tempDiv.style.padding = '0';
-    tempDiv.style.margin = '0';
-    
-    // Create resume content container
-    const resumeContainer = document.createElement('div');
-    resumeContainer.style.width = '100%';
-    resumeContainer.style.minHeight = '1100px';
-    tempDiv.appendChild(resumeContainer);
+    tempDiv.style.cssText = 'position:absolute;left:-9999px;top:0;width:800px;min-height:1100px;background:white;';
     document.body.appendChild(tempDiv);
     
     try {
-      // Render resume content
-      resumeContainer.innerHTML = `
-        <div style="width: 100%; min-height: 1100px; font-family: system-ui, sans-serif;" data-pdf-context="true">
-          <div style="padding: 40px; color: #374151;">
-            <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="font-size: 28px; font-weight: bold; margin: 0 0 8px 0;">${resume.data.personalInfo.fullName || 'Your Name'}</h1>
-              <h2 style="font-size: 18px; color: #4f46e5; margin: 0 0 16px 0;">${resume.data.personalInfo.jobTitle || 'Job Title'}</h2>
-              <div style="font-size: 14px; color: #6b7280;">
-                ${resume.data.personalInfo.email || 'email@example.com'} | 
-                ${resume.data.personalInfo.phone || '(555) 123-4567'} | 
-                ${resume.data.personalInfo.location || 'City, State'}
-              </div>
-            </div>
-            
-            ${resume.data.personalInfo.summary ? `
-            <div style="margin-bottom: 24px;">
-              <h3 style="font-size: 16px; font-weight: bold; margin: 0 0 12px 0; text-transform: uppercase; border-bottom: 2px solid #374151; padding-bottom: 4px;">Summary</h3>
-              <p style="font-size: 14px; line-height: 1.5; margin: 0;">${resume.data.personalInfo.summary}</p>
-            </div>` : ''}
-            
-            ${resume.data.experience.length > 0 ? `
-            <div style="margin-bottom: 24px;">
-              <h3 style="font-size: 16px; font-weight: bold; margin: 0 0 12px 0; text-transform: uppercase; border-bottom: 2px solid #374151; padding-bottom: 4px;">Experience</h3>
-              ${resume.data.experience.map(exp => `
-                <div style="margin-bottom: 16px;">
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                      <h4 style="font-size: 16px; font-weight: bold; margin: 0 0 4px 0;">${exp.role}</h4>
-                      <div style="font-size: 14px; font-weight: 600; color: #4f46e5; margin: 0 0 4px 0;">${exp.company}</div>
-                    </div>
-                    <div style="font-size: 14px; color: #6b7280; text-align: right;">
-                      <div>${exp.startDate} - ${exp.endDate || 'Present'}</div>
-                    </div>
-                  </div>
-                  <p style="font-size: 14px; line-height: 1.5; margin: 8px 0 0 0;">${exp.description}</p>
-                </div>
-              `).join('')}
-            </div>` : ''}
-            
-            ${resume.data.education.length > 0 ? `
-            <div style="margin-bottom: 24px;">
-              <h3 style="font-size: 16px; font-weight: bold; margin: 0 0 12px 0; text-transform: uppercase; border-bottom: 2px solid #374151; padding-bottom: 4px;">Education</h3>
-              ${resume.data.education.map(edu => `
-                <div style="margin-bottom: 16px;">
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                      <h4 style="font-size: 16px; font-weight: bold; margin: 0 0 4px 0;">${edu.degree}</h4>
-                      <div style="font-size: 14px; font-weight: 600; color: #4f46e5; margin: 0 0 4px 0;">${edu.school}</div>
-                    </div>
-                    <div style="font-size: 14px; color: #6b7280; text-align: right;">
-                      <div>${edu.graduationDate}</div>
-                    </div>
-                  </div>
-                  ${edu.description ? `<p style="font-size: 14px; line-height: 1.5; margin: 8px 0 0 0;">${edu.description}</p>` : ''}
-                </div>
-              `).join('')}
-            </div>` : ''}
-          </div>
-        </div>
-      `;
+      // Render the actual template via LivePreview (same system as ResumeBuilder)
+      const root = createRoot(tempDiv);
+      root.render(<LivePreview data={resume.data} templateId={resume.templateId} />);
       
-      // Wait for content to fully render
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Wait for template component to fully load and render (includes lazy-loaded templates)
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Capture with exact dimensions
+      // Capture with html2canvas (same settings as ResumeBuilder)
       const canvas = await html2canvas(tempDiv, {
         scale: 2,
         useCORS: true,
@@ -293,12 +201,8 @@ export const MyResumesPage: React.FC = () => {
         scrollX: 0,
         scrollY: 0,
         onclone: (clonedDoc) => {
-          // Set PDF mode for templates that need special styling
           clonedDoc.body.setAttribute('data-pdf-mode', 'true');
-          
-          // Also add class to html element for broader detection
           clonedDoc.documentElement.classList.add('html2canvas');
-          
           const images = clonedDoc.getElementsByTagName('img');
           Array.from(images).forEach(img => {
             if (img.src) {
@@ -308,6 +212,8 @@ export const MyResumesPage: React.FC = () => {
         }
       });
       
+      root.unmount();
+      
       // Create PDF matching canvas dimensions exactly
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -315,11 +221,9 @@ export const MyResumesPage: React.FC = () => {
         format: [canvas.width, canvas.height]
       });
       
-      // Add image at 100% size
       const imgData = canvas.toDataURL('image/png');
       pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
       
-      // Save PDF
       const filename = `${resume.title.toLowerCase().replace(/\s+/g, '-')}.pdf`;
       pdf.save(filename);
       
@@ -330,7 +234,9 @@ export const MyResumesPage: React.FC = () => {
       showToast("PDF generation failed. Please try again.", "error");
       addNotification("PDF generation failed. Please try again.", "error");
     } finally {
-      document.body.removeChild(tempDiv);
+      if (tempDiv.parentNode) {
+        tempDiv.parentNode.removeChild(tempDiv);
+      }
     }
   };
 

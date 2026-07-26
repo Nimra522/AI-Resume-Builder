@@ -8,19 +8,16 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAuthLoading } = useAuth();
   const { navigate } = useLocation();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isAuthenticated) {
-        navigate('/login');
-      }
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [isAuthenticated, navigate]);
+    if (!isAuthLoading && !isAuthenticated) {
+      navigate('/login', { replace: true });
+    }
+  }, [isAuthLoading, isAuthenticated, navigate]);
 
-  if (!isAuthenticated) {
+  if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-pulse flex flex-col items-center">
@@ -29,6 +26,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         </div>
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   return <>{children}</>;

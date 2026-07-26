@@ -6,13 +6,15 @@ interface ToggleSwitchProps {
   description?: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
+  disabled?: boolean;
 }
 
 export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ 
   label, 
   description, 
   checked, 
-  onChange 
+  onChange,
+  disabled 
 }) => {
   return (
     <div className="flex items-center justify-between py-3">
@@ -24,9 +26,11 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
         type="button"
         role="switch"
         aria-checked={checked}
-        onClick={() => onChange(!checked)}
+        onClick={() => !disabled && onChange(!checked)}
+        disabled={disabled}
         className={`
-          relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+          relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+          ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           ${checked ? 'bg-primary' : 'bg-gray-200'}
         `}
       >
