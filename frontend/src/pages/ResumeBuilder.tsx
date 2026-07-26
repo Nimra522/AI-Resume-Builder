@@ -254,7 +254,7 @@ export const ResumeBuilder: React.FC = () => {
           wrapper.appendChild(clone);
           document.body.appendChild(wrapper);
           const canvas = await html2canvas(wrapper, {
-            scale: 1.5,
+            scale: 0.5,
             useCORS: true,
             backgroundColor: '#ffffff',
             logging: false,
@@ -262,7 +262,7 @@ export const ResumeBuilder: React.FC = () => {
             width: 800,
             height: 1100,
           });
-          thumbnail = canvas.toDataURL('image/jpeg', 0.75);
+          thumbnail = canvas.toDataURL('image/jpeg', 0.7);
         } catch (e) {
           console.warn('Thumbnail generation failed, continuing save:', e);
         } finally {

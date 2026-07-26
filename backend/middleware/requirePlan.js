@@ -12,7 +12,7 @@ const templateAccessMap = {
   creative: 'pro',
   tech: 'premium',
   academic: 'free',
-  compact: 'pro',
+  compact: 'free',
   elegant: 'free',
   startup: 'pro'
 };

@@ -6,7 +6,7 @@ const templateAccessMap = {
   executive: 'Free',
   creative: 'Free',
   academic: 'Free',
-  compact: 'Pro',
+  compact: 'Free',
   startup: 'Pro',
   'modern-timeline': 'Pro',
   'warm-professional': 'Pro',
