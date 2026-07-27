@@ -19,15 +19,15 @@ const experience = [
 ];
 
 const aiSuggestions = [
-  'Tailored your resume for higher ATS screening success.',
-  'Generated role-specific content to strengthen your application.',
+  'Generated a professional resume summary in seconds.',
+  'Created job-specific experience descriptions and skill suggestions.',
 ];
 
 export const HeroResumeVisual: React.FC = () => {
   const floatingCards = [
     {
-      label: 'ATS Score',
-      value: '92',
+      label: 'Templates',
+      value: '100+',
       tone: 'bg-emerald-50 text-emerald-700 border-emerald-100 shadow-emerald-100/80',
       position: 'top-right',
     },
@@ -38,8 +38,8 @@ export const HeroResumeVisual: React.FC = () => {
       position: 'bottom-left',
     },
     {
-      label: 'Resume Analysis',
-      value: '96%',
+      label: 'PDF Export',
+      value: 'Ready',
       tone: 'bg-indigo-50 text-indigo-700 border-indigo-100 shadow-indigo-100/80',
       position: 'bottom-right',
     },
