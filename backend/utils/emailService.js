@@ -1,34 +1,26 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-// Required environment variables:
-// EMAIL_USER=your_gmail_address@gmail.com
-// EMAIL_PASS=your_gmail_app_password
-// (Gmail app password: https://myaccount.google.com/apppasswords)
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html }) => {
+  console.log('Sending email via Resend:', { to, subject, htmlLength: html?.length });
 
-  console.log("Email Data:", {
-    to,
-    subject,
-    htmlLength: html?.length,
-    html
-  });
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
+  const fromAddress = process.env.EMAIL_FROM || 'onboarding@resend.dev';
+  const fromName = 'ResumeAI';
 
-  await transporter.sendMail({
-    from: `"ResumeAI" <${process.env.EMAIL_USER}>`,
+  const { data, error } = await resend.emails.send({
+    from: `"${fromName}" <${fromAddress}>`,
     to,
     subject,
     html
   });
+
+  if (error) {
+    console.error('Resend email error:', error);
+    throw error;
+  }
+
+  console.log('Email sent successfully via Resend:', data?.id);
 };
 
 module.exports = { sendEmail };
