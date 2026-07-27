@@ -24,6 +24,7 @@ import { PricingPage } from '../pages/PricingPage';
 import { UserProfilePage } from '../pages/UserProfilePage';
 import { DashboardOverview } from '../pages/DashboardOverview';
 import { HelpSupportPage } from '../pages/HelpSupportPage';
+import { ATSChecker } from '../pages/ATSChecker';
 import { PaymentSuccess } from '../pages/PaymentSuccess';
 import { PaymentCancel } from '../pages/PaymentCancel';
 import { BrowserRouter, useLocation, Link } from 'react-router-dom';
@@ -104,9 +105,10 @@ const AppRoutes: React.FC = () => {
         {pathname === '/dashboard/resumes' && <MyResumesPage />}
         {(pathname === '/dashboard/profile' || pathname === '/profile') && <UserProfilePage />}
         {pathname === '/dashboard/support' && <HelpSupportPage />}
+        {pathname === '/dashboard/ats-checker' && <ATSChecker />}
         {pathname === '/settings' && <SettingsPage />}
         {pathname.startsWith('/dashboard/') && 
-         !['/dashboard', '/dashboard/resumes', '/dashboard/profile', '/dashboard/support'].includes(pathname) &&
+         !['/dashboard', '/dashboard/resumes', '/dashboard/profile', '/dashboard/support', '/dashboard/ats-checker'].includes(pathname) &&
          <PlaceholderDashboard title={pathname.replace('/dashboard/', '').toUpperCase()} />
         }
       </ProtectedRoute>

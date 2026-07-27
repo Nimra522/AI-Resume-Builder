@@ -11,7 +11,8 @@ import {
   LogOut, 
   Menu, 
   X,
-  Bell
+  Bell,
+  FileSearch
 } from 'lucide-react';
 import LogoImage from '../../assets/Logo.png';
 import { NavItem } from '../../types';
@@ -24,6 +25,7 @@ import FloatingChatButton from '../ui/FloatingChatButton';
 const DASHBOARD_NAV: NavItem[] = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { label: 'My Resumes', path: '/dashboard/resumes', icon: FileText },
+  { label: 'ATS Checker', path: '/dashboard/ats-checker', icon: FileSearch },
   { label: 'Settings', path: '/settings', icon: Settings },
   { label: 'Help & Support', path: '/dashboard/support', icon: HelpCircle },
 ];
